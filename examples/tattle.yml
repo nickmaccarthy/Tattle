@@ -1,0 +1,21 @@
+
+Tattle:
+    alert_directory: "$TATTLE_HOME/etc/alerts"
+    report_directory: "$TATTLE_HOME/etc/reports"
+
+Elasticsearch: 
+    servers:
+        - "esh.placester.net"
+    args:   
+        port: 443
+        use_ssl: true
+        timeout: 10 
+
+Mail:
+    server: 'localhost'
+    port: 2525
+    default_sender: 'tattle@localhost'
+    subject_prefix: "Tattle Alert: "
+
+Workers:
+    pool_size: 10
