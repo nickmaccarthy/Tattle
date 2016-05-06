@@ -11,7 +11,6 @@ import elasticsearch_dsl
 from elasticsearch_dsl.aggs import AGGS 
 from datemath import datemath, dm
 import tattle 
-from tattle.search.query import Query
 from tattle.exceptions import TQLException, ESQueryException
 import re
 import json
