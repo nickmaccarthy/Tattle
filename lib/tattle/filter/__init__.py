@@ -7,7 +7,6 @@ import dateutil
 from dateutil.relativedelta import relativedelta
 from elasticsearch import Elasticsearch
 import tattle 
-from tattle.search.query import Query
 import re
 import json
 import operator
