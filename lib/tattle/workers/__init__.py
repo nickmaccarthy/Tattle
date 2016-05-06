@@ -3,7 +3,6 @@ import os
 import datetime
 import tattle
 from tattle.search import Search
-from tattle.search.query import Query
 from tattle.utils import FlattenDict
 import tattle.filter
 import tattle.alert
