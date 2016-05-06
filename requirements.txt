@@ -1,7 +1,7 @@
 arrow==0.7.0
 ecdsa==0.11
 elasticsearch==2.3.0
--e git+git@github.com:nickmaccarthy/elasticsearch-dsl-py.git@584a774bb13cc327130503671d517546a80deb04#egg=elasticsearch_dsl-master
+-e git+https://github.com/nickmaccarthy/elasticsearch-dsl-py.git@584a774bb13cc327130503671d517546a80deb04#egg=elasticsearch_dsl-master
 Fabric==1.10.2
 Flask==0.10.1
 gunicorn==19.4.5
