@@ -5,15 +5,26 @@ Tattle:
 
 Elasticsearch: 
     servers:
+<<<<<<< HEAD
         - "esh.placester.net"
     args:   
         port: 443
         use_ssl: true
+=======
+        - "escluster.yourcompany.com"
+    args:   
+        port: 9200
+        use_ssl: false
+>>>>>>> bf980734a1b49dbdb40b29c4f97d69657b3c6154
         timeout: 10 
 
 Mail:
     server: 'localhost'
+<<<<<<< HEAD
     port: 2525
+=======
+    port: 25
+>>>>>>> bf980734a1b49dbdb40b29c4f97d69657b3c6154
     default_sender: 'tattle@localhost'
     subject_prefix: "Tattle Alert: "
 
