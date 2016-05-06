@@ -1,0 +1,11 @@
+env/*
+etc/alerts/*.y*ml
+etc/tattle/*.y*ml
+etc/reports/*.y*ml
+*.pyc
+*.sw*
+var/log/*.log
+misc/*
+bin/esq_test.py*
+bin/search_test.py*
+bin/qtest.py*
