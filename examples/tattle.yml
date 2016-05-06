@@ -1,0 +1,21 @@
+
+Tattle:
+    alert_directory: "$TATTLE_HOME/etc/alerts"
+    report_directory: "$TATTLE_HOME/etc/reports"
+
+Elasticsearch: 
+    servers:
+        - "escluster.yourcompany.com"
+    args:   
+        port: 9200
+        use_ssl: false
+        timeout: 10 
+
+Mail:
+    server: 'localhost'
+    port: 25
+    default_sender: 'tattle@localhost'
+    subject_prefix: "Tattle Alert: "
+
+Workers:
+    pool_size: 10
