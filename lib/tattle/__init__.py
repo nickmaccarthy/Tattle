@@ -86,7 +86,7 @@ def dict_to_html_table(ourl):
         for l in ourl:
             table.append("<tr>")
             for h in headers:
-                table.append("<td> %s </td>" % (str(l[h])))
+                table.append("<td><pre> %s </pre></td>" % (str(l[h])))
             table.append("</tr>")
         table.append("</tbody>")
         table.append("</table>")
@@ -281,6 +281,9 @@ def pprint(obj):
     import pprint
     pp = pprint.PrettyPrinter(indent=4)
     return pp.pprint(obj)
+
+def pprint_as_json(blob):
+    return pprint_json(blob)
 
 ''' pretty prints into json '''
 def pprint_json(blob):
