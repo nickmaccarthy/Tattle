@@ -20,6 +20,7 @@ def tnd(es, alert):
     global logger
 
     should_alert = False
+    matches = None
 
     if tattle.normalize_boolean(alert.get('disabled')) == True: 
         logger.info('Alert: {} is disabled.  Moving on...'.format(alert.get('name')))
@@ -65,7 +66,6 @@ def tnd(es, alert):
         results = results_to_df([x['_source'] for x in results_hits])
     elif len(results_hits) == 0:
         results = [ {'message': 'no results found'} ]
-        #logger.info("No results found: alert: {}".format(alert['name']))
 
     if not isinstance(results, list):
         results = results.to_dict('records')
@@ -86,7 +86,6 @@ def tnd(es, alert):
             should_alert = True
     elif '_number_of_events' in alert_type:
         matches = tattle.filter.meets_total(results, results_total, alert['alert']['relation'], alert['alert']['qty'])
-        fd = FlattenDict()
         if matches:
             total, results = matches
             if alert['alert'].has_key('return_matches') and tattle.normalize_boolean(alert['alert']['return_matches']) == True:
@@ -98,17 +97,19 @@ def tnd(es, alert):
         logger.error("Alert type not found, please specify a valid alert type. Alert: {}, reason: {} is what I got".format(alert['name'], alert_type))
         return
 
-    matches = (matches, esq['intentions'])
+    if matches:
+        matches = (matches, esq['intentions'])
 
     if should_alert:
             # update the alert_triggers
-            es.index(index='tattle-int', doc_type='alert_trigger', id=alert['name'], body={'alert-name': alert['name'], '@timestamp': datetime.datetime.utcnow(), 'time': tattle.get_current_utc(), 'results': results})
+            es.index(index='tattle-int', doc_type='alert_trigger', id=alert['name'], body={'alert-name': alert['name'], '@timestamp': datetime.datetime.utcnow(), 'time': tattle.get_current_utc(), 'matches': matches[0]})
             # log the alert in tattle-int
-            es.index(index='tattle-int', doc_type='alert-fired', id=tattle.md5hash("{0}{1}".format(alert['name'], tattle.get_current_utc())), body={'alert-name': alert['name'], '@timestamp': datetime.datetime.utcnow(), 'time_unix': tattle.get_current_utc(), 'alert-results': results})
+            es.index(index='tattle-int', doc_type='alert-fired', id=tattle.md5hash("{0}{1}".format(alert['name'], tattle.get_current_utc())), body={'alert-name': alert['name'], '@timestamp': datetime.datetime.utcnow(), 'time_unix': tattle.get_current_utc(), 'alert-matches': matches[0], 'alert-args': alert})
 
             if alert['action'].has_key('email'):
                 should_email = tattle.normalize_boolean(alert['action']['email']['enabled'])
                 if should_email:
+
                     from tattle.alert import EmailAlert
                     email_alert = EmailAlert(matches=matches, alert=alert)
                     email_alert.fire()
