@@ -26,25 +26,127 @@ logger = tattle.get_logger('alert')
 
 TATTLE_HOME = os.environ['TATTLE_HOME']
 
-def make_email_body(results, ainfo):
-    template_dir = os.path.join(TATTLE_HOME, 'usr', 'share', 'templates')
-    env = Environment(loader=FileSystemLoader(template_dir))
-    template = env.get_template('email.html')
-    print type(results['results'])
-    if isinstance(results['results'], list):
-        results_table = tattle.dict_to_html_table(results['results'])
-    elif isinstance(results['results'], str):
-        results_table = results['results']
-    else:
-        results_table = "No results found"
+class AlertException(Exception):
+    pass
 
-    try:
-        rendered_html = template.render(ainfo=ainfo, results=results, results_table=results_table)
-        return rendered_html
-    except Exception as e:
-        log_msg = "Unable to render email template. <br /><b>Reason: </b>{}</br />".format(e)
-        logger.exception(log_msg)
-        return log_msg
+class AlertBase(object):
+    """ 
+        Base class for types of alerts
+    """
+    def __init__(self, **kwargs):
+        self.matches = None
+        self.alert = None
+        self.intentions = None
+        for k,v in kwargs.items():
+            setattr(self, k, v)
+        if not self.matches or not self.alert:
+            raise AlertException("Alerts require matches (dict) and alert defintion (dict)")
+        self.set_title()
+        self.matches, self.intentions = self.matches
+
+    def fire(self, **kwargs):
+        raise NotImplementedError()
+        
+    def set_title(self,):
+        if self.alert['alert'].has_key('title'):
+            self.title = self.alert['alert']['title']
+        elif self.alert.has_key('name'):
+            self.title = self.alert['name']
+        else:
+            self.title = "Not Defined"
+
+    def __repr__(self,):
+       return "<AlertClass: %s - Name: %s>" % ( self.__class__.__name__,  self.alert['name'] )
+            
+    
+class PPrintAlert(AlertBase):
+    def __init__(self, **kwargs):
+        super(PPrintAlert, self).__init__(**kwargs)
+    
+    def fire(self):
+        self.run()
+
+    def run(self):
+        print("\n\n")
+        print("-==== PPRINTED ALERT: ====-")
+        print("TITLE: {}".format(self.title))
+        print("alert defiition:")
+        tattle.pprint(self.alert)
+        print("alert matches:")
+        tattle.pprint(self.matches)
+        print("-==== END ALERT ====-")
+        print("\n\n")
+
+
+class EmailAlert(AlertBase):
+    
+    def __init__(self, **kwargs):
+        super(EmailAlert, self).__init__(**kwargs)
+
+        for k,v in self.alert['action']['email'].items():
+            if k == 'enabled': continue
+            setattr(self, k, v)
+
+        try:
+            self.server = smtplib.SMTP(mailcfg.get('host','localhost'), mailcfg.get('port', 25))
+        except Exception as e:
+            logger.exception("Unable to connect to SMTP server: reason: %s, mailcfg: %s" % (e,mailcfg))
+            
+        self.sender = kwargs.get('sender', mailcfg['default_sender'])
+        # sets our email subject
+        self.set_subject(**kwargs)
+
+        self.subject_prefix = mailcfg.get('subject_prefix', '')
+        self.subject = "{prefix}{subject}".format(prefix=self.subject_prefix, subject=self.subject)
+
+        self.email_body = self.make_email_body()
+
+        self.msg = MIMEText(self.email_body, 'html')
+        self.msg['Subject'] = self.subject
+        self.msg['From'] = self.sender
+        if not isinstance(self.to, list):
+            self.to = [self.to]
+        self.msg['To'] = ','.join(self.to)
+        if kwargs.get('cc'):
+            self.msg['cc'] = kwargs.get('cc')
+        if kwargs.get('bcc'):
+            self.msg['bcc'] = kwargs.get('bcc')
+
+    def fire(self,):
+        self.send_email()
+
+    def send_email(self,):
+            try: 
+                self.server.sendmail(self.sender, self.to, self.msg.as_string())
+                self.server.quit()
+            except Exception as e:
+                logger.exception("Unable to send email, reason: {}".format(e))
+
+    def set_subject(self, **kwargs):
+        if self.alert['action']['email'].has_key('subject'):
+            self.subject = self.alert['alert']['email']['subject']
+        else: 
+            self.subject = self.title
+
+    def make_email_body(self, ):
+        template_dir = os.path.join(TATTLE_HOME, 'usr', 'share', 'templates')
+        env = Environment(loader=FileSystemLoader(template_dir))
+        template = env.get_template('email.html')
+        if isinstance(self.matches, list):
+            results_table = tattle.dict_to_html_table(self.matches)
+        elif isinstance(self.matches, str):
+            results_table = self.matches
+        else:
+            results_table = "No results found"
+
+        try:
+            rendered_html = template.render(ainfo=self.alert, results=self.matches, intentions=self.intentions, results_table=results_table)
+            return rendered_html
+        except Exception as e:
+            log_msg = "Unable to render email template. <br /><b>Reason: </b>{}</br />".format(e)
+            logger.exception(log_msg)
+            return log_msg
+
 
 def find_in_alerts(search_id):
     for al in alerts:
@@ -68,7 +170,7 @@ def email(to, results, ainfo, **kwargs):
     msg['To'] = ','.join(to)
 
     try:
-        server = smtplib.SMTP(mailcfg.get('host','localhost'), mailcfg.get('port', 2525))
+        server = smtplib.SMTP(mailcfg.get('host','localhost'), mailcfg.get('port', 25))
         server.sendmail(sender, to, msg.as_string())
         server.quit()
     except Exception as e:
