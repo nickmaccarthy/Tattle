@@ -7,6 +7,7 @@ from tattle.utils import FlattenDict
 import tattle.filter
 import tattle.alert
 import json
+from tattle.result import results_to_df
 
 TATTLE_HOME = os.environ.get('TATTLE_HOME')
 
