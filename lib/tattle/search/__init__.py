@@ -29,7 +29,7 @@ class DSLBase(object):
         self._start = None
         self._start_time = dm('now-1m')
         self._end_time = dm('now')
-        self._exclude = ''
+        self.exclude = ''
         self._ts_field = '@timestamp'
         self._index_ts_pattern = 'YYYY.MM.DD'
         self._index_name_pattern = 'logstash-*'
@@ -183,7 +183,7 @@ class TQL(DSLBase):
 
         rangeq = elasticsearch_dsl.Q('range', **{ '{}'.format(self._ts_field) : { 'from': self._start_time.format(self._ISO_TS), 'to': self._end_time.format(self._ISO_TS)}})
         luceneq = elasticsearch_dsl.Q('query_string', query=qd['query_opts']['args'])
-        excludeq = elasticsearch_dsl.Q('query_string', query=self._exclude)
+        excludeq = elasticsearch_dsl.Q('query_string', query=self.exclude)
 
         s = elasticsearch_dsl.Search()
         s = s.source(include=qd['fields'])
