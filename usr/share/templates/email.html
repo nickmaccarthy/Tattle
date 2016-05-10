@@ -8,9 +8,9 @@
                 <strong>Severity:</strong> {{ ainfo.severity }} <br />
                 <strong>Alert Name:</strong> {{ainfo.name}}  <br />
                 <strong>Description:</strong> {{ainfo.description}} <br />
-                <strong>Query:</strong> {{results['intentions']['_query']}} <br />
+                <strong>Query:</strong> {{intentions['_query']}} <br />
                 <strong>Trigger Reason:</strong> Because <strong>{{ainfo['alert']['type']}}</strong> was <strong>{% filter upper %}{{ainfo['alert']['relation']}}{% endfilter %}</strong> to <strong>{{ainfo['alert']['qty']}}</strong> <br />
-                <strong>Times:</strong> <b>Start:</b> {{results['intentions']['_start_time']}} <b>End:</b> {{results['intentions']['_end_time']}} <br />
+                <strong>Times:</strong> <b>Start:</b> {{intentions['_start_time']}} <b>End:</b> {{intentions['_end_time']}} <br />
             </p>
             <p>
                 <strong>Results:</strong>
