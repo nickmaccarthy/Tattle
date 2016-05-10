@@ -72,6 +72,9 @@ def find_in_dict(dct, regex):
                         key2 = k
                     events_list = [k, { key1: dct[key1], key2: dct[key2] }]
                     results.append(events_list)
+                #elif re.match('.*value$', k):
+                #    events_list = [ k:v, 'key': 'omg', 'val': 'omg1' ]
+                #    results.append(events_list)]
                 else:
                     events_list = [k, {k:v}]
                     results.append(events_list)
@@ -79,6 +82,8 @@ def find_in_dict(dct, regex):
         results = None
         #logger.info("No items found in find_in_dict, dct: {}, regex: {}".format(dct, regex))
     return results
+
+
 
 ''' 
     Sets an operator object for our shorthand operator syntax
@@ -98,9 +103,28 @@ def get_operator(op):
         opr = operator.eq
     elif "ne" in op:
         opr = operator.ne
-
     return opr
     
+def findindict(dct, regex):
+    for k,v in dct.items():
+        if isinstance(v, dict):
+            return findindict(v, regex)
+        else:
+            if re.match(regex, k):
+                ret = (k,v)
+                return ret
+
+def meets_in_field(results, regex, op, number):
+    retl = []
+    opr = get_operator(op)
+    for result in results:
+        found = findindict(result, regex)
+        if found:
+            k,v = found
+            if opr(v, number):
+                retl.append(result)
+    return retl
+
 def meets_threshold(lst, op, number):
     opr = get_operator(op) 
     retl = []
@@ -109,7 +133,6 @@ def meets_threshold(lst, op, number):
         #if item[1][item_key] >= number:
         if opr(item[1][item_key], number):
             d = {}
-
             ''' normalize the key and doc count, basically strip out everything except 'key' and 'doc_count' '''
             for k,v in item[1].iteritems():
                 if 'doc_count' in k:
@@ -120,11 +143,10 @@ def meets_threshold(lst, op, number):
             retl.append(item)
     return retl
 
-def meets_total(results, operator, number):
+def meets_total(results, total, operator, number):
     ret = None
-    total = results['hits'].get('total')
+    #total = results['hits'].get('total')
     opr = get_operator(operator)
     if opr(total, number):
         return ( total, results )
-
 
