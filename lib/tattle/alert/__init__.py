@@ -34,15 +34,17 @@ class AlertBase(object):
         Base class for types of alerts
     """
     def __init__(self, **kwargs):
-        self.matches = None
-        self.alert = None
-        self.intentions = None
+        self.event_queue = None
         for k,v in kwargs.items():
             setattr(self, k, v)
-        if not self.matches or not self.alert:
-            raise AlertException("Alerts require matches (dict) and alert defintion (dict)")
+        if not self.event_queue:
+            raise AlertException("Alerts require an EventQueue")
+        self.eq = self.event_queue
+        #self.matches, self.intentions = self.matches
+        self.matches = self.eq.matches
+        self.intentions = self.eq.intentions
+        self.alert = self.eq.alert
         self.set_title()
-        self.matches, self.intentions = self.matches
 
     def fire(self, **kwargs):
         raise NotImplementedError()
@@ -67,13 +69,18 @@ class PPrintAlert(AlertBase):
         self.run()
 
     def run(self):
+        tattle.pprint(vars(self.eq))
         print("\n\n")
         print("-==== PPRINTED ALERT: ====-")
         print("TITLE: {}".format(self.title))
         print("alert defiition:")
-        tattle.pprint(self.alert)
+        tattle.pprint(self.eq.alert)
         print("alert matches:")
         tattle.pprint(self.matches)
+        print("results total:")
+        print(self.eq.count('matches'))
+        print("event queue:")
+        print(tattle.pprint(vars(self.eq)))
         print("-==== END ALERT ====-")
         print("\n\n")
 
@@ -140,7 +147,7 @@ class EmailAlert(AlertBase):
             results_table = "No results found"
 
         try:
-            rendered_html = template.render(ainfo=self.alert, results=self.matches, intentions=self.intentions, results_table=results_table)
+            rendered_html = template.render(ainfo=self.alert, results=self.matches, intentions=self.intentions, results_table=results_table, eq=self.eq)
             return rendered_html
         except Exception as e:
             log_msg = "Unable to render email template. <br /><b>Reason: </b>{}</br />".format(e)
