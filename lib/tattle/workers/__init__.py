@@ -3,14 +3,14 @@ import os
 import datetime
 import tattle
 from tattle.search import Search
-from tattle.utils import FlattenDict
+from tattle.utils import FlattenDict, EventQueue
 import tattle.filter
 import tattle.alert
 import json
 from tattle.result import results_to_df
+import random
 
 TATTLE_HOME = os.environ.get('TATTLE_HOME')
-
 
 s = Search()
 
@@ -56,9 +56,14 @@ def tnd(es, alert):
     
     if not results: return
 
+    q = EventQueue(alert=alert, results=results, intentions=esq['intentions'])
     results_hits = results['hits']['hits']
     results_aggs = results.get('aggregations')
     results_total = results['hits']['total']
+
+    q.results_hits = results_hits
+    q.results_aggs = results_aggs
+    q.results_total = results_total
 
     if results_aggs and len(results_aggs) > 0:
         results = results_to_df(results['aggregations']['terms']['buckets'])
@@ -88,8 +93,14 @@ def tnd(es, alert):
         matches = tattle.filter.meets_total(results, results_total, alert['alert']['relation'], alert['alert']['qty'])
         if matches:
             total, results = matches
-            if alert['alert'].has_key('return_matches') and tattle.normalize_boolean(alert['alert']['return_matches']) == True:
-                matches = results
+            if alert['alert'].has_key('return_matches'):
+                amatch = alert['alert']['return_matches']
+                matchlen = amatch.get('length', 10)
+                return_random = amatch.get('random', False)
+                if return_random:
+                    matches = random.sample(results, matchlen)
+                else:
+                    matches = results[0:matchlen]
             else:
                 matches = "<br />I have found a total of <b>{}</b> matches. <br /> Note: Matches not returned because 'return_matches' was false.".format(total)
             should_alert = True
@@ -98,22 +109,20 @@ def tnd(es, alert):
         return
 
     if matches:
-        matches = (matches, esq['intentions'])
+        q.matches = matches
 
     if should_alert:
             # update the alert_triggers
-            es.index(index='tattle-int', doc_type='alert_trigger', id=alert['name'], body={'alert-name': alert['name'], '@timestamp': datetime.datetime.utcnow(), 'time': tattle.get_current_utc(), 'matches': matches[0]})
+            es.index(index='tattle-int', doc_type='alert_trigger', id=alert['name'], body={'alert-name': alert['name'], '@timestamp': datetime.datetime.utcnow(), 'time': tattle.get_current_utc(), 'matches': q.matches})
             # log the alert in tattle-int
-            es.index(index='tattle-int', doc_type='alert-fired', id=tattle.md5hash("{0}{1}".format(alert['name'], tattle.get_current_utc())), body={'alert-name': alert['name'], '@timestamp': datetime.datetime.utcnow(), 'time_unix': tattle.get_current_utc(), 'alert-matches': matches[0], 'alert-args': alert})
+            es.index(index='tattle-int', doc_type='alert-fired', id=tattle.md5hash("{0}{1}".format(alert['name'], tattle.get_current_utc())), body={'alert-name': alert['name'], '@timestamp': datetime.datetime.utcnow(), 'time_unix': tattle.get_current_utc(), 'alert-matches': q.matches, 'alert-args': alert})
 
             if alert['action'].has_key('email'):
                 should_email = tattle.normalize_boolean(alert['action']['email']['enabled'])
                 if should_email:
-
                     from tattle.alert import EmailAlert
-                    email_alert = EmailAlert(matches=matches, alert=alert)
+                    email_alert = EmailAlert(event_queue=q)
                     email_alert.fire()
-                    #email_it = tattle.alert.email( alert['action']['email']['to'], {'results': matches, 'intentions': esq['intentions']}, alert, subject=email_subject ) 
                     email_it = True
                     if email_it:
                         logger.info("""msg="{0}", email_to="{1}", name="{2}", subject="{3}" """.format( "Email Sent", email_alert.to, alert['name'], email_alert.subject ))
@@ -121,7 +130,7 @@ def tnd(es, alert):
             if alert['action'].has_key('pprint'):
                 if tattle.normalize_boolean(alert['action']['pprint']['enabled']) == True:
                     from tattle.alert import PPrintAlert
-                    pp_alert = PPrintAlert(matches=matches, alert=alert)
+                    pp_alert = PPrintAlert(event_queue=q)
                     pp_alert.fire()
                     
             if alert['action'].has_key('script'):
@@ -131,6 +140,9 @@ def tnd(es, alert):
         logger.info("Nope, i would not alert. Alert: {} Reason: {} was not {} {}".format(alert['name'], alert['alert']['type'], alert['alert']['relation'], alert['alert']['qty']))
 
     return True
+
+
+
 #def tnd(es, alert):
 #    global logger
 #
