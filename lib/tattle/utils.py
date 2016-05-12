@@ -3,6 +3,10 @@ import pprint
 import re
 from collections import OrderedDict 
 import os
+from operator import itemgetter
+from datemath import datemath
+import tattle
+import random
 
 class FlattenDict(object):
 
@@ -53,3 +57,37 @@ class FlattenDict(object):
 
         return retl
 
+
+class EventQueue(object):
+
+    def __init__(self, **kwargs):
+        self.alert = None
+        self.es_results = None
+        self.matches = None 
+        self.intentions = None
+        self.results_hits = None
+        self.results_aggs = None
+        self.results_total = None
+        self.timeframe = datemath('now-1m') 
+        self.timestamp = '@timestamp'
+        self.data = (self.matches, self.es_results, self.alert)
+        for k,v in kwargs.items():
+            setattr(self, k, v)
+
+    def count(self, key='matches'):
+        #tattle.pprint(getattr(self,key))
+        return len(getattr(self, key))
+
+    def get_random(self, number, of='matches'):
+        return random.sample(getattr(self, of), number)
+
+    def duration(self, key='matches'):
+        if not self.data:
+            return datemath('now')
+        else:
+            d = getattr(self,key)
+            d = sorted(d, key=itemgetter(self.timestamp))
+            return datemath(d[-1]) - datemath(d[0])
+
+    def __repr__(self):
+        return "<EventQueue count=%s>" % ( self.count() )
