@@ -144,17 +144,90 @@ class TQL(DSLBase):
                 return our_tuple
 
     def build_agg(self,string):
-        parts = string.split(" ")
+        agg_name = None
+        order = None
+        m = None
         args = {}
-        for part in parts:
-            if ":" in part:
-                key, val = part.split(":")
-                args[key] = val
-            elif "=" in part:
-                k,v = part.split("=")
-                args[k] = v
+        agg_type, agg_args = string.split(" ", 1)
+        args = dict(re.findall('(\w+)\s*=\s*([^=]*)(?=\s+\w+\s*=\s*|$)', agg_args))
 
-        thed = { 'args': args, 'type': parts[0] }
+        # clean up commas our of the arg keys
+        args = { k.strip(','):v.strip(',') for k,v in args.items() }
+
+        if args.has_key('name') or args.has_key('title'):
+            agg_name = args.get('name') or args.get('title')
+            try:
+                del(args['name'])
+            except:
+                del(args['title'])
+
+        if args.has_key('order'):
+            args['order'] = eval(args['order'])
+
+
+        #print string
+
+        #print re.search('(\[\s*\{.*?\])', string)
+
+        ## extract our order by, etc
+        #if re.search('(\[\s*\{.*?\])', string): 
+        #    regex = '(\[\s*\{.*?\])'
+        #    m = re.search(regex,string)
+        #elif re.search('(\{.*?\})', string):
+        #    regex = '(\{.*?\})'
+        #    m = re.search(regex,string)
+
+        #if m:
+        #    order = m.group(1)
+        #    try:
+        #        order = eval(order)
+        #    except Exception as e:
+        #        msg = 'Unable to eval json into dict: %s' % (e)
+        #        logger.exception(msg)
+        #        raise Exception(msg)
+
+        #    args['order'] = order
+        #    # strip it out of the query arg
+        #    string = re.sub(regex, '', string)
+
+        #parts = string.split(" ")
+        #tattle.pprint(parts)
+        #for part in parts:
+        #    splitkey = None
+        #    if ":" in part:
+        #        splitkey = ':'
+        #    elif "=" in part:
+        #        splitkey = '='
+
+        #    if splitkey:
+        #        k,v = part.split(splitkey, 1)
+        #        # extract our order by, etc
+        #        if re.search('(\[\s*\{.*?\])', string): 
+        #            print "WTF"
+        #            regex = '(\[\s*\{.*?\])'
+        #            m = re.search(regex,string)
+        #        elif re.search('(\{.*?\})', string):
+        #            regex = '(\{.*?\})'
+        #            m = re.search(regex,string)
+
+        #        if m:
+        #            order = m.group(1)
+        #            try:
+        #                order = eval(order)
+        #            except Exception as e:
+        #                msg = 'Unable to eval json into dict: %s' % (e)
+        #                logger.exception(msg)
+        #                raise Exception(msg)
+
+        #            args['order'] = order
+        #            # strip it out of the query arg
+        #            string = re.sub(regex, '', string)
+
+        #        print string
+        #        args[k] = v
+
+        thed = { 'title': agg_name or agg_type, 'args': args, 'type': agg_type }
+        #tattle.pprint(thed)
         return thed
 
     def build_main_query(self, lquery):
@@ -189,34 +262,27 @@ class TQL(DSLBase):
         s = s.source(include=qd['fields'])
         q = elasticsearch_dsl.Q('bool', must=[luceneq,rangeq], must_not=excludeq)
         s = s.query(q)
-             
+
         # aggs
         if qd.get('aggs'):
+            aggs = qd['aggs']
             try:
-                fa = qd['aggs'][0]
-                fa_title = fa['type']
-                fa_args = fa['agg']['args']
-                agg_type = fa['agg']['type']
-                base, fname, params_def = self.get_agg(agg_type)
+                fa = aggs[0]['agg']
+                base, fname, params_def = self.get_agg(fa['type'])
                 basename = self.find_method(base)
-                aggz = getattr(s.aggs, basename)(*[fa_title,fname], **fa_args)
+                aggobj = getattr(s.aggs, basename)(*[fa['title'] , fa['type']], **fa['args'])
             except Exception as e:
-                raise TQLException("Why u no base!!? {}".format(e))
+                raise TQLException("Unable to agg base: reason: {}".format(e))
 
-            if len(qd.get('aggs')) > 1:
-                # We dont need the first agg any more, so lets delete it
-                del qd['aggs'][0]
-                # Go though each of the other aggs, and nest 'em
-                for i, agg in enumerate(qd['aggs']):
-                    i = i+1
+            if len(aggs) > 1:
+                for agg in aggs[1:]:
                     try:
-                        agg_type = agg['agg']['type']
+                        agg = agg['agg']
+                        agg_type = agg['type']
                         base, fname, params_def = self.get_agg(agg_type)
                         basename = self.find_method(base)
-                        agg_title = fname 
-                        args = agg['agg']['args']
-                        aggz = getattr(aggz, basename)(*[agg_title,fname], **args)
-                        
+                        aggobj = getattr(aggobj, basename)(*[agg['title'], fname], **agg['args'])
+
                         # todo: support pipelines
                         #if basename == 'pipeline':
                         #    print "pipeline"
@@ -226,11 +292,12 @@ class TQL(DSLBase):
                         #    aggz = getattr(aggz, basename)(*[agg_title,fname], **args)
 
                     except Exception as e:
-                        raise TQLException("Why no base in a loop??!!! {}".format(e))
+                        raise TQLException("Unable to agg base in a loop: reason: {}".format(e))
 
             s = s[self.agg_size_from:self.agg_size]
         else:
             s = s[self.hit_size_from:self.hit_size]
+
 
 
         self._esq = s
