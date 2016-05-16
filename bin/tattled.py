@@ -35,8 +35,13 @@ except Exception as e:
 #eslogger = tattle.get_logger('elasticsearch')
 #estracelogger = tattle.get_logger('elasticsearch.trace')
 
-# Creates our tattle-internal index if its not already there
-index_create = es.indices.create(index='tattle-int', ignore=400)
+# checks to see if the tattle index exists
+tattle_index = es.indices.exists(index='tattle-int')
+
+if not tattle_index:
+    # Creates our tattle-internal index if its not already there
+    index_create = es.indices.create(index='tattle-int', ignore=400)
+    logger.info('tattle index did not exist.  creating it')
 
 def worker(alert):
     try:
