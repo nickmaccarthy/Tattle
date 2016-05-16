@@ -288,7 +288,7 @@ def pprint_as_json(blob):
 ''' pretty prints into json '''
 def pprint_json(blob):
     try:
-        print simplejson.dumps(blob, sort_keys=True, indent=4, ensure_ascii=False)
+        print simplejson.dumps(blob, sort_keys=False, indent=4, ensure_ascii=False)
     except UnicodeDecodeError:
         # This blob contains non-unicode, so lets pretend it's Latin-1 to show something
         print simplejson.dumps(blob, sort_keys=True, indent=4, encoding='Latin-1', ensure_ascii=False)
