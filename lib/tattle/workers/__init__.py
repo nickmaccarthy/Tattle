@@ -57,6 +57,7 @@ def tnd(es, alert):
     if not results: return
 
     q = EventQueue(alert=alert, results=results, intentions=esq['intentions'])
+
     results_hits = results['hits']['hits']
     results_aggs = results.get('aggregations')
     results_total = results['hits']['total']
@@ -94,11 +95,15 @@ def tnd(es, alert):
         if matches:
             total, results = matches
             if alert['alert'].has_key('return_matches'):
+                # todo:  move this logic somewhere more robust
                 amatch = alert['alert']['return_matches']
                 matchlen = amatch.get('length', 10)
                 return_random = amatch.get('random', False)
                 if return_random:
-                    matches = random.sample(results, matchlen)
+                    if matchlen >= len(results):
+                        matches = results
+                    else:
+                        matches = random.sample(results, matchlen)
                 else:
                     matches = results[0:matchlen]
             else:
@@ -112,7 +117,6 @@ def tnd(es, alert):
         q.matches = matches
 
     if should_alert:
-            # update the alert_triggers
             es.index(index='tattle-int', doc_type='alert_trigger', id=alert['name'], body={'alert-name': alert['name'], '@timestamp': datetime.datetime.utcnow(), 'time': tattle.get_current_utc(), 'matches': q.matches})
             # log the alert in tattle-int
             es.index(index='tattle-int', doc_type='alert-fired', id=tattle.md5hash("{0}{1}".format(alert['name'], tattle.get_current_utc())), body={'alert-name': alert['name'], '@timestamp': datetime.datetime.utcnow(), 'time_unix': tattle.get_current_utc(), 'alert-matches': q.matches, 'alert-args': alert})
