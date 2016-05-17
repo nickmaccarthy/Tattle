@@ -1,0 +1,153 @@
+{
+  "order": 0,
+  "template": "tattle-int",
+  "settings": {
+    "index": {
+      "number_of_replicas": "3",
+      "number_of_shards": "5",
+      "refresh_interval": "5s"
+    }
+  },
+  "mappings": {
+    "_default_": {
+      "dynamic_templates": [
+        {
+          "message_field": {
+            "mapping": {
+              "index": "analyzed",
+              "omit_norms": true,
+              "fielddata": {
+                "format": "disabled"
+              },
+              "type": "string"
+            },
+            "match": "message",
+            "match_mapping_type": "string"
+          }
+        },
+        {
+          "string_fields": {
+            "mapping": {
+              "index": "analyzed",
+              "omit_norms": true,
+              "fielddata": {
+                "format": "disabled"
+              },
+              "type": "string",
+              "fields": {
+                "raw": {
+                  "index": "not_analyzed",
+                  "ignore_above": 256,
+                  "doc_values": true,
+                  "type": "string"
+                }
+              }
+            },
+            "match": "*",
+            "match_mapping_type": "string"
+          }
+        },
+        {
+          "float_fields": {
+            "mapping": {
+              "doc_values": true,
+              "type": "float"
+            },
+            "match": "*",
+            "match_mapping_type": "float"
+          }
+        },
+        {
+          "double_fields": {
+            "mapping": {
+              "doc_values": true,
+              "type": "double"
+            },
+            "match": "*",
+            "match_mapping_type": "double"
+          }
+        },
+        {
+          "byte_fields": {
+            "mapping": {
+              "doc_values": true,
+              "type": "byte"
+            },
+            "match": "*",
+            "match_mapping_type": "byte"
+          }
+        },
+        {
+          "short_fields": {
+            "mapping": {
+              "doc_values": true,
+              "type": "short"
+            },
+            "match": "*",
+            "match_mapping_type": "short"
+          }
+        },
+        {
+          "integer_fields": {
+            "mapping": {
+              "doc_values": true,
+              "type": "integer"
+            },
+            "match": "*",
+            "match_mapping_type": "integer"
+          }
+        },
+        {
+          "long_fields": {
+            "mapping": {
+              "doc_values": true,
+              "type": "long"
+            },
+            "match": "*",
+            "match_mapping_type": "long"
+          }
+        },
+        {
+          "date_fields": {
+            "mapping": {
+              "doc_values": true,
+              "type": "date"
+            },
+            "match": "*",
+            "match_mapping_type": "date"
+          }
+        },
+        {
+          "geo_point_fields": {
+            "mapping": {
+              "doc_values": true,
+              "type": "geo_point"
+            },
+            "match": "*",
+            "match_mapping_type": "geo_point"
+          }
+        }
+      ],
+      "properties": {
+        "@timestamp": {
+          "doc_values": true,
+          "type": "date"
+        },
+        "time": {
+          "doc_values": true,
+          "type": "date",
+        },
+        "@version": {
+          "index": "not_analyzed",
+          "doc_values": true,
+          "type": "string"
+        }
+      },
+      "_all": {
+        "enabled": true,
+        "omit_norms": true
+      }
+    }
+  },
+  "aliases": {}
+}
