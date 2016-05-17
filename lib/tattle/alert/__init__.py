@@ -136,7 +136,7 @@ class EmailAlert(AlertBase):
             self.subject = self.title
 
     def make_email_body(self, ):
-        template_dir = os.path.join(TATTLE_HOME, 'usr', 'share', 'templates')
+        template_dir = os.path.join(TATTLE_HOME, 'usr', 'share', 'templates', 'html')
         env = Environment(loader=FileSystemLoader(template_dir))
         template = env.get_template('email.html')
         if isinstance(self.matches, list):
@@ -213,7 +213,12 @@ def email_basic(to, subject, body, **kwargs):
     gets the previous run for an alert
 '''
 def last_run(es, alert_name):
-    res = es.search(index='tattle-int', doc_type='alert_trigger', q='alert-name:%s' % (alert_name), sort='time:desc')
+    
+    try:
+        res = es.search(index='tattle-int', doc_type='alert_trigger', q='alert-name:%s' % (alert_name), sort='time:desc')
+    except:
+        res = None
+
     if res:
         for h in res['hits']['hits']:
             return float(h['_source']['time'])
