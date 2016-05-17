@@ -1,3 +1,5 @@
+
+
 import sys
 import os
 import datetime
@@ -45,6 +47,8 @@ class DSLBase(object):
 
 
 class ESQuery(DSLBase):
+
+
     def __init__(self, query, **kwargs):
 
         super(ESQuery, self).__init__(**kwargs)
@@ -66,10 +70,10 @@ class ESQuery(DSLBase):
         except Exception as e:
             raise ESQueryException("Unable to JSON load our ES Query, reason: {}".format(e))
 
-        #tattle.pprint_json(self._esqd)
-
 
 class TQL(DSLBase):
+
+
     def __init__(self, query, **kwargs):
 
         super(TQL, self).__init__(**kwargs)
@@ -149,9 +153,14 @@ class TQL(DSLBase):
         m = None
         args = {}
         agg_type, agg_args = string.split(" ", 1)
+
+        '''
+            find any of our key=value pairs, will even match order statements and the such as well
+            examples: field=@timestamp, order=[{'_count':'desc'},{'field':'foobar'}]
+        '''
         args = dict(re.findall('(\w+)\s*=\s*([^=]*)(?=\s+\w+\s*=\s*|$)', agg_args))
 
-        # clean up commas our of the arg keys
+        # clean up commas out of the arg keys and vals
         args = { k.strip(','):v.strip(',') for k,v in args.items() }
 
         if args.has_key('name') or args.has_key('title'):
@@ -297,7 +306,6 @@ class TQL(DSLBase):
             s = s[self.agg_size_from:self.agg_size]
         else:
             s = s[self.hit_size_from:self.hit_size]
-
 
 
         self._esq = s
