@@ -37,6 +37,13 @@ except Exception as e:
 
 # checks to see if the tattle index exists
 tattle_index = es.indices.exists(index='tattle-int')
+# check to see if the tattle index template exists
+tattle_index_template = es.indices.exists_template(name='tattle-int')
+
+if not tattle_index_template:
+    with open(os.path.join(TATTLE_HOME, 'usr','share','templates','index', 'tattle-int.json'), 'r') as f:
+        template_json = f.read()
+    createit = es.indices.put_template(name='tattle-int', create=True, body=template_json)
 
 if not tattle_index:
     # Creates our tattle-internal index if its not already there
