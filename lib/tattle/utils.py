@@ -79,7 +79,12 @@ class EventQueue(object):
         return len(getattr(self, key))
 
     def get_random(self, number, of='matches'):
-        return random.sample(getattr(self, of), number)
+        items = getattr(self, of)
+        print len(items)
+        if number >= len(items):
+            return items
+        else:
+            return random.sample(items, number)
 
     def duration(self, key='matches'):
         if not self.data:
