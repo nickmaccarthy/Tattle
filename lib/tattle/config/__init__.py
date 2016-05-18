@@ -17,6 +17,10 @@ def load_yaml_file(filename):
             raise TattleYAMLLoadException("Unable to load yaml file: {}, reason: {}".format(filename, e))
     return doc
 
+def load_pd_config():
+    pdconf = load_yaml_file(os.path.join(TATTLE_HOME, 'etc', 'tattle', 'pagerduty.yml'))
+    return pdconf
+
 def load_tattle_config():
     ''' loads our tattle config '''
     tattle_conf = load_yaml_file(os.path.join(TATTLE_HOME, 'etc', 'tattle', 'tattle.yml'))
