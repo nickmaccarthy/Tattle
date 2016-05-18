@@ -20,7 +20,9 @@ tcfg = tattle.config.load_tattle_config()
 mailcfg = tcfg['Mail']
 
 from pprint import pprint
+
 import requests
+from requests.exceptions import RequestException
 
 logger = tattle.get_logger('alert')
 
@@ -57,6 +59,16 @@ class AlertBase(object):
         else:
             self.title = "Not Defined"
 
+    def create_alert_body(self, matches):
+        body = '\n----------------------------------------\n'
+        for match in matches:
+           # body += unicode(BasicMatchString(self.rule, match))
+            # Separate text of aggregated alerts with dashes
+            body += match
+        body += '\n---------------------------------------\n'
+        return body
+
+ 
     def __repr__(self,):
        return "<AlertClass: %s - Name: %s>" % ( self.__class__.__name__,  self.alert['name'] )
             
@@ -153,6 +165,67 @@ class EmailAlert(AlertBase):
             log_msg = "Unable to render email template. <br /><b>Reason: </b>{}</br />".format(e)
             logger.exception(log_msg)
             return log_msg
+
+
+class PagerDutyAlert(AlertBase):
+    
+    def __init__(self, **kwargs):
+        super(PagerDutyAlert, self).__init__(**kwargs)
+        pdcfg = tattle.config.load_pd_config()
+        
+        self.pagerduty_service_key = pdcfg['service_key']
+        self.pagerduty_client_name = pdcfg['client_name']
+        self.pagerduty_incident_key = pdcfg['incident_key']
+        self.url = 'https://events.pagerduty.com/generic/2010-04-15/create_event.json'
+
+    def make_body(self):
+        fd = tattle.utils.FlattenDict()
+        fd.kibana_nested = True
+        body = [ '\n-----------------\n']
+        body.append('Alert Info:\n')
+        #body.append(fd.flatten_dict(self.alert))
+        alertd = fd.flatten_dict(self.alert)
+        tattle.pprint(alertd)
+        for k,v in alertd.items():
+            body.append('{}: {}'.format(k,v))
+        body.append('\n')
+        body.append('Matches:\n')
+        matchd = fd.flatten_dict(self.matches)
+        for k,v in matchd.items():
+            body.append('{}: {}'.format(k,v))
+        body.append('\n')
+        body.append('\n-----------------\n')
+
+        return ''.join(body)
+    
+        #alert_info = self.alert
+        #matches = self.matches
+        #ret = { 'alert-info': self.alert, 'matches': self.matches }
+        #return json.dumps(ret)
+
+    def fire(self):
+        headers = {'content-type': 'application/json'}
+        payload = {
+            'service_key': self.pagerduty_service_key,
+            'description': self.title,
+            'event_type': 'trigger',
+            'incident_key': self.pagerduty_incident_key,
+            'client': self.pagerduty_client_name,
+            'details': {
+                'alert-info': self.alert,
+                'matches': self.matches
+                #"information": self.make_body.encode('UTF-8'),
+                #"information": self.make_body(),
+            },
+        }
+
+        try:
+            response = requests.post(self.url, data=json.dumps(payload, ensure_ascii=False), headers=headers)
+            response.raise_for_status()
+        except RequestException as e:
+            #raise RequestException("Error posting to pagerduty: %s" % e)
+            logger.error('Error posting to pagerduty: %s' % e)
+
 
 
 def find_in_alerts(search_id):
