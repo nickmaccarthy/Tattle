@@ -22,6 +22,7 @@ logger = tattle.get_logger('tattle.search.Search')
 class DSLBase(object):
     def __init__(self, **kwargs):
         self._ISO_TS = 'YYYY-MM-DDTHH:mm:ssZZ'
+        self._PRETTY_TS = 'MMM d YYYY, HH:mm:ss ZZ'
         self.agg_size_from = 0
         self.agg_size = 0
         self.hit_size_from = 0
@@ -89,6 +90,8 @@ class TQL(DSLBase):
         except TQLException, e:
             raise TQLArgsException("Unable to set arguments for TQL, I am missing: %s" % (e))
 
+        self._start_time_pretty = self._start_time.format(self._PRETTY_TS)
+        self._end_time_pretty = self._end_time.format(self._PRETTY_TS)
         self._qd = self.get_intentions(self._query_raw)
         self.build_es_query()
    
@@ -307,7 +310,6 @@ class TQL(DSLBase):
         else:
             s = s[self.hit_size_from:self.hit_size]
 
-
         self._esq = s
         self._esqd = self._esq.to_dict()
 
@@ -355,7 +357,6 @@ class Search(object):
         return returnd
 
     def tql_query(self, query, **qargs):
-
         self.set_vars(**qargs)
 
         exclude = qargs.get('exclude', '')
