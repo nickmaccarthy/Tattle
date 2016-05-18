@@ -15,8 +15,8 @@
                 <strong>Trigger Reason:</strong> Because <strong>{{ ainfo['alert']['type'] }}</strong> was <strong>{% filter upper %}{{ainfo['alert']['relation']}}{% endfilter %}</strong> to <strong>{{ainfo['alert']['qty']}}</strong> <br />
                 {% endif %}
                 <strong>Times:</strong> <br />
-                <b>Start:</b> {{intentions['_start_time']}} <br />
-                <b>End:</b> {{intentions['_end_time']}} <br />
+                &nbsp;&nbsp;<b>Start:</b> {{intentions['_start_time_pretty']}} <br />
+                &nbsp;&nbsp;<b>End:</b> {{intentions['_end_time_pretty']}} <br />
             </p>
             <p>
                 <strong>Results:</strong> </br>
