@@ -9,6 +9,7 @@ import tattle.alert
 import json
 from tattle.result import results_to_df
 import random
+from tattle.alert import EmailAlert, PPrintAlert, PagerDutyAlert
 
 TATTLE_HOME = os.environ.get('TATTLE_HOME')
 
@@ -124,7 +125,6 @@ def tnd(es, alert):
             if alert['action'].has_key('email'):
                 should_email = tattle.normalize_boolean(alert['action']['email']['enabled'])
                 if should_email:
-                    from tattle.alert import EmailAlert
                     email_alert = EmailAlert(event_queue=q)
                     email_alert.fire()
                     email_it = True
@@ -133,9 +133,13 @@ def tnd(es, alert):
 
             if alert['action'].has_key('pprint'):
                 if tattle.normalize_boolean(alert['action']['pprint']['enabled']) == True:
-                    from tattle.alert import PPrintAlert
                     pp_alert = PPrintAlert(event_queue=q)
                     pp_alert.fire()
+                
+            if alert['action'].has_key('pagerduty'):
+                pdalert = PagerDutyAlert(event_queue=q)
+                pdalert.fire()
+                logger.info("""msg="{}", name="{}" """.format("PagetDuty Alert Sent", alert['name']))
                     
             if alert['action'].has_key('script'):
                 SCRIPT_DIRS = tattle.get_bindirs(TATTLE_HOME)
@@ -144,6 +148,7 @@ def tnd(es, alert):
         logger.info("Nope, i would not alert. Alert: {} Reason: {} was not {} {}".format(alert['name'], alert['alert']['type'], alert['alert']['relation'], alert['alert']['qty']))
 
     return True
+
 
 
 
