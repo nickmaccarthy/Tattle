@@ -178,6 +178,17 @@ def relative_time_to_seconds(timestr):
 
     return interval * time_multiplier
 
+'''
+    finds an item in a dictionary, works with nested dicts too
+'''
+def find_in_dict(obj, key):
+    if key in obj: return obj[key]
+    for k, v in obj.items():
+        if isinstance(v,dict):
+            item = find_in_dict(v, key)
+            if item is not None:
+                return item
+
 
 def fd(d):
     def items():
