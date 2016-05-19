@@ -91,17 +91,17 @@ def find_in_dict(dct, regex):
 def get_operator(op):
     if not op: return None
 
-    if "ge" in op:
+    if "ge" in op or ">=" in op:
         opr = operator.__ge__
-    elif "gt" in op:
+    elif "gt" in op or ">" in op:
         opr = operator.__gt__
-    elif "le" in op:
+    elif "le" in op or "<=" in op:
         opr = operator.__le__
-    elif "lt" in op:
+    elif "lt" in op or "<" in op:
         opr = operator.__lt__
-    elif "eq" in op:
+    elif "eq" in op or "=" in op or "==" in op:
         opr = operator.eq
-    elif "ne" in op:
+    elif "ne" in op or "!=" in op or "<>" in op:
         opr = operator.ne
     return opr
     
@@ -121,7 +121,7 @@ def meets_in_field(results, regex, op, number):
         found = findindict(result, regex)
         if found:
             k,v = found
-            if opr(v, number):
+            if opr(v, number): 
                 retl.append(result)
     return retl
 
