@@ -175,7 +175,8 @@ class PagerDutyAlert(AlertBase):
         
         self.pagerduty_service_key = pdcfg['service_key']
         self.pagerduty_client_name = pdcfg['client_name']
-        self.pagerduty_incident_key = pdcfg['incident_key']
+        #self.pagerduty_incident_key = pdcfg['incident_key']
+        self.pagerduty_incident_key = tattle.make_md5(self.title)
         self.url = 'https://events.pagerduty.com/generic/2010-04-15/create_event.json'
 
     def make_body(self):
