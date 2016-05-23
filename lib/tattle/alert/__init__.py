@@ -169,15 +169,29 @@ class EmailAlert(AlertBase):
 
 class PagerDutyAlert(AlertBase):
     
-    def __init__(self, **kwargs):
+    def __init__(self, service_name, **kwargs):
         super(PagerDutyAlert, self).__init__(**kwargs)
-        pdcfg = tattle.config.load_pd_config()
-        
-        self.pagerduty_service_key = pdcfg['service_key']
-        self.pagerduty_client_name = pdcfg['client_name']
-        #self.pagerduty_incident_key = pdcfg['incident_key']
+        pdcfg = tattle.config.load_pd_config() 
+
+        # Find our config options based on our service name
+        cfg = self.get_service_args(service_name, pdcfg)
+
+        if not cfg:
+            msg = "Unable to find PagerDuty config for: {}, cannot continue.".format(service_name)
+            logger.exception(msg)   
+            raise Exception(msg)
+       
+        self.pagerduty_service_key = cfg.get('service_key')
+        self.pagerduty_client_name = cfg.get('client_name', 'Tattle')
         self.pagerduty_incident_key = tattle.make_md5(self.title)
         self.url = 'https://events.pagerduty.com/generic/2010-04-15/create_event.json'
+
+
+    def get_service_args(self, key, pdcfg):
+        for k,args in pdcfg.items():
+            if key in k:
+                #return { k:args }
+                return args
 
     def make_body(self):
         fd = tattle.utils.FlattenDict()
@@ -199,11 +213,6 @@ class PagerDutyAlert(AlertBase):
 
         return ''.join(body)
     
-        #alert_info = self.alert
-        #matches = self.matches
-        #ret = { 'alert-info': self.alert, 'matches': self.matches }
-        #return json.dumps(ret)
-
     def fire(self):
         headers = {'content-type': 'application/json'}
         payload = {
@@ -215,8 +224,6 @@ class PagerDutyAlert(AlertBase):
             'details': {
                 'alert-info': self.alert,
                 'matches': self.matches
-                #"information": self.make_body.encode('UTF-8'),
-                #"information": self.make_body(),
             },
         }
 
