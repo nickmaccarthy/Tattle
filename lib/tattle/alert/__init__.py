@@ -37,6 +37,7 @@ class AlertBase(object):
     """
     def __init__(self, **kwargs):
         self.event_queue = None
+        self.title = None
         for k,v in kwargs.items():
             setattr(self, k, v)
         if not self.event_queue:
@@ -50,9 +51,14 @@ class AlertBase(object):
 
     def fire(self, **kwargs):
         raise NotImplementedError()
-        
-    def set_title(self,):
-        if self.alert['alert'].has_key('title'):
+
+    def fire_per_match(self, **kwargs):
+        raise NotImplementedError()
+               
+    def set_title(self):
+        if self.title:
+            self.title = self.title
+        elif self.alert['alert'].has_key('title'):
             self.title = self.alert['alert']['title']
         elif self.alert.has_key('name'):
             self.title = self.alert['name']
@@ -102,22 +108,30 @@ class EmailAlert(AlertBase):
     def __init__(self, **kwargs):
         super(EmailAlert, self).__init__(**kwargs)
 
+        self.subject = None
+        self.cc = None
+        self.bcc = None
+
         for k,v in self.alert['action']['email'].items():
             if k == 'enabled': continue
             setattr(self, k, v)
 
+        self.sender = kwargs.get('sender', mailcfg['default_sender'])
+        # sets our email subject
+
+        self.subject_prefix = mailcfg.get('subject_prefix', '')
+
+        if not self.subject:
+            self.set_subject(**kwargs)
+
+
+    def connect(self):
         try:
             self.server = smtplib.SMTP(mailcfg.get('host','localhost'), mailcfg.get('port', 25))
         except Exception as e:
             logger.exception("Unable to connect to SMTP server: reason: %s, mailcfg: %s" % (e,mailcfg))
-            
-        self.sender = kwargs.get('sender', mailcfg['default_sender'])
-        # sets our email subject
-        self.set_subject(**kwargs)
 
-        self.subject_prefix = mailcfg.get('subject_prefix', '')
-        self.subject = "{prefix}{subject}".format(prefix=self.subject_prefix, subject=self.subject)
-
+    def build_msg(self):
         self.email_body = self.make_email_body()
 
         self.msg = MIMEText(self.email_body, 'html')
@@ -126,12 +140,16 @@ class EmailAlert(AlertBase):
         if not isinstance(self.to, list):
             self.to = [self.to]
         self.msg['To'] = ','.join(self.to)
-        if kwargs.get('cc'):
-            self.msg['cc'] = kwargs.get('cc')
-        if kwargs.get('bcc'):
-            self.msg['bcc'] = kwargs.get('bcc')
+        if self.cc:
+            self.msg['cc'] = self.cc
+        if self.bcc:
+            self.msg['bcc'] = self.bcc
 
-    def fire(self,):
+
+    def fire(self):
+        self.connect()
+        self.subject = "{prefix}{subject}".format(prefix=self.subject_prefix, subject=self.subject)
+        self.build_msg()
         self.send_email()
 
     def send_email(self,):
@@ -151,6 +169,11 @@ class EmailAlert(AlertBase):
         template_dir = os.path.join(TATTLE_HOME, 'usr', 'share', 'templates', 'html')
         env = Environment(loader=FileSystemLoader(template_dir))
         template = env.get_template('email.html')
+
+        # convert a single dict into a list, so it can be built with dict_to_html_table()
+        if isinstance(self.matches, dict):
+            self.matches = [ self.matches ]
+
         if isinstance(self.matches, list):
             results_table = tattle.dict_to_html_table(self.matches)
         elif isinstance(self.matches, str):
@@ -183,8 +206,9 @@ class PagerDutyAlert(AlertBase):
        
         self.pagerduty_service_key = cfg.get('service_key')
         self.pagerduty_client_name = cfg.get('client_name', 'Tattle')
-        self.pagerduty_incident_key = tattle.make_md5(self.title)
+
         self.url = 'https://events.pagerduty.com/generic/2010-04-15/create_event.json'
+
 
 
     def get_service_args(self, key, pdcfg):
@@ -214,12 +238,13 @@ class PagerDutyAlert(AlertBase):
         return ''.join(body)
     
     def fire(self):
+
         headers = {'content-type': 'application/json'}
         payload = {
             'service_key': self.pagerduty_service_key,
             'description': self.title,
             'event_type': 'trigger',
-            'incident_key': self.pagerduty_incident_key,
+            'incident_key': tattle.make_md5(self.title),
             'client': self.pagerduty_client_name,
             'details': {
                 'alert-info': self.alert,
