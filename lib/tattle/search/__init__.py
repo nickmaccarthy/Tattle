@@ -90,6 +90,8 @@ class TQL(DSLBase):
         except TQLException, e:
             raise TQLArgsException("Unable to set arguments for TQL, I am missing: %s" % (e))
 
+        self._start_time_iso_str = self._start_time.format(self._ISO_TS)
+        self._end_time_iso_str = self._end_time.format(self._ISO_TS)
         self._start_time_pretty = self._start_time.format(self._PRETTY_TS)
         self._end_time_pretty = self._end_time.format(self._PRETTY_TS)
         self._qd = self.get_intentions(self._query_raw)
