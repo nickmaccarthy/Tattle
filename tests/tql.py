@@ -1,4 +1,3 @@
-#!/usr/local/bin/python
 import sys
 import os
 import re
@@ -12,14 +11,20 @@ os.environ['TATTLE_HOME'] = str(TATTLE_HOME)
 
 sys.path.append(os.path.join(TATTLE_HOME, 'lib'))
 sys.path.append(os.path.join(TATTLE_HOME))
+sys.path.append(os.path.join('.'))
 
 import unittest
 
 from elasticsearch import Elasticsearch
+import pandas as pd
+
 import tattle
 import tattle.workers
 import tattle.config
 from tattle.search import Search
+from tattle.result import results_to_df
+from tattle.utils import EventQueue
+
 
 s = Search()
 
@@ -241,6 +246,35 @@ class TestTQL(unittest.TestCase):
                 }
         """
         self.assertEqual(tqlq['esquery'], json.loads(expected)) 
+
+    def testSingleAggResults(self):
+        from results import single_agg
+        results = json.loads(single_agg)
+        buckets = tattle.find_in_dict(results, 'buckets')
+
+        self.assertFalse(buckets)
+        self.assertTrue(isinstance(results, dict))
+
+    def testDoubleBucketedAgg(self):
+        from results import tripple_nested_agg, nested_terms_agg
+        r1 = json.loads(nested_terms_agg)
+        r2 = json.loads(tripple_nested_agg)
+        
+        q = EventQueue(results=r1)
+        q2 = EventQueue(results=r2)
+
+        self.assertTrue(tattle.find_in_dict(r1, 'buckets'))
+        self.assertTrue(tattle.find_in_dict(r2, 'buckets'))
+        
+        r1key = q.results_aggs.keys()[0]
+        r2key = q2.results_aggs.keys()[0]
+
+        rdf1 = results_to_df(q.results_aggs[r1key]['buckets'])
+        rdf2 = results_to_df(q2.results_aggs[r2key]['buckets'])
+
+        self.assertTrue(isinstance(rdf1, pd.DataFrame))
+        self.assertTrue(isinstance(rdf2, pd.DataFrame)) 
+
 
 if __name__ == "__main__":
     unittest.main()
