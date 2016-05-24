@@ -63,6 +63,7 @@ class EventQueue(object):
     def __init__(self, **kwargs):
         self.alert = None
         self.es_results = None
+        self.results = None
         self.matches = None 
         self.intentions = None
         self.results_hits = None
@@ -73,14 +74,30 @@ class EventQueue(object):
         self.data = (self.matches, self.es_results, self.alert)
         for k,v in kwargs.items():
             setattr(self, k, v)
+        self.results_hits = self.get_results_hits()
+        self.results_aggs = self.get_results_aggs()
+        self.results_total = self.get_results_total()
+
+    def get_results_hits(self):
+        if self.results is not None and isinstance(self.results, dict) and self.results.get('hits'):
+            return self.results['hits'].get('hits')
+        return 0
+
+    def get_results_aggs(self):
+        if isinstance(self.results, dict) and self.results.get('aggregations'):
+            return self.results.get('aggregations')
+        return None
+
+    def get_results_total(self):
+        if isinstance(self.results, dict) and self.results.get('hits'):
+            return self.results['hits'].get('total', 0)
+        return 0
 
     def count(self, key='matches'):
-        #tattle.pprint(getattr(self,key))
         return len(getattr(self, key))
 
     def get_random(self, number, of='matches'):
         items = getattr(self, of)
-        print len(items)
         if number >= len(items):
             return items
         else:
