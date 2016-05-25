@@ -135,7 +135,13 @@
         },
         "time": {
           "doc_values": true,
-          "type": "date",
+          "type": "date"
+        },
+        "matches": {
+          "type": "object"
+        },
+        "results": {
+          "type": "object"
         },
         "@version": {
           "index": "not_analyzed",
