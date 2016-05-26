@@ -43,7 +43,7 @@ if not tattle_index_template:
     with open(os.path.join(TATTLE_HOME, 'usr','share','templates','index', 'tattle-int.json'), 'r') as f:
         template_json = f.read()
     createit = es.indices.put_template(name='tattle-int', create=True, body=template_json)
-    logger.info('Tattle index mappgin for  tattle-int  did not exist, so I created it')
+    logger.info('Tattle index mapping for tattle-int did not exist, so I created it')
     
 
 if not tattle_index:
