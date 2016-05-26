@@ -35,7 +35,7 @@ def tnd(es, alert):
 
     realert_threshold = tattle.relative_time_to_seconds(alert['alert']['realert'])
 
-    logger.info('last alert for %s was %s' % ( alert['name'], tattle.epoch2iso(tattle.alert.last_run(es, alert['name']))))
+    logger.debug('last alert for %s was %s' % ( alert['name'], tattle.epoch2iso(tattle.alert.last_run(es, alert['name']))))
 
     if tattle.alert.last_run(es, alert['name']) > 0:
         last_run = tattle.alert.last_run(es, alert['name'])
