@@ -137,10 +137,20 @@
           "doc_values": true,
           "type": "date"
         },
+        "alert-info": {
+          "enabled": false,
+          "type": "object"
+        },
+        "alert-args": {
+          "enabled": false,
+          "type": "object"
+        },
         "matches": {
+          "enabled": false,
           "type": "object"
         },
         "results": {
+          "enabled": false,
           "type": "object"
         },
         "@version": {
