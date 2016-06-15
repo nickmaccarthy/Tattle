@@ -36,10 +36,14 @@ def tnd(es, alert):
     realert_threshold = tattle.relative_time_to_seconds(alert['alert']['realert'])
 
     logger.debug('last alert for %s was %s' % ( alert['name'], tattle.epoch2iso(tattle.alert.last_run(es, alert['name']))))
-
-    if tattle.alert.last_run(es, alert['name']) > 0:
-        last_run = tattle.alert.last_run(es, alert['name'])
-        time_since = ( tattle.get_current_time_local() - tattle.alert.last_run(es, alert['name']))
+    
+    last_run = tattle.alert.last_run(es, alert['name']) 
+    if last_run is None:
+        logger.info("Last run was None for: %s.  This is the first time we have seen it." % (alert['name']))
+        last_run = 100000000
+    
+    if last_run > 0:
+        time_since = ( tattle.get_current_time_local() - last_run )
         if time_since <= realert_threshold: 
             # No need to go any further, we havent hit our threshold yet
             logger.info("Alert is within re-alert threshold.  Name: {}, re-alert threshold: {}, last run: {}, human: {}".format(alert['name'], alert['alert']['realert'], last_run, tattle.humanize_ts(last_run)))
@@ -156,9 +160,11 @@ def tnd(es, alert):
         q.matches = matches
 
     if should_alert:
-            es.index(index='tattle-int', doc_type='alert_trigger', id=alert['name'], body={'alert-name': alert['name'], '@timestamp': datetime.datetime.utcnow(), 'time': tattle.get_current_utc(), 'matches': q.matches})
+            #es.index(index='tattle-int', doc_type='alert_trigger', id=alert['name'], body={'alert-name': alert['name'], '@timestamp': datetime.datetime.utcnow(), 'time': tattle.get_current_utc(), 'matches': q.matches})
+            es.index(index='tattle-int', doc_type='alert_trigger', id=alert['name'], body={'alert-name': alert['name'], '@timestamp': datetime.datetime.utcnow(), 'time': tattle.get_current_utc()})
             # log the alert in tattle-int
-            es.index(index='tattle-int', doc_type='alert-fired', id=tattle.md5hash("{0}{1}".format(alert['name'], tattle.get_current_utc())), body={'alert-name': alert['name'], '@timestamp': datetime.datetime.utcnow(), 'time_unix': tattle.get_current_utc(), 'alert-matches': q.matches, 'alert-args': alert})
+            #es.index(index='tattle-int', doc_type='alert-fired', id=tattle.md5hash("{0}{1}".format(alert['name'], tattle.get_current_utc())), body={'alert-name': alert['name'], '@timestamp': datetime.datetime.utcnow(), 'time_unix': tattle.get_current_utc(), 'alert-matches': q.matches, 'alert-args': alert})
+            es.index(index='tattle-int', doc_type='alert-fired', id=tattle.md5hash("{0}{1}".format(alert['name'], tattle.get_current_utc())), body={'alert-name': alert['name'], '@timestamp': datetime.datetime.utcnow(), 'time_unix': tattle.get_current_utc()} )
 
             if alert['action'].has_key('email'):
                 should_email = tattle.normalize_boolean(alert['action']['email']['enabled'])
