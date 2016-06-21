@@ -382,3 +382,10 @@ def makecsvfromlist(lst, filename=None):
             fh.write('No results')
 
     return filename_full
+
+
+'''
+    Gets the current location of $TATTLE_HOME
+'''
+def get_tattlehome():
+    return os.environ['TATTLE_HOME']
