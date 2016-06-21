@@ -30,7 +30,7 @@ def tnd(es, alert):
     matches = None
 
     if tattle.normalize_boolean(alert.get('disabled')) == True: 
-        logger.info('Alert: {} is disabled.  Moving on...'.format(alert.get('name')))
+        logger.debug('Alert: {} is disabled.  Moving on...'.format(alert.get('name')))
         return
 
     realert_threshold = tattle.relative_time_to_seconds(alert['alert']['realert'])
@@ -39,14 +39,14 @@ def tnd(es, alert):
     
     last_run = tattle.alert.last_run(es, alert['name']) 
     if last_run is None:
-        logger.info("Last run was None for: %s.  This is the first time we have seen it." % (alert['name']))
+        logger.info("Last run was 'None; for: %s.  This is the first time we have seen it." % (alert['name']))
         last_run = 100000000
     
     if last_run > 0:
         time_since = ( tattle.get_current_time_local() - last_run )
         if time_since <= realert_threshold: 
             # No need to go any further, we havent hit our threshold yet
-            logger.info("Alert is within re-alert threshold.  Name: {}, re-alert threshold: {}, last run: {}, human: {}".format(alert['name'], alert['alert']['realert'], last_run, tattle.humanize_ts(last_run)))
+            logger.debug("Alert is within re-alert threshold.  Name: {}, re-alert threshold: {}, last run: {}, human: {}".format(alert['name'], alert['alert']['realert'], last_run, tattle.humanize_ts(last_run)))
             return
 
     if alert.get('tql_query'):
@@ -219,7 +219,7 @@ def tnd(es, alert):
                 SCRIPT_DIRS = tattle.get_bindirs(TATTLE_HOME)
                 print tattle.run_script(alert['alert']['action']['script']['filename'], matches)
     else:
-        logger.info("Nope, i would not alert. Alert: {} Reason: {} was not {} {}".format(alert['name'], alert['alert']['type'], alert['alert']['relation'], alert['alert']['qty']))
+        logger.debug("Nope, i would not alert. Alert: {} Reason: {} was not {} {}".format(alert['name'], alert['alert']['type'], alert['alert']['relation'], alert['alert']['qty']))
 
     return True
 
