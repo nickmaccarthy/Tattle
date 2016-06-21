@@ -278,7 +278,7 @@ class TQL(DSLBase):
         s = s.query(q)
 
         # aggs
-        if qd.get('aggs'):
+        if 'aggs' in qd:
             aggs = qd['aggs']
             try:
                 fa = aggs[0]['agg']

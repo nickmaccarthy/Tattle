@@ -2,6 +2,9 @@ env/*
 etc/alerts/*.y*ml
 etc/tattle/*.y*ml
 etc/reports/*.y*ml
+etc/tales/*.y*ml
+etc/tattle/tales/*.y*ml
+
 *.pyc
 *.sw*
 var/log/*.log
