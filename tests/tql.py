@@ -5,6 +5,7 @@ import datetime
 import time
 import yaml
 import json
+from pprint import pprint
 
 TATTLE_HOME = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 os.environ['TATTLE_HOME'] = str(TATTLE_HOME)
