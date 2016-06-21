@@ -187,8 +187,15 @@ def tnd(es, alert):
 
             if alert['action'].has_key('pprint'):
                 if tattle.normalize_boolean(alert['action']['pprint']['enabled']) == True:
-                    pp_alert = PPrintAlert(event_queue=q)
-                    pp_alert.fire()
+                    if alert['action']['pprint'].has_key('once_per_match'):
+                        for m in q.matches:
+                            mq = EventQueue(alert=alert, results=results, matches=m, intentions=esq['intentions'])
+                            pp_alert = PPrintAlert(event_queue=mq)
+                            pp_alert.title = "{} - {}".format(alert['name'], m[alert['action']['pprint']['once_per_match'].get('match_key', 'key')])
+                            pp_alert.fire()
+                    else:
+                        pp_alert = PPrintAlert(event_queue=q)
+                        pp_alert.fire()
                 
             if alert['action'].has_key('pagerduty'):
                 if tattle.normalize_boolean(alert['action']['pagerduty']['enabled']) == True:
