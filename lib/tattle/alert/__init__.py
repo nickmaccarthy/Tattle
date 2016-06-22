@@ -209,6 +209,7 @@ class PagerDutyAlert(AlertBase):
 
         self.url = 'https://events.pagerduty.com/generic/2010-04-15/create_event.json'
 
+        self.title = "Tattle - {}".format(self.title)
 
 
     def get_service_args(self, key, pdcfg):
