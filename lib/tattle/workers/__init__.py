@@ -209,7 +209,7 @@ def tnd(es, alert):
                             pdalert = PagerDutyAlert(service_name, event_queue=mq)
                             pdalert.title = "{} - {}".format(alert['name'], m[alert['action']['email']['once_per_match'].get('match_key', 'key')])
                             pdalert.fire()
-                            logger.info("""msg="{}", name="{}" """.format("PagetDuty Alert Sent", pdalert.title))
+                            logger.info("""msg="{}", name="{}" """.format("PagerDuty Alert Sent", pdalert.title))
                     else:
                         pdalert = PagerDutyAlert(service_name, event_queue=q)
                         pdalert.fire()
