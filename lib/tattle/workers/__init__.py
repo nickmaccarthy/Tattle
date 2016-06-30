@@ -110,7 +110,7 @@ def tnd(es, alert):
         matches = tattle.filter.meets_in_field(results, alert['alert']['field'], alert['alert']['relation'], alert['alert']['qty'])
         if matches:
             should_alert = True
-    elif '_number_of_events' in alert_type:
+    elif alert_type in ('frequency', 'number_of_events', '_number_of_events_', '_number_of_events'):
         matches = tattle.filter.meets_total(results, results_total, alert['alert']['relation'], alert['alert']['qty'])
         if matches:
             total, results = matches
