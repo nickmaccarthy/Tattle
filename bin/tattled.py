@@ -22,7 +22,7 @@ logger = tattle.get_logger('tattled')
 
 # Load configs
 tcfg = tattle.config.load_tattle_config()
-alerts = tattle.config.load_alerts()
+tales = tattle.config.load_tales()
 
 try:
     from ES import connect as es_connect 
@@ -58,10 +58,10 @@ def worker(alert):
         logger.exception("Unable to complete worker task, alert: {}, reason: {}".format(alert['name'], e))  
 
 def main():
-    # Run the alerts
+    # Run the Tales 
     pool = ThreadPool(processes=int(tcfg['Workers']['pool_size']))
     pool = ThreadPool()
-    pool.map(worker, alerts)
+    pool.map(worker, tales)
     pool.close()
     pool.join()
 
