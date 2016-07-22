@@ -17,7 +17,7 @@ from email.mime.multipart import MIMEMultipart
 from jinja2 import Environment, FileSystemLoader 
 
 tcfg = tattle.config.load_tattle_config()
-mailcfg = tcfg['Mail']
+#mailcfg = tcfg['Mail']
 
 from pprint import pprint
 
@@ -108,6 +108,7 @@ class EmailAlert(AlertBase):
     def __init__(self, **kwargs):
         super(EmailAlert, self).__init__(**kwargs)
 
+        mailcfg = tattle.load_email_config()
         self.subject = None
         self.cc = None
         self.bcc = None
