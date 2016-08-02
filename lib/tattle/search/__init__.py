@@ -155,6 +155,7 @@ class TQL(DSLBase):
     def build_agg(self,string):
         agg_name = None
         order = None
+        script = None
         m = None
         args = {}
         agg_type, agg_args = string.split(" ", 1)
@@ -177,6 +178,8 @@ class TQL(DSLBase):
 
         if args.has_key('order'):
             args['order'] = eval(args['order'])
+        elif args.has_key('script'):
+            args['script'] = eval(args['script'])
 
 
         #print string
