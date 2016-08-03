@@ -1,0 +1,2 @@
+Workers:
+    pool_size: 10
