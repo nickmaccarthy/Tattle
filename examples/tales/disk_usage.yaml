@@ -1,0 +1,31 @@
+name: "Disk Usage over 90 %"
+description: "Disk Usage High on a host or series of hosts"
+severity: "High"
+tql_query: "summary.fullest_disk:>=90 | terms name=server, field=host.raw | avg name=fullest_disk, field=summary.fullest_disk"
+index: "system-metrics-*"
+disabled: 0
+timeperiod:
+    start: "now-1h"
+    end: "now"
+alert:
+    type: "frequency"
+    relation: "gt"
+    qty: 0
+    realert: "4h"
+    return_matches:
+        length: 10
+        random: true
+action:
+    pagerduty:
+        enabled: 1
+        service_key: "TattleAlerts"
+        once_per_match:
+            match_key: "key"
+
+    email:
+        enabled: 1
+        once_per_match:
+            match_key: "key"
+        to:
+            - 'my_email@company.com'
+            - 'alerts@company.com'

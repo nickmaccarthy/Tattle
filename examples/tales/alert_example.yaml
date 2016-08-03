@@ -1,0 +1,80 @@
+# (Required) 1
+# Name of the alert
+name: 'long-running-query'
+
+# (Optional) 
+# A description about this alert
+description: 'A long running query on a SQL server'
+
+# (Optional) 
+# Severity of the alert
+severity: 'Medium'
+
+# (Optional)
+# A TQL Query to use
+tql_query: 'plist.Time:>=60 AND NOT plist.Command:"Sleep" | fields @timestamp, plist.Time, plist.User, plist.Info'
+
+# (Optional)
+# The elasticsearch query ( JSON string ) to search 
+#es_query: ' { "query": "query_string": { "Some string" }} '
+# NOTE: Either a 'tql_query' or 'es_query' are required
+
+# (Required)
+# The index pattern to search events against
+# A at the end of the index name '*' will denote this being a timeseries based index.
+# If Tattle finds this, it will automatically generate the index names ( by day )
+index: 'rds-*'
+
+# (Required)
+# If the alert is enabled ( 0 ), or disabled ( 1 )
+disabled: 0 
+
+# (Required)
+# When this alert should run. 
+# 1m, 2h, 3d, 2M, etc 
+schedule_interval: '4h'
+
+# (Required)
+# Time period to search for events.
+# Supports the elasticsearch datemath format.
+# 'from' is required
+# if 'end' is not available, Tattle will default to 'now'
+# please note, that due to the word 'from' being a reserved word in python
+# 'start' and 'end' are also valid entries as well
+timeperiod: 
+    from: 'now-1h'
+    to: 'now'
+
+# ( Required )
+# type:
+#   1. _number_of_events_
+#     A frequency of the number of events
+#  
+# releation:
+#   1. gt = greater than
+#   2. lt = less than
+#   3. ge = greater than or equal to
+#   4. le = less than or equal to
+#   5. eq = equal to
+#   6. ne = not equal to
+# 
+# qty:
+#   the number we are comparing against with releation
+#
+# realert:
+#   A threshold between how long it will be before Tattle will alert about this again.  
+#   supports datemath format, '10m', '1h', '2d', etc   
+alert:
+    type: 'number_of_events'
+    relation: "gt"
+    qty: 0
+    realert: '10s'
+filter:
+    dedup: "plist.Info"
+
+# (Required)
+# What alert actions we will take
+action:
+    email:
+        enabled: 1 
+        to: 'someuser@company.com'

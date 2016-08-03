@@ -36,6 +36,7 @@ def load_email_config():
     return emailconf
 
 def get_taledirs():
+    ''' directories where we can find tales '''
     TATTLE_HOME = tattle.get_tattlehome()
     dirs = [
         os.path.join(TATTLE_HOME, 'etc', 'tattle', 'tales'),
@@ -43,7 +44,24 @@ def get_taledirs():
         os.path.join(TATTLE_HOME, 'etc', 'alerts')
     ]
     return dirs
-             
+
+def load_configs():
+    ''' 
+        loads all tattle configurations
+        key for the dict is the name of the config
+    '''
+    confs = {}
+    conf_dirs = [ os.path.join(TATTLE_HOME, 'etc', 'tattle') ]
+    for dir in conf_dirs:
+        for yaml_conf in glob.glob("{}/*.y*ml".format(dir)):
+            conf_name = os.path.basename(yaml_conf).split('.')[0]
+            try:
+                loaded = load_yaml_file(yaml_conf)
+            except Exception as e:
+                raise "Unable to load tattle configuration: {}, reason: {}".format(yaml_conf, e)
+            confs[conf_name] = loaded
+    return confs  
+
 def load_alerts():
     ''' loads our alerts '''
     tale_dirs = get_taledirs()
@@ -69,3 +87,4 @@ def load_alerts():
    
 def load_tales():
     return load_alerts() 
+

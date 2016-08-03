@@ -1,0 +1,4 @@
+level: 'debug' 
+log_directory: '$TATTLE_HOME/var/log/'
+max_bytes: 10002400
+backup_count: 5
