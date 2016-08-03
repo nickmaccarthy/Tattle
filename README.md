@@ -1,7 +1,7 @@
 # Tattle
 ### Alerting For Your Elasticsearch Data 
 
-Before you begin, please read the full documentation for Tattle here:  https://tattle.readthedocs.io
+Before you begin, please read the full documentation for Tattle here:  https://tattle.readthedocs.io/en/latest/intro.html 
 
 Welcome to Tattle, an alerting tool for your Elasticsearch data.  
 
@@ -24,4 +24,4 @@ Back in 2013 when ELK was farily new term in most people vocabularies, I couldnt
 
 ## Documentation
 
-Read the full documentation for Tattle here:  https://tattle.readthedocs.io
+Read the full documentation for Tattle here:  https://tattle.readthedocs.io/en/latest/intro.html
