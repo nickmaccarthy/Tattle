@@ -1,0 +1,8 @@
+# The email server where Tattle can relay emails from
+server: 'localhost'
+# The port for the email server
+port: 25
+# What you would like the sender to be
+default_sender: 'tattle@localhost'
+# The prefix for the subject line of the email.  Example: "Tattle Tale: <my tale name>".  If you dont want a prefix, simply just make this blank
+subject_prefix: "Tattle Tale: "

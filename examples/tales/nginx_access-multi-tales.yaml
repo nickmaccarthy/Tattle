@@ -1,0 +1,49 @@
+tales:
+    -
+        name: "NGINX 502 Spike"
+        description: "A high number of 501's have occured in our NGINX logs"
+        severity: "Criticial"
+        tql_query: "status:502"
+        index: "nginx-access-*"
+        disabled: 0
+        schedule_interval: "1m"
+        timeperiod:
+            start: "now-1m"
+            end: "now"
+        alert:
+            type: "frequency"
+            relation: "ge"
+            qty: 10 
+            realert: "15m"
+            return_matches: false
+        action: 
+            email:
+                disabled: 0
+                to: 'alerts@mycompany.com'
+    -
+        name: "NGINX 404 Spike"
+        description: "A high number of 404's have occured in our NGINX logs"
+        severity: "Criticial"
+        tql_query: "status:404"
+        index: "nginx-access-*"
+        disabled: 0
+        schedule_interval: "1m"
+        timeperiod:
+            start: "now-1m"
+            end: "now"
+        alert:
+            type: "frequency"
+            relation: "ge"
+            qty: 400 
+            realert: "15m"
+            return_matches: false
+        action: 
+            email:
+                disabled: 0
+                to: 'alerts@mycompany.com'
+            pagerduty:
+                disabled: 0
+                service_key: "TattleAlerts"
+                once_per_match:
+                    match_key: "key" 
+

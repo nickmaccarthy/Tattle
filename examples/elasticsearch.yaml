@@ -1,0 +1,7 @@
+# The elasticsearch server(s) to connect to.  This is typically the 'client node' of the cluster.  You can specify one or more servers here
+servers: [ 'elasticsearch.mycompany.com' ]
+# The variables for the args can be found here: https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch
+args:
+    port: 9200
+    use_ssl: false
+    timeout: 30
