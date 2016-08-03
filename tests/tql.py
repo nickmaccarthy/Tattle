@@ -40,12 +40,14 @@ class TestTQL(unittest.TestCase):
    
 
     def testIndexPattern(self):
+        """ tests to make sure we have the correct index pattern """
         indexes = self.tql_query('foobarbaz', index='logstash-*', start='2016-01-01||-3d', end='2016-01-01')
         expected = "logstash-2015.12.29,logstash-2015.12.30,logstash-2015.12.31,logstash-2016.01.01" 
         self.assertEqual(indexes['search_indexes'], expected) 
 
 
     def testLuceneQueryNoAggs(self):
+        """ test just a lucene query """
         tqlq = self.tql_query('hostname.raw:foobarbaz')
         expected = """
             {
@@ -87,6 +89,7 @@ class TestTQL(unittest.TestCase):
         self.assertEqual(tqlq['esquery'], json.loads(expected)) 
 
     def testFields(self):
+        """ tests fields """
         tqlq = self.tql_query('status:[500-502] | fields @timestamp, status, message')
         expected = """
                 {
@@ -130,6 +133,7 @@ class TestTQL(unittest.TestCase):
         self.assertEqual(tqlq['esquery'], json.loads(expected)) 
 
     def testTermsAgg(self):
+        """ tests a single agg """
         tqlq = self.tql_query('* | terms field=hostname.raw')
         expected = """
                   {
@@ -178,6 +182,7 @@ class TestTQL(unittest.TestCase):
         self.assertEqual(tqlq['esquery'], json.loads(expected)) 
 
     def testTermsWithOrder(self):
+        """ tests orders """
         tqlq = self.tql_query('metric:ReadIOPS | date_histogram field=@timestamp, interval=minute | terms field=database.raw, order=[ { "database.raw": "desc"}, {"_count": "desc"} ] | avg field=average')
         expected = """
                        {
@@ -248,6 +253,60 @@ class TestTQL(unittest.TestCase):
         """
         self.assertEqual(tqlq['esquery'], json.loads(expected)) 
 
+    def testScriptOne(self):
+        """ tests scripting """
+        tqlq = self.tql_query('* | stats name=grades_stats, script={"inline": "_value * correction", "params": {"correction": 1.2}}')
+        expected = """
+            {
+                "query": {
+                    "bool": {
+                        "must_not": [
+                            {
+                                "query_string": {
+                                    "query": ""
+                                }
+                            }
+                        ],
+                        "must": [
+                            {
+                                "query_string": {
+                                    "query": "*"
+                                }
+                            },
+                            {
+                                "range": {
+                                    "@timestamp": {
+                                        "from": "2015-12-31T22:00:00-00:00",
+                                        "to": "2016-01-01T00:00:00-00:00"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                },
+                "_source": {
+                    "include": [
+                        "*"
+                    ]
+                },
+                "from": 0,
+                "aggs": {
+                    "grades_stats": {
+                        "stats": {
+                            "script": {
+                                "inline": "_value * correction",
+                                "params": {
+                                    "correction": 1.2
+                                }
+                            }
+                        }
+                    }
+                },
+                "size": 0
+            }
+        """
+        self.assertEqual(tqlq['esquery'], json.loads(expected)) 
+        
     def testSingleAggResults(self):
         from results import single_agg
         results = json.loads(single_agg)
