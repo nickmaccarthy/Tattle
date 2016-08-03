@@ -7,6 +7,7 @@ class logger(object):
 
         self.logger = logging.getLogger(name)
         self.logger.setLevel(logging.DEBUG)
+        #self.logger.setLevel(logging.INFO)
 
         TATTLE_HOME = os.environ.get('TATTLE_HOME')
         #print os.environ
