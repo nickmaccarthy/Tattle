@@ -1,0 +1,252 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Alert Types &mdash; Tattle latest documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Tattle latest documentation" href="index.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Tattle
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Tattle Intro - Alerting For Your Elasticsearch Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Getting Started - Install &amp; Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tales.html">Tales, Alerts and Actions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tql.html">Tattle Query Language (TQL)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logging.html">Logging</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">Tattle</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>Alert Types</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/talesalerts.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="alert-types">
+<h1>Alert Types<a class="headerlink" href="#alert-types" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="frequency">
+<h2>Frequency<a class="headerlink" href="#frequency" title="Permalink to this headline">¶</a></h2>
+<p>Frequency alerts occur when a certain number of events ( as defined by <code class="docutils literal"><span class="pre">relation</span></code> and <code class="docutils literal"><span class="pre">qty</span></code>) occur within a certain period of time.</p>
+<p>Here are some examples:</p>
+<ul class="simple">
+<li>&#8220;20 or more failed login events with in the past 1 hour&#8221;</li>
+</ul>
+<p>Example</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">name</span><span class="p">:</span> <span class="s2">&quot;Too many login failures&quot;</span>
+<span class="n">tql_query</span><span class="p">:</span> <span class="s2">&quot;\*failed login\*&quot;</span>
+<span class="n">index</span><span class="p">:</span> <span class="s2">&quot;secure-log-*&quot;</span>
+<span class="n">timeperiod</span><span class="p">:</span>
+    <span class="n">start</span><span class="p">:</span> <span class="s2">&quot;now-1h&quot;</span>
+    <span class="n">end</span><span class="p">:</span> <span class="s2">&quot;now&quot;</span>
+<span class="n">alert</span><span class="p">:</span>
+    <span class="nb">type</span><span class="p">:</span> <span class="s2">&quot;frequency&quot;</span>
+    <span class="n">qty</span><span class="p">:</span> <span class="mi">20</span>
+    <span class="n">relation</span><span class="p">:</span> <span class="s2">&quot;&gt;=&quot;</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li>&#8220;300 or more Nginx logs with an error code of 502 in the last 1 minute&#8221;</li>
+</ul>
+<p>Example</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">name</span><span class="p">:</span> <span class="s2">&quot;NGINX 502 errors&quot;</span>
+<span class="n">tql_query</span><span class="p">:</span> <span class="s2">&quot;status:502 | terms field=hostname&quot;</span>
+<span class="n">index</span><span class="p">:</span> <span class="s2">&quot;nginx-access-*&quot;</span>
+<span class="n">timeperiod</span><span class="p">:</span>
+    <span class="n">start</span><span class="p">:</span> <span class="s2">&quot;now-1m&quot;</span>
+    <span class="n">end</span><span class="p">:</span> <span class="s2">&quot;now&quot;</span>
+<span class="n">alert</span><span class="p">:</span>
+    <span class="nb">type</span><span class="p">:</span> <span class="s2">&quot;frequency&quot;</span>
+    <span class="n">qty</span><span class="p">:</span> <span class="mi">300</span>
+    <span class="n">relation</span><span class="p">:</span> <span class="s2">&quot;&gt;=&quot;</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li>&#8220;Less than 1000 events on all of our NGINX logs for the past 1 hour&#8221;</li>
+</ul>
+<p>Example</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">name</span><span class="p">:</span> <span class="s2">&quot;Low event count on NGINX, possible log outage&quot;</span>
+<span class="n">tql_query</span><span class="p">:</span> <span class="s2">&quot;*&quot;</span>
+<span class="n">index</span><span class="p">:</span> <span class="s2">&quot;nginx-access-*&quot;</span>
+<span class="n">timeperiod</span><span class="p">:</span>
+    <span class="n">start</span><span class="p">:</span> <span class="s2">&quot;now-1h&quot;</span>
+    <span class="n">end</span><span class="p">:</span> <span class="s2">&quot;now&quot;</span>
+<span class="n">alert</span><span class="p">:</span>
+    <span class="nb">type</span><span class="p">:</span> <span class="s2">&quot;frequency&quot;</span>
+    <span class="n">qty</span><span class="p">:</span> <span class="mi">1000</span>
+    <span class="n">relation</span><span class="p">:</span> <span class="s2">&quot;le&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="regex-match">
+<h2>Regex Match<a class="headerlink" href="#regex-match" title="Permalink to this headline">¶</a></h2>
+<p>Match alerts are useful for aggregation alerts.  Often times the result of an aggregtion query will result in a <code class="docutils literal"><span class="pre">value</span></code>.  This type of alert type can use a regular expression to match the value and compare it to our <code class="docutils literal"><span class="pre">qty</span></code> and <code class="docutils literal"><span class="pre">relation</span></code> fields</p>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2014, Nick MacCarthy (nick@nickmaccarthy.com).
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'latest',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
