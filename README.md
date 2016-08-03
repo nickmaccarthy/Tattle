@@ -1,6 +1,8 @@
 # Tattle
 ### Alerting For Your Elasticsearch Data 
 
+Before you begin, please read the full documentation for Tattle here:  https://tattle.readthedocs.io
+
 Welcome to Tattle, an alerting tool for your Elasticsearch data.  
 
 Tattle aims to provide you with alerting capabilities for the data stored in your Elasticsearch cluster.  Utilizing powerful Elasticsearch features such as Aggregations and Lucene Query Syntax, coupled together with Tattle's own query language (TQL) our goal is to make alerts that easy to build and most of all, easy to read (because lets face it, you probably wont be the only one who has to read them)
