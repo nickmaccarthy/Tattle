@@ -21,7 +21,8 @@ import tattle.config
 logger = tattle.get_logger('tattled')
 
 # Load configs
-tcfg = tattle.config.load_tattle_config()
+#tcfg = tattle.config.load_tattle_config()
+tcfg = tattle.config.load_configs()['tattle']
 tales = tattle.config.load_tales()
 
 try:
@@ -59,12 +60,11 @@ def worker(alert):
 
 def main():
     # Run the Tales 
-    pool = ThreadPool(processes=int(tcfg['Workers']['pool_size']))
+    pool = ThreadPool(processes=int(tcfg['Workers'].get('pool_size', 10)))
     pool = ThreadPool()
     pool.map(worker, tales)
     pool.close()
     pool.join()
-
 
 
 if __name__ == "__main__":
