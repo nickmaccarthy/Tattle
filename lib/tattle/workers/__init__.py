@@ -106,7 +106,7 @@ def tnd(es, alert):
             matches = tattle.filter.meets_threshold(filtered, alert['alert']['relation'], alert['alert']['qty'])
             if matches:
                 should_alert = True
-    elif 'agg_match' in alert_type:
+    elif alert_type in ('agg_match', 'regex_match'):
         matches = tattle.filter.meets_in_field(results, alert['alert']['field'], alert['alert']['relation'], alert['alert']['qty'])
         if matches:
             should_alert = True
