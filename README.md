@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/nickmaccarthy/Tattle.svg?branch=master)](https://travis-ci.org/nickmaccarthy/Tattle.svg?branch=master)
+
 # Tattle
 ### Alerting For Your Elasticsearch Data 
 
