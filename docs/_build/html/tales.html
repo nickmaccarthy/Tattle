@@ -106,7 +106,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#alert-types">Alert Types</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#frequency">Frequency</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#regex-match">Regex Match</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#aggregation-match">Aggregation Match</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#alert-actions">Alert Actions</a><ul>
@@ -395,7 +395,7 @@
 <li><code class="docutils literal"><span class="pre">eq</span></code>, <code class="docutils literal"><span class="pre">=</span></code> - Equal To</li>
 <li><code class="docutils literal"><span class="pre">ne</span></code>, <code class="docutils literal"><span class="pre">!=</span></code> - Not Equal To</li>
 <li><code class="docutils literal"><span class="pre">lt</span></code>, <code class="docutils literal"><span class="pre">&lt;</span></code> - Less Than</li>
-<li>&#8216;<code class="docutils literal"><span class="pre">gt</span></code>, <code class="docutils literal"><span class="pre">&gt;</span></code> - Greater Than</li>
+<li><code class="docutils literal"><span class="pre">gt</span></code>, <code class="docutils literal"><span class="pre">&gt;</span></code> - Greater Than</li>
 <li><code class="docutils literal"><span class="pre">le</span></code>, <code class="docutils literal"><span class="pre">&lt;=</span></code> - Less Than or Equal To</li>
 <li><code class="docutils literal"><span class="pre">ge</span></code>, <code class="docutils literal"><span class="pre">&gt;=</span></code> - Greater Than or Equal To</li>
 </ul>
@@ -541,9 +541,74 @@
 </pre></div>
 </div>
 </div>
-<div class="section" id="regex-match">
-<h3>Regex Match<a class="headerlink" href="#regex-match" title="Permalink to this headline">¶</a></h3>
-<p>Match alerts are useful for aggregation alerts.  Often times the result of an aggregtion query will result in a <code class="docutils literal"><span class="pre">value</span></code>.  This type of alert type can use a regular expression to match the value and compare it to our <code class="docutils literal"><span class="pre">qty</span></code> and <code class="docutils literal"><span class="pre">relation</span></code> fields</p>
+<div class="section" id="aggregation-match">
+<h3>Aggregation Match<a class="headerlink" href="#aggregation-match" title="Permalink to this headline">¶</a></h3>
+<p>Agg Match alerts are useful for aggregation based alerts where the keys and values can change depending on your data.  Often times the result of most metric based aggregtions will a field called <code class="docutils literal"><span class="pre">value</span></code>.  This type of alert type can use a regular expression to match the value and compare it to our <code class="docutils literal"><span class="pre">qty</span></code> and <code class="docutils literal"><span class="pre">relation</span></code> fields</p>
+<p>When you use an agg_match, Tattle will flatten the aggregation returned so it can be iterated against and matched by a regular expression.</p>
+<p>Take this example a return</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;hits&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;hits&quot;</span><span class="p">:</span> <span class="p">[],</span>
+        <span class="s2">&quot;total&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="s2">&quot;max_score&quot;</span><span class="p">:</span> <span class="mf">0.0</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;_shards&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;successful&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+        <span class="s2">&quot;failed&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">&quot;total&quot;</span><span class="p">:</span> <span class="mi">5</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;took&quot;</span><span class="p">:</span> <span class="mi">31</span><span class="p">,</span>
+    <span class="s2">&quot;aggregations&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;terms&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;buckets&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;avg&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mf">90.8</span>
+                    <span class="p">},</span>
+                    <span class="s2">&quot;key&quot;</span><span class="p">:</span> <span class="s2">&quot;someserver1.somecompany.net&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;doc_count&quot;</span><span class="p">:</span> <span class="mi">1</span>
+                <span class="p">},</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;avg&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mf">93.5</span>
+                    <span class="p">},</span>
+                    <span class="s2">&quot;key&quot;</span><span class="p">:</span> <span class="s2">&quot;someserver2.somecompany.net&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;doc_count&quot;</span><span class="p">:</span> <span class="mi">1</span>
+                <span class="p">}</span>
+            <span class="p">],</span>
+            <span class="s2">&quot;sum_other_doc_count&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;doc_count_error_upper_bound&quot;</span><span class="p">:</span> <span class="mi">0</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;timed_out&quot;</span><span class="p">:</span> <span class="n">false</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Tattle would flatten the aggregations section this to</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">aggregations</span><span class="o">.</span><span class="n">terms</span><span class="o">.</span><span class="n">buckets</span><span class="o">.</span><span class="mf">0.</span><span class="n">avg</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="mf">90.8</span>
+<span class="n">aggregations</span><span class="o">.</span><span class="n">terms</span><span class="o">.</span><span class="n">buckets</span><span class="o">.</span><span class="mf">0.</span><span class="n">key</span> <span class="o">=</span> <span class="n">someserver1</span><span class="o">.</span><span class="n">somecompany</span><span class="o">.</span><span class="n">net</span>
+<span class="n">aggregations</span><span class="o">.</span><span class="n">terms</span><span class="o">.</span><span class="n">buckets</span><span class="o">.</span><span class="mf">1.</span><span class="n">avg</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="mf">93.5</span>
+<span class="n">aggregations</span><span class="o">.</span><span class="n">terms</span><span class="o">.</span><span class="n">buckets</span><span class="o">.</span><span class="mf">1.</span><span class="n">key</span> <span class="o">=</span> <span class="n">someserver2</span><span class="o">.</span><span class="n">somecompany</span><span class="o">.</span><span class="n">net</span>
+</pre></div>
+</div>
+<p>So if we wanted to look for any <cite>values</cite> in our aggs that are <code class="docutils literal"><span class="pre">&gt;=</span> <span class="pre">90</span></code> we would use the regular expression <code class="docutils literal"><span class="pre">^.value$</span></code> as our match key.</p>
+<p>Some examples</p>
+<p>Basic example where we look for any <cite>value</cite> that is <code class="docutils literal"><span class="pre">&gt;=</span></code> <cite>90</cite></p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">alert</span><span class="p">:</span>
+    <span class="nb">type</span><span class="p">:</span> <span class="s2">&quot;agg_match&quot;</span>
+    <span class="n">field</span><span class="p">:</span> <span class="s1">&#39;^.*value$&#39;</span>
+    <span class="n">relation</span><span class="p">:</span> <span class="s2">&quot;&gt;=&quot;</span>
+    <span class="n">qty</span><span class="p">:</span> <span class="mi">90</span>
+</pre></div>
+</div>
+<p>Or if we wanted to only look at only the first bucket, for a value <code class="docutils literal"><span class="pre">&gt;=</span> <span class="pre">20</span></code></p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">alert</span><span class="p">:</span>
+    <span class="nb">type</span><span class="p">:</span> <span class="s2">&quot;agg_match&quot;</span>
+    <span class="n">field</span><span class="p">:</span> <span class="s1">&#39;^\.buckets\.0.*value$&#39;</span>
+    <span class="n">relation</span><span class="p">:</span> <span class="s2">&quot;&gt;=&quot;</span>
+    <span class="n">qty</span><span class="p">:</span> <span class="mi">20</span>
+</pre></div>
+</div>
 </div>
 </div>
 <div class="section" id="alert-actions">

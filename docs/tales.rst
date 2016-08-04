@@ -145,7 +145,7 @@ relation
         * ``eq``, ``=`` - Equal To
         * ``ne``, ``!=`` - Not Equal To
         * ``lt``, ``<`` - Less Than
-        * '``gt``, ``>`` - Greater Than
+        * ``gt``, ``>`` - Greater Than
         * ``le``, ``<=`` - Less Than or Equal To
         * ``ge``, ``>=`` - Greater Than or Equal To
 
@@ -243,9 +243,78 @@ Example
         relation: "le"
 
 
-Regex Match
-~~~~~~~~~~~
-Match alerts are useful for aggregation alerts.  Often times the result of an aggregtion query will result in a ``value``.  This type of alert type can use a regular expression to match the value and compare it to our ``qty`` and ``relation`` fields
+Aggregation Match
+~~~~~~~~~~~~~~~~~~
+Agg Match alerts are useful for aggregation based alerts where the keys and values can change depending on your data.  Often times the result of most metric based aggregtions will a field called ``value``.  This type of alert type can use a regular expression to match the value and compare it to our ``qty`` and ``relation`` fields
+
+When you use an agg_match, Tattle will flatten the aggregation returned so it can be iterated against and matched by a regular expression.
+
+Take this example a return 
+::
+    {
+        "hits": {
+            "hits": [],
+            "total": 2,
+            "max_score": 0.0
+        },
+        "_shards": {
+            "successful": 5,
+            "failed": 0,
+            "total": 5
+        },
+        "took": 31,
+        "aggregations": {
+            "terms": {
+                "buckets": [
+                    {
+                        "avg": {
+                            "value": 90.8
+                        },
+                        "key": "someserver1.somecompany.net",
+                        "doc_count": 1
+                    },
+                    {
+                        "avg": {
+                            "value": 93.5
+                        },
+                        "key": "someserver2.somecompany.net",
+                        "doc_count": 1
+                    }
+                ],
+                "sum_other_doc_count": 0,
+                "doc_count_error_upper_bound": 0
+            }
+        },
+        "timed_out": false
+    }
+
+Tattle would flatten the aggregations section this to
+::
+    aggregations.terms.buckets.0.avg.value = 90.8
+    aggregations.terms.buckets.0.key = someserver1.somecompany.net
+    aggregations.terms.buckets.1.avg.value = 93.5
+    aggregations.terms.buckets.1.key = someserver2.somecompany.net
+
+
+So if we wanted to look for any `values` in our aggs that are ``>= 90`` we would use the regular expression ``^.value$`` as our match key.  
+
+Some examples
+
+Basic example where we look for any `value` that is ``>=`` `90`
+::
+    alert:
+        type: "agg_match"
+        field: '^.*value$'
+        relation: ">="
+        qty: 90
+
+Or if we wanted to only look at only the first bucket, for a value ``>= 20``
+::
+    alert:
+        type: "agg_match"
+        field: '^\.buckets\.0.*value$'
+        relation: ">="
+        qty: 20
 
 
 Alert Actions
