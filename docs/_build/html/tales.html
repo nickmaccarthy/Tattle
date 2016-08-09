@@ -91,6 +91,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#name">name</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#description">description</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#severity">severity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#enabled">enabled</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#disabled">disabled</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#tql-query">tql_query</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#index">index</a></li>
@@ -111,6 +112,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#alert-actions">Alert Actions</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#email">Email</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#script">Script</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pager-duty">Pager Duty</a></li>
 </ul>
 </li>
@@ -187,7 +189,7 @@
 <span class="n">severity</span><span class="p">:</span> <span class="s2">&quot;High&quot;</span>
 <span class="n">tql_query</span><span class="p">:</span> <span class="s2">&quot;summary.fullest_disk:&gt;=90 | terms name=server, field=host.raw | avg name=fullest_disk, field=summary.fullest_disk&quot;</span>
 <span class="n">index</span><span class="p">:</span> <span class="s2">&quot;system-metrics-*&quot;</span>
-<span class="n">disabled</span><span class="p">:</span> <span class="mi">0</span>
+<span class="n">enabled</span><span class="p">:</span> <span class="mi">1</span>
 <span class="n">timeperiod</span><span class="p">:</span>
     <span class="n">start</span><span class="p">:</span> <span class="s2">&quot;now-1h&quot;</span>
     <span class="n">end</span><span class="p">:</span> <span class="s2">&quot;now&quot;</span>
@@ -257,23 +259,39 @@
 </pre></div>
 </div>
 </div>
+<div class="section" id="enabled">
+<h3>enabled<a class="headerlink" href="#enabled" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><ul class="simple">
+<li>Required: <cite>Yes</cite></li>
+<li>Description: Whteher this Tale is enabled (1)(True) or disabled (0)(False)</li>
+</ul>
+</div></blockquote>
+<p>Example:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># This alert is enabled</span>
+<span class="n">enabled</span><span class="p">:</span> <span class="mi">1</span>
+<span class="c1"># This alert is disabled</span>
+<span class="n">enabled</span><span class="p">:</span> <span class="mi">0</span>
+<span class="c1"># You can even use strings</span>
+<span class="n">enabled</span><span class="p">:</span> <span class="s2">&quot;yes&quot;</span>
+<span class="c1"># Or True and False Statements</span>
+<span class="n">enabled</span><span class="p">:</span> <span class="n">true</span>
+</pre></div>
+</div>
+</div>
 <div class="section" id="disabled">
 <h3>disabled<a class="headerlink" href="#disabled" title="Permalink to this headline">¶</a></h3>
 <blockquote>
 <div><ul class="simple">
-<li>Required: <cite>Yes</cite></li>
-<li>Description: Whteher this Tale is enabled (0) or disabled (1)</li>
+<li>Required: <cite>Yes</cite> but only if you didnt specify an <code class="docutils literal"><span class="pre">enabled</span></code></li>
+<li>Description:  The same thing as as <code class="docutils literal"><span class="pre">enabled</span></code> above, but with opposite logic.  Tattle used to use the term <code class="docutils literal"><span class="pre">disabled</span></code> instead of <code class="docutils literal"><span class="pre">enabled</span></code>, but this old method is left in for legacy support.  Please use the <code class="docutils literal"><span class="pre">enabled</span></code> term going forward with new Tales.</li>
 </ul>
 </div></blockquote>
 <p>Example:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># This alert is enabled, i.e. its NOT disabled</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># This alert is enabled, not disabled</span>
 <span class="n">disabled</span><span class="p">:</span> <span class="mi">0</span>
-<span class="c1"># This alert is disabled</span>
+<span class="c1"># this alert is disabled</span>
 <span class="n">disabled</span><span class="p">:</span> <span class="mi">1</span>
-<span class="c1"># You can even use strings</span>
-<span class="n">disabled</span><span class="p">:</span> <span class="s2">&quot;yes&quot;</span>
-<span class="c1"># Or True and False Statements</span>
-<span class="n">disabled</span><span class="p">:</span> <span class="n">true</span>
 </pre></div>
 </div>
 </div>
@@ -637,6 +655,33 @@
 </div>
 <p>If you want to change the HTML for the email, add company logos etc, you can change the templates directly in <code class="docutils literal"><span class="pre">$TATTLE_HOME/use/share/templates/html/email.html</span></code></p>
 </div>
+<div class="section" id="script">
+<h3>Script<a class="headerlink" href="#script" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal"><span class="pre">script</span></code> alert action allows you to specify a script to run when the alert is fired/triggerd.  When Tattle fires off the script, it passes in the results from the alert, the Tale definition, and the TQL query intentions for use within the script.</p>
+<p>When the script is called, three arguments are passed in to, each argument will contain JSON as its data.</p>
+<dl class="docutils">
+<dt>Arguments</dt>
+<dd><ul class="first last simple">
+<li><code class="docutils literal"><span class="pre">$1</span></code> - The results, or matches from the alert</li>
+<li><code class="docutils literal"><span class="pre">$2</span></code> - The Tale details that was responsible for triggering this alert</li>
+<li><code class="docutils literal"><span class="pre">$3</span></code> - The TQL Query intentions</li>
+</ul>
+</dd>
+</dl>
+<p>Your script must be in <code class="docutils literal"><span class="pre">$TATTLE_HOME/bin/scripts</span></code> and must be executable.</p>
+<p>Here is an example script that will echo out each of the ARGV&#8217;s</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>#!/bin/bash
+echo &#39;RESULTS:&#39;
+echo $1
+
+echo &#39;TALE:&#39;
+echo $2
+
+echo &#39;INTENTIONS:&#39;
+echo $3
+</pre></div>
+</div>
+</div>
 <div class="section" id="pager-duty">
 <h3>Pager Duty<a class="headerlink" href="#pager-duty" title="Permalink to this headline">¶</a></h3>
 <p>Another very common use for Tattle is to send its alert direclty to Pager Duty.</p>
@@ -695,7 +740,7 @@
         <span class="n">severity</span><span class="p">:</span> <span class="s2">&quot;Criticial&quot;</span>
         <span class="n">tql_query</span><span class="p">:</span> <span class="s2">&quot;status:502&quot;</span>
         <span class="n">index</span><span class="p">:</span> <span class="s2">&quot;nginx-access-*&quot;</span>
-        <span class="n">disabled</span><span class="p">:</span> <span class="mi">0</span>
+        <span class="n">enabled</span><span class="p">:</span> <span class="mi">1</span>
         <span class="n">schedule_interval</span><span class="p">:</span> <span class="s2">&quot;1m&quot;</span>
         <span class="n">timeperiod</span><span class="p">:</span>
             <span class="n">start</span><span class="p">:</span> <span class="s2">&quot;now-1m&quot;</span>
@@ -708,7 +753,7 @@
             <span class="n">return_matches</span><span class="p">:</span> <span class="n">false</span>
         <span class="n">action</span><span class="p">:</span>
             <span class="n">email</span><span class="p">:</span>
-                <span class="n">disabled</span><span class="p">:</span> <span class="mi">0</span>
+                <span class="n">enabled</span><span class="p">:</span> <span class="mi">1</span>
                 <span class="n">to</span><span class="p">:</span> <span class="s1">&#39;alerts@mycompany.com&#39;</span>
 
     <span class="c1"># Tale 2</span>
@@ -718,7 +763,7 @@
         <span class="n">severity</span><span class="p">:</span> <span class="s2">&quot;Criticial&quot;</span>
         <span class="n">tql_query</span><span class="p">:</span> <span class="s2">&quot;status:404&quot;</span>
         <span class="n">index</span><span class="p">:</span> <span class="s2">&quot;nginx-access-*&quot;</span>
-        <span class="n">disabled</span><span class="p">:</span> <span class="mi">0</span>
+        <span class="n">enabled</span><span class="p">:</span> <span class="mi">1</span>
         <span class="n">schedule_interval</span><span class="p">:</span> <span class="s2">&quot;1m&quot;</span>
         <span class="n">timeperiod</span><span class="p">:</span>
             <span class="n">start</span><span class="p">:</span> <span class="s2">&quot;now-1m&quot;</span>
@@ -731,10 +776,10 @@
             <span class="n">return_matches</span><span class="p">:</span> <span class="n">false</span>
         <span class="n">action</span><span class="p">:</span>
             <span class="n">email</span><span class="p">:</span>
-                <span class="n">disabled</span><span class="p">:</span> <span class="mi">0</span>
+                <span class="n">enabled</span><span class="p">:</span> <span class="mi">1</span>
                 <span class="n">to</span><span class="p">:</span> <span class="s1">&#39;alerts@mycompany.com&#39;</span>
             <span class="n">pagerduty</span><span class="p">:</span>
-                <span class="n">disabled</span><span class="p">:</span> <span class="mi">0</span>
+                <span class="n">enabled</span><span class="p">:</span> <span class="mi">1</span>
                 <span class="n">service_key</span><span class="p">:</span> <span class="s2">&quot;TattleAlerts&quot;</span>
                 <span class="n">once_per_match</span><span class="p">:</span>
                     <span class="n">match_key</span><span class="p">:</span> <span class="s2">&quot;key&quot;</span>

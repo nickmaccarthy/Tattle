@@ -23,7 +23,7 @@ TQL Query with multiple aggs and multi action example
     severity: "High"
     tql_query: "summary.fullest_disk:>=90 | terms name=server, field=host.raw | avg name=fullest_disk, field=summary.fullest_disk"
     index: "system-metrics-*"
-    disabled: 0
+    enabled: 1
     timeperiod:
         start: "now-1h"
         end: "now"
@@ -76,20 +76,32 @@ Example:
 ::
     severity: "High"
 
-disabled
+enabled
 ~~~~~~~~
     * Required: `Yes`
-    * Description: Whteher this Tale is enabled (0) or disabled (1)
+    * Description: Whteher this Tale is enabled (1)(True) or disabled (0)(False)
 Example: 
 ::
-    # This alert is enabled, i.e. its NOT disabled
-    disabled: 0
+    # This alert is enabled
+    enabled: 1
     # This alert is disabled
-    disabled: 1
+    enabled: 0
     # You can even use strings
-    disabled: "yes"
+    enabled: "yes"
     # Or True and False Statements
-    disabled: true
+    enabled: true
+
+disabled
+~~~~~~~~~~
+    * Required: `Yes` but only if you didnt specify an ``enabled``
+    * Description:  The same thing as as ``enabled`` above, but with opposite logic.  Tattle used to use the term ``disabled`` instead of ``enabled``, but this old method is left in for legacy support.  Please use the ``enabled`` term going forward with new Tales.
+Example:
+::  
+    # This alert is enabled, not disabled
+    disabled: 0
+    # this alert is disabled
+    disabled: 1
+
 
 tql_query
 ~~~~~~~~~
@@ -350,6 +362,33 @@ Example
 
 If you want to change the HTML for the email, add company logos etc, you can change the templates directly in ``$TATTLE_HOME/use/share/templates/html/email.html``
 
+Script
+~~~~~~~~~~
+
+The ``script`` alert action allows you to specify a script to run when the alert is fired/triggerd.  When Tattle fires off the script, it passes in the results from the alert, the Tale definition, and the TQL query intentions for use within the script.
+
+When the script is called, three arguments are passed in to, each argument will contain JSON as its data.
+
+Arguments
+    * ``$1`` - The results, or matches from the alert
+    * ``$2`` - The Tale details that was responsible for triggering this alert
+    * ``$3`` - The TQL Query intentions
+
+Your script must be in ``$TATTLE_HOME/bin/scripts`` and must be executable.
+
+Here is an example script that will echo out each of the ARGV's
+::
+    #!/bin/bash
+    echo 'RESULTS:'
+    echo $1
+
+    echo 'TALE:'
+    echo $2
+
+    echo 'INTENTIONS:'
+    echo $3
+
+
 Pager Duty
 ~~~~~~~~~~
 
@@ -416,7 +455,7 @@ Example for NGINX logs
             severity: "Criticial"
             tql_query: "status:502"
             index: "nginx-access-*"
-            disabled: 0
+            enabled: 1
             schedule_interval: "1m"
             timeperiod:
                 start: "now-1m"
@@ -429,7 +468,7 @@ Example for NGINX logs
                 return_matches: false
             action: 
                 email:
-                    disabled: 0
+                    enabled: 1
                     to: 'alerts@mycompany.com'
 
         # Tale 2
@@ -439,7 +478,7 @@ Example for NGINX logs
             severity: "Criticial"
             tql_query: "status:404"
             index: "nginx-access-*"
-            disabled: 0
+            enabled: 1
             schedule_interval: "1m"
             timeperiod:
                 start: "now-1m"
@@ -452,10 +491,10 @@ Example for NGINX logs
                 return_matches: false
             action: 
                 email:
-                    disabled: 0
+                    enabled: 1
                     to: 'alerts@mycompany.com'
                 pagerduty:
-                    disabled: 0
+                    enabled: 1
                     service_key: "TattleAlerts"
                     once_per_match:
                         match_key: "key" 
