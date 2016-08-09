@@ -191,6 +191,20 @@ class EmailAlert(AlertBase):
             return log_msg
 
 
+
+class ScriptAlert(AlertBase):
+
+    def __init__(self, script_name, **kwargs):
+        super(ScriptAlert, self).__init__(**kwargs)
+        self.script_name = script_name
+
+    def fire(self):
+        try:
+            tattle.run_script(self.script_name, json.dumps(self.matches), json.dumps(self.alert), json.dumps(self.intentions)) 
+        except Exception as e:
+            logger.exception('Unable to run script: %s, reason: %s'.format(self.script_name, e))
+        
+        
 class PagerDutyAlert(AlertBase):
     
     def __init__(self, service_name, **kwargs):
@@ -240,7 +254,6 @@ class PagerDutyAlert(AlertBase):
         return ''.join(body)
     
     def fire(self):
-
         headers = {'content-type': 'application/json'}
         payload = {
             'service_key': self.pagerduty_service_key,
