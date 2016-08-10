@@ -173,17 +173,17 @@
 <h1>Tales, Alerts and Actions<a class="headerlink" href="#tales-alerts-and-actions" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
-<p>Tattle Tales are the heart and soul of the system.  Tales are definitions for alerts and define such things as what query will run, our time window, thresholds, actions to take, etc.</p>
+<p>Tales are the heart and soul of the system.  Tales are definitions for alerts and define such things as our time window for the events we seek, what query will run, thresholds, actions to take, etc.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">Tales are  kept in <cite>yaml</cite> files in <code class="docutils literal"><span class="pre">$TATTLE_HOME/etc/tattle/tales</span></code>, <code class="docutils literal"><span class="pre">$TATTLE_HOME/etc/tales</span></code> or in <code class="docutils literal"><span class="pre">$TATTLE_HOME/etc/alerts</span></code>.</p>
 </div>
-<p>To understand <cite>Tales</cite>, lets take a look at a few examples below.  We will use these as reference for the rest of the Tales documentation.</p>
+<p>To understand <cite>Tales</cite>, lets take a look at an example below.  Please note, we will use this as a reference for the rest of the Tales documentation.</p>
 </div>
 <div class="section" id="example-tales">
 <h2>Example Tales<a class="headerlink" href="#example-tales" title="Permalink to this headline">¶</a></h2>
-<p>In this example, we will finding all hosts in our environment that have a disk usage of greater than or equal to 90%.  When a match is found, it will send us an alert via Pagerduty as well as an email for each <cite>key</cite> ( host in this case ) that was matched.</p>
-<p>TQL Query with multiple aggs and multi action example</p>
+<p>In this example, we will be finding all hosts in our environment that have a disk usage of <cite>greater than or equal</cite> to <cite>90%</cite> for the past <cite>1 hour</cite>.  When a match is found, it will send us an alert via Pagerduty as well as an email for each <cite>key</cite> ( host in this case ) that was matched.</p>
+<p>TQL Query with multiple aggregations and multiple actions example</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">name</span><span class="p">:</span> <span class="s2">&quot;Disk Usage over 90 %&quot;</span>
 <span class="n">description</span><span class="p">:</span> <span class="s2">&quot;Disk Usage High on a host or series of hosts&quot;</span>
 <span class="n">severity</span><span class="p">:</span> <span class="s2">&quot;High&quot;</span>
@@ -217,9 +217,10 @@
             <span class="o">-</span> <span class="s1">&#39;alerts@company.com&#39;</span>
 </pre></div>
 </div>
+<p>For more breakdown on this Tale, lets look at the <a class="reference internal" href="#tales-definitions"><span class="std std-ref">Tale Definitions</span></a> section.</p>
 </div>
 <div class="section" id="tale-definitions">
-<h2>Tale Definitions<a class="headerlink" href="#tale-definitions" title="Permalink to this headline">¶</a></h2>
+<span id="tales-definitions"></span><h2>Tale Definitions<a class="headerlink" href="#tale-definitions" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="name">
 <h3>name<a class="headerlink" href="#name" title="Permalink to this headline">¶</a></h3>
 <blockquote>
@@ -300,7 +301,7 @@
 <blockquote>
 <div><ul class="simple">
 <li>Required: <cite>Yes</cite></li>
-<li>Description: The TQL query for the Tale.  See the TQL section for more details</li>
+<li>Description: The TQL query for the Tale.  See the <a class="reference internal" href="tql.html"><span class="doc">Tattle Query Language (TQL)</span></a> page for more details on TQL</li>
 </ul>
 </div></blockquote>
 <p>Example:</p>
@@ -377,7 +378,7 @@
 <dt>Values</dt>
 <dd><ul class="first last">
 <li><dl class="first docutils">
-<dt><code class="docutils literal"><span class="pre">frequency</span></code></dt>
+<dt><code class="docutils literal"><span class="pre">frequency</span></code> or <code class="docutils literal"><span class="pre">number_of_events</span></code></dt>
 <dd><ul class="first last simple">
 <li>Description: If the <cite>number of events</cite> meets our <code class="docutils literal"><span class="pre">relation</span></code> and <code class="docutils literal"><span class="pre">qty</span></code></li>
 </ul>
@@ -669,6 +670,10 @@
 </dd>
 </dl>
 <p>Your script must be in <code class="docutils literal"><span class="pre">$TATTLE_HOME/bin/scripts</span></code> and must be executable.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The script will run as whatever user Tattle runs as.  For example if you run Tattle under a user called <cite>tattle</cite>, then the script will run as the user <cite>tattle</cite>.</p>
+</div>
 <p>Here is an example script that will echo out each of the ARGV&#8217;s</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span>#!/bin/bash
 echo &#39;RESULTS:&#39;
@@ -760,7 +765,7 @@ echo $3
     <span class="o">-</span>
         <span class="n">name</span><span class="p">:</span> <span class="s2">&quot;NGINX 404 Spike&quot;</span>
         <span class="n">description</span><span class="p">:</span> <span class="s2">&quot;A high number of 404&#39;s have occured in our NGINX logs&quot;</span>
-        <span class="n">severity</span><span class="p">:</span> <span class="s2">&quot;Criticial&quot;</span>
+        <span class="n">severity</span><span class="p">:</span> <span class="s2">&quot;Medium&quot;</span>
         <span class="n">tql_query</span><span class="p">:</span> <span class="s2">&quot;status:404&quot;</span>
         <span class="n">index</span><span class="p">:</span> <span class="s2">&quot;nginx-access-*&quot;</span>
         <span class="n">enabled</span><span class="p">:</span> <span class="mi">1</span>

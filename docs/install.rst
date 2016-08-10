@@ -1,15 +1,15 @@
 Getting Started - Install & Setup
 =================================
 
-Installing Tattle is pretty simple process. Tattle was written in Python, and was designed to work within a `virtualenv <http://docs.python-guide.org/en/latest/dev/virtualenvs/>`_.  The first steps for getting Tattle installed are ensuring you have Python 2.7 installed on your system, as well as `pip <https://pypi.python.org/pypi/pip>`_ and `virtualenv <http://docs.python-guide.org/en/latest/dev/virtualenvs/>`_ ( typically installing python 2.7 on a modern linux system is as easy as ``apt-get install python27 python27-virtualenv python27-pip`` for Debian based systems (such as Ubunut) or ``yum install python27 python27-pip python27-virtualenv`` for CentOS based users )
+Installing Tattle is pretty simple process. Tattle was written in Python, and was designed to work within a `virtualenv <http://docs.python-guide.org/en/latest/dev/virtualenvs/>`_.  The first steps for getting Tattle installed are ensuring you have Python 2.7 installed on your system, as well as `pip <https://pypi.python.org/pypi/pip>`_ and `virtualenv <http://docs.python-guide.org/en/latest/dev/virtualenvs/>`_ ( typically installing python 2.7 on a modern linux system is as easy as ``apt-get install python27 python27-virtualenv python27-pip`` for Debian based systems (such as Ubuntu) or ``yum install python27 python27-pip python27-virtualenv`` for CentOS based users )
 
 .. note::
-    If you already have python 2.7.10 or above installed, then you should already have pip installed.  You can typlically install virtualenv with pip as well
+    If you already have python 2.7.10 or above installed, then you should already have `pip`.  You can typically install virtualenv with pip as well
 
 After `Python 2.7`, `pip` and `virtualenv` have been installed, you will need ensure you have `git` installed ( ``apt-get install git``) to clone the repository where Tattle is located. 
 
 .. note::
-    If you dont have `git` installed, you can also download the zip file for Tattle from the `Tattle Github <https://github.com/nickmaccarthy/Tattle>`_ page and unzip it manually to a directory of your choice.  
+    We use git to pull down the source code for Tattle.  If you dont have or want to install `git`, you can also download the zip file for Tattle from the `Tattle Github <https://github.com/nickmaccarthy/Tattle>`_ page and unzip it manually to a directory of your choice.  
 
 After you have these base applications installed, check our the :ref:`setup-tattle` section to continue.
 
@@ -29,7 +29,7 @@ Requirements
 
 Setup & Install
 -------------------
-Lets assume we will assume will be installing Tattle to ``/opt/Tattle``, if you are installing into a different location, replace ``/opt/tattle`` with your install directory.
+For the sake of this documentation we will be installing Tattle to ``/opt/Tattle``.  If you wish to install Tattle into a different location, simply replace ``/opt/tattle`` with your install directory.
 ::
     cd /opt
     git clone https://github.com/nickmaccarthy/Tattle
@@ -38,7 +38,7 @@ Lets assume we will assume will be installing Tattle to ``/opt/Tattle``, if you 
     pip install -r requirements.txt
 
 .. note::
-    ``$TATTLE_HOME`` refers to where you have installed Tattle.  In the case of this documentation we installed it in ``/opt/Tattle``
+    Throughout the rest of this documentation, you will see reference to ``$TATTLE_HOME``.  This is a variable to represent where Tattle was installed.   In the case of this documentation we installed it in ``/opt/Tattle``
 
 .. _configure-tattle:
 

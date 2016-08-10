@@ -5,7 +5,7 @@ The Tattle Query Language (TQL) is a short hand syntax used for building Elastic
 
 Introduction
 -------------------------------
-Since Elasticsearch queries can get quite long, it can make managing them for a rolling window alerting system like Tattle a bit difficult.  The Tattle Query Language aims to shorten some of these common queries into an easier read and understand syntax.
+When I was building the first verion of Tattle (project Bluenote), I noticed a pattern in the Elasticserach queries I was making to find events.  For example, They all had `time windows`, they all had a ``query_string`` (Lucene query), a ``size``, a ``to`` and ``from``, etc.  So I thought it would be nice to have a short hand syntax to represent an Elasticsearch query that was easy to understand and write, which in turn would make managing hundreds or thousands of Tales easier. Through some experimentation I came up with TQL which aims to do just that.   
 
 Examples
 -------------------------------
@@ -101,7 +101,7 @@ In this case we have three hosts in the ``hostname`` aggregation that have had 5
 
 Nesting
 ---------------------------------
-Aggregations in Elasticserach can be nested, and this is the default behaviour in TQL.  You can nest as many aggregations as you with by using `|`.  
+Aggregations in Elasticserach can be nested, and this is the default behaviour in TQL.  You can nest as many aggregations as you with by using ``|``.  
 
 In this example, we can want to average a metric and group it by the host.  
 ::

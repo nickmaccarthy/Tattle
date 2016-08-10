@@ -3,20 +3,20 @@ Tales, Alerts and Actions
 
 Introduction
 ------------
-Tattle Tales are the heart and soul of the system.  Tales are definitions for alerts and define such things as what query will run, our time window, thresholds, actions to take, etc. 
+Tales are the heart and soul of the system.  Tales are definitions for alerts and define such things as our time window for the events we seek, what query will run, thresholds, actions to take, etc. 
 
 
 .. note::
     Tales are  kept in `yaml` files in ``$TATTLE_HOME/etc/tattle/tales``, ``$TATTLE_HOME/etc/tales`` or in ``$TATTLE_HOME/etc/alerts``. 
 
-To understand `Tales`, lets take a look at a few examples below.  We will use these as reference for the rest of the Tales documentation.
+To understand `Tales`, lets take a look at an example below.  Please note, we will use this as a reference for the rest of the Tales documentation.
 
 Example Tales
 -------------
 
-In this example, we will finding all hosts in our environment that have a disk usage of greater than or equal to 90%.  When a match is found, it will send us an alert via Pagerduty as well as an email for each `key` ( host in this case ) that was matched.
+In this example, we will be finding all hosts in our environment that have a disk usage of `greater than or equal` to `90%` for the past `1 hour`.  When a match is found, it will send us an alert via Pagerduty as well as an email for each `key` ( host in this case ) that was matched.
 
-TQL Query with multiple aggs and multi action example
+TQL Query with multiple aggregations and multiple actions example
 ::
     name: "Disk Usage over 90 %"
     description: "Disk Usage High on a host or series of hosts"
@@ -49,6 +49,10 @@ TQL Query with multiple aggs and multi action example
             to: 
                 - 'my_email@company.com'
                 - 'alerts@company.com'
+
+For more breakdown on this Tale, lets look at the :ref:`tales-definitions` section. 
+
+.. _tales-definitions:
 
 Tale Definitions
 -----------------
@@ -106,7 +110,7 @@ Example:
 tql_query
 ~~~~~~~~~
     * Required: `Yes`
-    * Description: The TQL query for the Tale.  See the TQL section for more details
+    * Description: The TQL query for the Tale.  See the :doc:`tql` page for more details on TQL
 Example:
 ::    
     tql_query: "summary.fullest_disk:>=90 | terms name=server, field=host.raw | avg name=fullest_disk, field=summary.fullest_disk"
@@ -145,7 +149,7 @@ type
     * Required: `Yes`
     * Description: The type of the alert
     * Values
-        * ``frequency`` 
+        * ``frequency`` or ``number_of_events``
             * Description: If the `number of events` meets our ``relation`` and ``qty``
         * ``agg_match``
             * Description: If our value meets a regular expression match of something
@@ -376,6 +380,9 @@ Arguments
 
 Your script must be in ``$TATTLE_HOME/bin/scripts`` and must be executable.
 
+.. note::
+    The script will run as whatever user Tattle runs as.  For example if you run Tattle under a user called `tattle`, then the script will run as the user `tattle`. 
+    
 Here is an example script that will echo out each of the ARGV's
 ::
     #!/bin/bash
@@ -475,7 +482,7 @@ Example for NGINX logs
         -
             name: "NGINX 404 Spike"
             description: "A high number of 404's have occured in our NGINX logs"
-            severity: "Criticial"
+            severity: "Medium"
             tql_query: "status:404"
             index: "nginx-access-*"
             enabled: 1

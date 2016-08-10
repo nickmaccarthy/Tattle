@@ -145,7 +145,7 @@
 <p>The Tattle Query Language (TQL) is a short hand syntax used for building Elasticsearh DSL queries.</p>
 <div class="section" id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
-<p>Since Elasticsearch queries can get quite long, it can make managing them for a rolling window alerting system like Tattle a bit difficult.  The Tattle Query Language aims to shorten some of these common queries into an easier read and understand syntax.</p>
+<p>When I was building the first verion of Tattle (project Bluenote), I noticed a pattern in the Elasticserach queries I was making to find events.  For example, They all had <cite>time windows</cite>, they all had a <code class="docutils literal"><span class="pre">query_string</span></code> (Lucene query), a <code class="docutils literal"><span class="pre">size</span></code>, a <code class="docutils literal"><span class="pre">to</span></code> and <code class="docutils literal"><span class="pre">from</span></code>, etc.  So I thought it would be nice to have a short hand syntax to represent an Elasticsearch query that was easy to understand and write, which in turn would make managing hundreds or thousands of Tales easier. Through some experimentation I came up with TQL which aims to do just that.</p>
 </div>
 <div class="section" id="examples">
 <h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
@@ -236,7 +236,7 @@
 </div>
 <div class="section" id="nesting">
 <h2>Nesting<a class="headerlink" href="#nesting" title="Permalink to this headline">¶</a></h2>
-<p>Aggregations in Elasticserach can be nested, and this is the default behaviour in TQL.  You can nest as many aggregations as you with by using <cite>|</cite>.</p>
+<p>Aggregations in Elasticserach can be nested, and this is the default behaviour in TQL.  You can nest as many aggregations as you with by using <code class="docutils literal"><span class="pre">|</span></code>.</p>
 <p>In this example, we can want to average a metric and group it by the host.</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">metric</span><span class="p">:</span><span class="n">DatabaseConnections</span> <span class="o">|</span> <span class="n">terms</span> <span class="n">field</span><span class="o">=</span><span class="n">database</span><span class="o">.</span><span class="n">raw</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">DB_Name</span> <span class="o">|</span> <span class="n">avg</span> <span class="n">field</span><span class="o">=</span><span class="n">connections</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">connection_avg</span>
 </pre></div>
