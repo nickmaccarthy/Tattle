@@ -215,20 +215,24 @@ def flatten_dict(d, lkey='', sep='.'):
     return ret
 
 
-def run_script(script_name, std_in):
+def run_script(script_name, matches, alert, intentions):
     logger = get_logger('run-script')
        
-    script_bins = [ os.path.join(os.environ["BN_HOME"], 'bin', 'scripts') ]
+    script_bins = [ os.path.join(os.environ["TATTLE_HOME"], 'bin', 'scripts') ]
 
     for bin_dir in script_bins:
         full_path = os.path.join(bin_dir, script_name)
 
         logger.info("will now run script: %s" % (full_path))
         try:
-            proc = subprocess.Popen(full_path, stdin=subprocess.PIPE)
-            proc.stdin.write(json.dumps(std_in['_results']))
+            #proc = subprocess.Popen(full_path, stdin=subprocess.PIPE)
+            #proc.stdin.write(json.dumps(std_in['_results']))
+            os.system("""%s '%s' '%s' '%s'""" % (full_path, matches, alert, intentions))
         except Exception, e:
             logger.exception("Unable to run script.  Reason: %s" % (e))
+
+        # We found our first match for the script, no need to go any further
+        return
 
 '''
     Loads a python module from a file, and returns it if it has a main() method

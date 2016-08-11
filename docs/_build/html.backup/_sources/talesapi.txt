@@ -1,0 +1,17 @@
+API
+================
+
+name
+---------------------
+Required: Yes
+`name` - Name of the alert
+
+description
+---------------------
+Required: Yes
+A brief description of the tale.  
+
+severity
+---------------------
+Required: No
+

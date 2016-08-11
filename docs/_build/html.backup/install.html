@@ -1,0 +1,304 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Getting Started - Install &amp; Setup &mdash; Tattle latest documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Tattle latest documentation" href="index.html"/>
+        <link rel="next" title="Tales, Alerts and Actions" href="tales.html"/>
+        <link rel="prev" title="Tattle Intro - Alerting For Your Elasticsearch Data" href="intro.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Tattle
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Tattle Intro - Alerting For Your Elasticsearch Data</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Getting Started - Install &amp; Setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#code">Code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#setup-install">Setup &amp; Install</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#configuration">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#running">Running</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#example-cron">Example Cron</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tales.html">Tales, Alerts and Actions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tql.html">Tattle Query Language (TQL)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logging.html">Logging</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">Tattle</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>Getting Started - Install &amp; Setup</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/install.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="getting-started-install-setup">
+<h1>Getting Started - Install &amp; Setup<a class="headerlink" href="#getting-started-install-setup" title="Permalink to this headline">¶</a></h1>
+<p>Installing Tattle is pretty simple process. Tattle was written in Python, and was designed to work within a <cite>virtualenv</cite>.  The first steps for getting Tattle installed are ensuring you have Python 2.7 installed on your system, as well as <cite>pip</cite> and <cite>virtualenv</cite> as well ( typically installing python 2.7 is as easy as <code class="docutils literal"><span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">python27</span> <span class="pre">python27-virtualenv</span> <span class="pre">python27-pip</span></code> )</p>
+<p>After Python 2.7, pip and virtualenv have been installed, you will need ensure you have <cite>git</cite> installed ( <code class="docutils literal"><span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">git</span></code>), or if you dont have <cite>git</cite> installed, you can download the zip file for Tattle from the Github page and unzip it manually to a directory of your choice.</p>
+<p>After you have these base applications installed, check our the <a class="reference internal" href="#setup-tattle"><span class="std std-ref">Setup &amp; Install</span></a> section to continue.</p>
+<div class="section" id="code">
+<h2>Code<a class="headerlink" href="#code" title="Permalink to this headline">¶</a></h2>
+<p>The source code for Tattle is located on Github:  <a class="reference external" href="https://github.com/nickmaccarthy/Tattle">https://github.com/nickmaccarthy/Tattle</a></p>
+</div>
+<div class="section" id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Python 2.7</li>
+<li>Virtualenv</li>
+<li>Pip</li>
+<li>Git</li>
+</ul>
+</div>
+<div class="section" id="setup-install">
+<span id="setup-tattle"></span><h2>Setup &amp; Install<a class="headerlink" href="#setup-install" title="Permalink to this headline">¶</a></h2>
+<p>Lets assume we will assume will be installing Tattle to <code class="docutils literal"><span class="pre">/opt/Tattle</span></code>, if you are installing into a different location, replace <code class="docutils literal"><span class="pre">/opt/tattle</span></code> with your install directory.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="o">/</span><span class="n">opt</span>
+<span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">nickmaccarthy</span><span class="o">/</span><span class="n">Tattle</span>
+<span class="n">cd</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">Tattle</span>
+<span class="n">virtualenv</span> <span class="n">env</span> <span class="o">&amp;&amp;</span> <span class="n">source</span> <span class="n">env</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">activate</span>
+<span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">r</span> <span class="n">requirements</span><span class="o">.</span><span class="n">txt</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><code class="docutils literal"><span class="pre">$TATTLE_HOME</span></code> refers to where you have installed Tattle.  In the case of this documentation we installed it in <code class="docutils literal"><span class="pre">/opt/Tattle</span></code></p>
+</div>
+</div>
+<div class="section" id="configuration">
+<span id="configure-tattle"></span><h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
+<p>There are a few things we need to configure before we cas start using Tattle.</p>
+<ol class="arabic simple">
+<li>We need to define how to connect to our Elasticserach cluster.  To do this, simple edit <code class="docutils literal"><span class="pre">$TATTLE_HOME/etc/tattle/elasticsearch.yaml</span></code></li>
+</ol>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">There are example configuration files in the <code class="docutils literal"><span class="pre">$TATTLE_HOME/examples</span></code> directory you can use for reference.  In this case, You can use the included <code class="docutils literal"><span class="pre">$TATTLE_HOME/examples/elasticsearch.yaml</span></code> as guidance.</p>
+</div>
+<p>Example</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">servers</span><span class="p">:</span>
+    <span class="o">-</span> <span class="s2">&quot;elasticsearch.mycompany.com&quot;</span>
+<span class="n">args</span><span class="p">:</span>
+    <span class="n">port</span><span class="p">:</span> <span class="mi">9200</span>
+    <span class="n">use_ssl</span><span class="p">:</span> <span class="n">false</span>
+    <span class="n">timeout</span><span class="p">:</span> <span class="mi">30</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The above YAML reference uses the directives defined the python elasticsearch client.  The variables for the args can be found here: <a class="reference external" href="https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch">https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch</a></p>
+</div>
+<p>2. We need to define our email configuration, and or other alert output configurations such as pagerduty, slack, etc.  In this case will just set up our email output.
+Create a new file called <code class="docutils literal"><span class="pre">$TATTLE_HOME/etc/tattle/email.yaml</span></code></p>
+<p>Example</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">server</span><span class="p">:</span> <span class="s1">&#39;localhost&#39;</span>
+<span class="n">port</span><span class="p">:</span> <span class="mi">25</span>
+<span class="n">default_sender</span><span class="p">:</span> <span class="s1">&#39;tattle@localhost&#39;</span>
+<span class="n">subject_prefix</span><span class="p">:</span> <span class="s2">&quot;Tattle Alert: &quot;</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="3">
+<li>Now we need to make <cite>Tale</cite>.  A <cite>Tale</cite> is a definition for our alert.  As Tales are specific to the type of data you need to alert on, they will require more a more in-depth explination then what we can provide in this section.   So please go check out the <a class="reference internal" href="tales.html"><span class="doc">Tales, Alerts and Actions</span></a> section on setting up a Tale, and come back to the next step once that is completed.</li>
+<li>Once you have configured your Tale, please look at the <a class="reference internal" href="#running-tattle"><span class="std std-ref">Running</span></a> section below.</li>
+</ol>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">A note on yaml configuration files.  You can use use both <code class="docutils literal"><span class="pre">.yml</span></code> or <code class="docutils literal"><span class="pre">.yaml</span></code> as your file extension</p>
+</div>
+</div>
+<div class="section" id="running">
+<span id="running-tattle"></span><h2>Running<a class="headerlink" href="#running" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li>Tattle is designed (in its current form) to run standalone.  Its best to run Tattle on a CRON job, typically with an interval of every minute.  You can run it manually yourself as well. Just run <code class="docutils literal"><span class="pre">$TATTLE_HOME/bin/tattled.py</span></code>.</li>
+</ol>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">There are thoughts of having Tattle run as daemon in the future.</p>
+</div>
+<ol class="arabic simple" start="2">
+<li>Tattle also comes with a tale/alert testing utility.  This is how you can check your Tale before you put it into &#8216;production&#8217;.  If there are matches, tattle will run whatever is in the Tale <code class="docutils literal"><span class="pre">action</span></code>.  Simply run <code class="docutils literal"><span class="pre">$TATTLE_HOME/bin/test_alert.py</span>&nbsp; <span class="pre">/path/to/the/tale.yaml</span></code>.</li>
+</ol>
+</div>
+<div class="section" id="example-cron">
+<span id="id1"></span><h2>Example Cron<a class="headerlink" href="#example-cron" title="Permalink to this headline">¶</a></h2>
+<p>Its typical for Tattle run on a CRON job, with a one minute interval.  Everytime Tattle runs, it will check all alerts/Tales.  So if you add additonal tales, Tattle should pick them on its next run</p>
+<p><code class="docutils literal"><span class="pre">*/1</span> <span class="pre">*</span> <span class="pre">*</span> <span class="pre">*</span> <span class="pre">*</span> <span class="pre">/opt/Tattle/env/bin/python</span> <span class="pre">/opt/Tattle/bin/tattled.py</span></code></p>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="tales.html" class="btn btn-neutral float-right" title="Tales, Alerts and Actions" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="intro.html" class="btn btn-neutral" title="Tattle Intro - Alerting For Your Elasticsearch Data" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2014, Nick MacCarthy (nick@nickmaccarthy.com).
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'latest',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

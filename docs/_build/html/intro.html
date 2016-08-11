@@ -1,0 +1,245 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Tattle Intro - Alerting For Your Elasticsearch Data &mdash; Tattle latest documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Tattle latest documentation" href="index.html"/>
+        <link rel="next" title="Getting Started - Install &amp; Setup" href="install.html"/>
+        <link rel="prev" title="Tattle - Alerting For Your Elasticsearch Data" href="index.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Tattle
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Tattle Intro - Alerting For Your Elasticsearch Data</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#history">History</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#quick-setup-install">Quick Setup &amp; Install</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Getting Started - Install &amp; Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tales.html">Tales, Alerts and Actions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tql.html">Tattle Query Language (TQL)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logging.html">Logging</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">Tattle</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>Tattle Intro - Alerting For Your Elasticsearch Data</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/intro.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="tattle-intro-alerting-for-your-elasticsearch-data">
+<h1>Tattle Intro - Alerting For Your Elasticsearch Data<a class="headerlink" href="#tattle-intro-alerting-for-your-elasticsearch-data" title="Permalink to this headline">¶</a></h1>
+<p>Welcome to Tattle, an alerting tool for your Elasticsearch data.</p>
+<p>Tattle aims to provide you with alerting capabilities for the data stored in your Elasticsearch cluster.  Utilizing powerful Elasticsearch features such as Aggregations and Lucene Query Syntax, coupled together with Tattle&#8217;s own query language (TQL) our goal is to make alerts that are easy to build and most of all, easy to read (because lets face it, you probably wont be the only one who has to read them)</p>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>Tattle was designed to make use of the powerful features of Elasticsearch (such as Aggregations) to alert us to a multitude of various metrics and log or event type data.  Things such as frequencys, event spikes, aggregation matches, etc all play a big role in our capabilities for alerting.  Coupled together with an extendable <code class="docutils literal"><span class="pre">alert</span> <span class="pre">action</span></code> mechanism, Tattle can even fix problems for you as they arise ( using the <code class="docutils literal"><span class="pre">script</span></code> action for example ), notify a Pager Duty Service, or even post to a Slack channel; or all of the above.</p>
+</div>
+<div class="section" id="history">
+<h2>History<a class="headerlink" href="#history" title="Permalink to this headline">¶</a></h2>
+<p>Back in 2013 when ELK was farily new term in most people vocabularies, I couldnt find any way to alert on the data inside my Elasticsearch cluster.  Since I was mostly using Elaticsearch to store log, metric and event type data, I couldnt really call ELK a full logging solution until it had the alerting component.  I then decided to build my own system, and &#8220;Project Bluenote&#8221; was born ( because I didnt have a better name for it at the time (and because I was listening to some old Bluenote records when I wrote the first few lines of code)).  Over the next year or so it was developed on an off in my free time and eventually became an invaluable tool for keeping my site up.  One day, after it alerted me that someone had released some particularly questionable code, they said &#8220;Bluenote is such a tattle tale&#8221;.  Figuring that was a much more appropriate name for the project, Tattle was born.</p>
+</div>
+<div class="section" id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Python 2.7</li>
+<li>Virtualenv</li>
+<li>Pip</li>
+<li>Git</li>
+</ul>
+</div>
+<div class="section" id="quick-setup-install">
+<h2>Quick Setup &amp; Install<a class="headerlink" href="#quick-setup-install" title="Permalink to this headline">¶</a></h2>
+<p>Lets assume we will assume will be installing Tattle to <code class="docutils literal"><span class="pre">/opt/Tattle</span></code>.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="o">/</span><span class="n">opt</span>
+<span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">nickmaccarthy</span><span class="o">/</span><span class="n">Tattle</span>
+<span class="n">cd</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">Tattle</span>
+<span class="n">virtualenv</span> <span class="n">env</span> <span class="o">&amp;&amp;</span> <span class="n">source</span> <span class="n">env</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">activate</span>
+<span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">r</span> <span class="n">requirements</span><span class="o">.</span><span class="n">txt</span>
+</pre></div>
+</div>
+<p>Note: <code class="docutils literal"><span class="pre">$TATTLE_HOME</span></code> refers to where you have installed Tattle.  In the case of this documentation we installed it in <code class="docutils literal"><span class="pre">/opt/Tattle</span></code></p>
+<p>Check out the <a class="reference internal" href="install.html"><span class="doc">Getting Started - Install &amp; Setup</span></a> section for more details.</p>
+<p>Or check out the <a class="reference internal" href="tales.html"><span class="doc">Tales, Alerts and Actions</span></a> section on setting up your first Tale and working with Tattle.</p>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="install.html" class="btn btn-neutral float-right" title="Getting Started - Install &amp; Setup" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="Tattle - Alerting For Your Elasticsearch Data" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2014, Nick MacCarthy (nick@nickmaccarthy.com).
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'latest',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

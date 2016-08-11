@@ -1,0 +1,482 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Tale Definitions &mdash; Tattle latest documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Tattle latest documentation" href="index.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Tattle
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="home.html">Home</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Getting Started - Install &amp; Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tales.html">Tales, Alerts and Actions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tql.html">Tattle Query Language (TQL)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logging.html">Logging</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">Tattle</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>Tale Definitions</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/talesdefinitions.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="tale-definitions">
+<h1>Tale Definitions<a class="headerlink" href="#tale-definitions" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="name">
+<h2>name<a class="headerlink" href="#name" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h3>name<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><ul class="simple">
+<li>Required: <cite>Yes</cite></li>
+<li>Description: Name of the alert</li>
+</ul>
+</div></blockquote>
+<p>Example:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>name: &quot;Disk Usage &gt;= 90%&quot;``
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="description">
+<h2>description<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id2">
+<h3>description<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><ul class="simple">
+<li>Required: <cite>Yes</cite></li>
+<li>Description: A brief description of the tale.</li>
+</ul>
+</div></blockquote>
+<p>Example:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">description</span><span class="p">:</span> <span class="s2">&quot;The disk usage on the server &gt;= 90</span><span class="si">% o</span><span class="s2">n the root filesystem``</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="severity">
+<h2>severity<a class="headerlink" href="#severity" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id3">
+<h3>severity<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><ul class="simple">
+<li>Required: <cite>No</cite></li>
+<li>Description: The severity of the alert.  This is a string, and can be whatever you want.  1-5, Low-Crit, etc</li>
+</ul>
+</div></blockquote>
+<p>Example:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">severity</span><span class="p">:</span> <span class="s2">&quot;High&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="disabled">
+<h2>disabled<a class="headerlink" href="#disabled" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id4">
+<h3>disabled<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><ul class="simple">
+<li>Required: <cite>Yes</cite></li>
+<li>Description: Whteher this Tale is enabled (0) or disabled (1)</li>
+</ul>
+</div></blockquote>
+<p>Example:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># This alert is enabled, i.e. its NOT disabled</span>
+<span class="n">disabled</span><span class="p">:</span> <span class="mi">0</span>
+<span class="c1"># This alert is disabled</span>
+<span class="n">disabled</span><span class="p">:</span> <span class="mi">1</span>
+<span class="c1"># You can even use strings</span>
+<span class="n">disabled</span><span class="p">:</span> <span class="s2">&quot;yes&quot;</span>
+<span class="c1"># Or True and False Statements</span>
+<span class="n">disabled</span><span class="p">:</span> <span class="n">true</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="tql-query">
+<h2>tql_query<a class="headerlink" href="#tql-query" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id5">
+<h3>tql_query<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><ul class="simple">
+<li>Required: <cite>Yes</cite></li>
+<li>Description: The TQL query for the Tale.  See the TQL section for more details</li>
+</ul>
+</div></blockquote>
+<p>Example:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">tql_query</span><span class="p">:</span> <span class="s2">&quot;summary.fullest_disk:&gt;=90 | terms name=server, field=host.raw | avg name=fullest_disk, field=summary.fullest_disk&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="index">
+<h2>index<a class="headerlink" href="#index" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id6">
+<h3>index<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><ul>
+<li><p class="first">Required <cite>Yes</cite></p>
+</li>
+<li><p class="first">Description: The index pattern where you the events you are searching reside.  Default is <code class="docutils literal"><span class="pre">logstash-*</span></code></p>
+</li>
+<li><dl class="first docutils">
+<dt>More information:</dt>
+<dd><ul class="first last simple">
+<li>Currently Tattle expects your indexes to be in daily format <code class="docutils literal"><span class="pre">YYYY.MM.DD</span></code> which is pretty standard/common.  The <code class="docutils literal"><span class="pre">*</span></code> at the end of the index name tells Tattle to figure out which indexes to search against based on the timeperiod.  Lets use the example of <code class="docutils literal"><span class="pre">now-1h</span></code> as our start time, and assume our current time is <code class="docutils literal"><span class="pre">2016/02/02</span> <span class="pre">00:01:00</span></code>; when Tattle runs it will actually search against two indexes:  <code class="docutils literal"><span class="pre">system-metrics-2016.02.02</span></code> and <code class="docutils literal"><span class="pre">system-metrics-2016.02.01</span></code> since <code class="docutils literal"><span class="pre">-1h</span></code> from now would have technically been yesterday.</li>
+<li>If you do not specify a <code class="docutils literal"><span class="pre">*</span></code> Tattle will use just that index name, with no time</li>
+<li>In the future we plan to add the definition of index pattern</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<p>Example:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">index</span><span class="p">:</span> <span class="s2">&quot;system-metrics-*</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="timeperiod">
+<h2>timeperiod<a class="headerlink" href="#timeperiod" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id7">
+<h3>timeperiod<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><ul>
+<li><p class="first"><code class="docutils literal"><span class="pre">start</span></code>, <code class="docutils literal"><span class="pre">end</span></code></p>
+</li>
+<li><p class="first">Required: <cite>Yes</cite></p>
+</li>
+<li><p class="first">Description: The timeperiod for events this Tale searches for.  This is a rolling window using python-datemath as our start and end times.</p>
+</li>
+<li><dl class="first docutils">
+<dt>More information:</dt>
+<dd><ul class="first last simple">
+<li>More documentation on python-datemath can be found here: <a class="reference external" href="https://github.com/nickmaccarthy/python-datemath">https://github.com/nickmaccarthy/python-datemath</a></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<p>Example:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">timeperiod</span><span class="p">:</span>
+    <span class="c1"># The start of our alert window</span>
+    <span class="n">start</span><span class="p">:</span> <span class="s1">&#39;now-1h&#39;</span>
+    <span class="c1"># The end of our alert window</span>
+    <span class="n">end</span><span class="p">:</span> <span class="s1">&#39;now&#39;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="alert">
+<h2>alert<a class="headerlink" href="#alert" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="type">
+<h3>type<a class="headerlink" href="#type" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><ul>
+<li><p class="first">Required: <cite>Yes</cite></p>
+</li>
+<li><p class="first">Description: The type of the alert</p>
+</li>
+<li><dl class="first docutils">
+<dt>Values</dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt><code class="docutils literal"><span class="pre">frequency</span></code></dt>
+<dd><ul class="first last simple">
+<li>Description: If the <cite>number of events</cite> meets our <code class="docutils literal"><span class="pre">relation</span></code> and <code class="docutils literal"><span class="pre">qty</span></code></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><code class="docutils literal"><span class="pre">agg_match</span></code></dt>
+<dd><ul class="first last simple">
+<li>Description: If our value meets a regular expression match of something</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="relation">
+<h3>relation<a class="headerlink" href="#relation" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><ul>
+<li><p class="first">Required: <cite>Yes</cite></p>
+</li>
+<li><p class="first">Description: If our event count meets our relation, then the alert should fire</p>
+</li>
+<li><dl class="first docutils">
+<dt>Values</dt>
+<dd><ul class="first last simple">
+<li><code class="docutils literal"><span class="pre">eq</span></code>, <code class="docutils literal"><span class="pre">=</span></code> - Equal To</li>
+<li><code class="docutils literal"><span class="pre">ne</span></code>, <code class="docutils literal"><span class="pre">!=</span></code> - Not Equal To</li>
+<li><code class="docutils literal"><span class="pre">lt</span></code>, <code class="docutils literal"><span class="pre">&lt;</span></code> - Less Than</li>
+<li>&#8216;<code class="docutils literal"><span class="pre">gt</span></code>, <code class="docutils literal"><span class="pre">&gt;</span></code> - Greater Than</li>
+<li><code class="docutils literal"><span class="pre">le</span></code>, <code class="docutils literal"><span class="pre">&lt;=</span></code> - Less Than or Equal To</li>
+<li><code class="docutils literal"><span class="pre">ge</span></code>, <code class="docutils literal"><span class="pre">&gt;=</span></code> - Greater Than or Equal To</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="qty">
+<h3>qty<a class="headerlink" href="#qty" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><ul class="simple">
+<li>Required: <cite>Yes</cite></li>
+<li>Description: What we compare our <code class="docutils literal"><span class="pre">relation</span></code> to</li>
+</ul>
+</div></blockquote>
+<p>Example&#8221;:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1">## If our number of events is greater than or equal to 10, then we should alert</span>
+<span class="n">relation</span><span class="p">:</span> <span class="s2">&quot;&gt;=&quot;</span>
+<span class="n">qty</span><span class="p">:</span> <span class="mi">10</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="realert">
+<h3>realert<a class="headerlink" href="#realert" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><ul>
+<li><p class="first">Required: <cite>Yes</cite></p>
+</li>
+<li><p class="first">Description:  How long Tattle will wait before it will re-alert on this Tale.  If Tattle is still finding matches for this Tale, but we are within the re-alert threshold, then Tattle will not alert.</p>
+</li>
+<li><dl class="first docutils">
+<dt>Notes:</dt>
+<dd><ul class="first last">
+<li><p class="first">Every time Tattle fires an alert, it stores it in the Tattle index in Elasticserach ( default is <code class="docutils literal"><span class="pre">tattle-int</span></code> ).  When the Tale gets loaded, one of the first thing it does it check to see when the last time this Tale fired.  It then compares the last time to the realert threshold, diffs the two and if we are beyone our re-alert threshold, then Tattle will re-fire the Tale.</p>
+</li>
+<li><dl class="first docutils">
+<dt>It uses simple datemath like so:</dt>
+<dd><ul class="first last simple">
+<li><code class="docutils literal"><span class="pre">1h</span></code></li>
+<li><code class="docutils literal"><span class="pre">2m</span></code></li>
+<li><code class="docutils literal"><span class="pre">3d</span></code></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<p>Example:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># Don&#39;t alert us to this again for 1 hour</span>
+<span class="n">realert</span><span class="p">:</span> <span class="s2">&quot;1h&quot;</span>
+</pre></div>
+</div>
+<dl class="docutils">
+<dt>return_matches:</dt>
+<dd><ul class="first last">
+<li><p class="first">Required: <cite>Yes</cite></p>
+</li>
+<li><p class="first">Description:  If Tattle should return the matches it found.  It will return those matches in whatever action you have configured</p>
+</li>
+<li><dl class="first docutils">
+<dt>Notes:</dt>
+<dd><ul class="first last simple">
+<li>Sometimes you can get many matches ( hundreds or thousands for example ).  With the <code class="docutils literal"><span class="pre">random:</span> <span class="pre">True</span></code> or <code class="docutils literal"><span class="pre">length:</span> <span class="pre">10</span></code> stanzas Tattle can return a randam sample of <code class="docutils literal"><span class="pre">10</span></code> results</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+<p>Example:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># Assuming we could get hundreds of matches back</span>
+<span class="n">return_matches</span><span class="p">:</span>
+    <span class="c1"># Return back a random sample of 20 results</span>
+    <span class="n">random</span><span class="p">:</span> <span class="n">true</span>
+    <span class="n">length</span><span class="p">:</span> <span class="mi">20</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="action">
+<h2>action<a class="headerlink" href="#action" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2014, Nick MacCarthy (nick@nickmaccarthy.com).
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'latest',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

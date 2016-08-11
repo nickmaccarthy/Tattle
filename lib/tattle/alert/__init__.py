@@ -8,6 +8,7 @@ from dateutil.relativedelta import relativedelta
 from elasticsearch import Elasticsearch
 import tattle
 import tattle.config
+from tattle.exceptions import ConfigException
 import re
 import json
 import operator
@@ -16,8 +17,8 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from jinja2 import Environment, FileSystemLoader 
 
-tcfg = tattle.config.load_tattle_config()
-#mailcfg = tcfg['Mail']
+#tcfg = tattle.config.load_tattle_config()
+tcfg = tattle.config.load_configs().get('tattle')
 
 from pprint import pprint
 
@@ -108,7 +109,11 @@ class EmailAlert(AlertBase):
     def __init__(self, **kwargs):
         super(EmailAlert, self).__init__(**kwargs)
 
-        mailcfg = tattle.load_email_config()
+        self.mailcfg = tattle.config.load_configs().get('email')
+
+        if self.mailcfg is None:
+            raise ConfigException("Unable to load the email config.  Does it exist at $TATTLE_HOME/etc/tattle/email.yml?")
+
         self.subject = None
         self.cc = None
         self.bcc = None
@@ -117,10 +122,10 @@ class EmailAlert(AlertBase):
             if k == 'enabled': continue
             setattr(self, k, v)
 
-        self.sender = kwargs.get('sender', mailcfg['default_sender'])
+        self.sender = kwargs.get('sender', self.mailcfg['default_sender'])
         # sets our email subject
 
-        self.subject_prefix = mailcfg.get('subject_prefix', '')
+        self.subject_prefix = self.mailcfg.get('subject_prefix', '')
 
         if not self.subject:
             self.set_subject(**kwargs)
@@ -128,9 +133,9 @@ class EmailAlert(AlertBase):
 
     def connect(self):
         try:
-            self.server = smtplib.SMTP(mailcfg.get('host','localhost'), mailcfg.get('port', 25))
+            self.server = smtplib.SMTP(self.mailcfg.get('host','localhost'), self.mailcfg.get('port', 25))
         except Exception as e:
-            logger.exception("Unable to connect to SMTP server: reason: %s, mailcfg: %s" % (e,mailcfg))
+            logger.exception("Unable to connect to SMTP server: reason: %s, mailcfg: %s" % (e,self.mailcfg))
 
     def build_msg(self):
         self.email_body = self.make_email_body()
@@ -191,14 +196,32 @@ class EmailAlert(AlertBase):
             return log_msg
 
 
+
+class ScriptAlert(AlertBase):
+
+    def __init__(self, script_name, **kwargs):
+        super(ScriptAlert, self).__init__(**kwargs)
+        self.script_name = script_name
+
+    def fire(self):
+        try:
+            tattle.run_script(self.script_name, json.dumps(self.matches), json.dumps(self.alert), json.dumps(self.intentions)) 
+        except Exception as e:
+            logger.exception('Unable to run script: %s, reason: %s'.format(self.script_name, e))
+        
+        
 class PagerDutyAlert(AlertBase):
     
     def __init__(self, service_name, **kwargs):
         super(PagerDutyAlert, self).__init__(**kwargs)
-        pdcfg = tattle.config.load_pd_config() 
+
+        self.pdcfg = tattle.config.load_configs().get('pagerduty')
+        if self.pdcfg is None:
+            raise ConfigException("Unable to load the pagerduty config. Does the pagerduty.yaml exist in $TATTLE_HOME/etc/tattle/pagerduty.yml?")
+
 
         # Find our config options based on our service name
-        cfg = self.get_service_args(service_name, pdcfg)
+        cfg = self.get_service_args(service_name)
 
         if not cfg:
             msg = "Unable to find PagerDuty config for: {}, cannot continue.".format(service_name)
@@ -213,8 +236,8 @@ class PagerDutyAlert(AlertBase):
         self.title = "Tattle - {}".format(self.title)
 
 
-    def get_service_args(self, key, pdcfg):
-        for k,args in pdcfg.items():
+    def get_service_args(self, key):
+        for k,args in self.pdcfg.items():
             if key in k:
                 #return { k:args }
                 return args
@@ -240,7 +263,6 @@ class PagerDutyAlert(AlertBase):
         return ''.join(body)
     
     def fire(self):
-
         headers = {'content-type': 'application/json'}
         payload = {
             'service_key': self.pagerduty_service_key,
@@ -259,7 +281,7 @@ class PagerDutyAlert(AlertBase):
             response.raise_for_status()
         except RequestException as e:
             #raise RequestException("Error posting to pagerduty: %s" % e)
-            logger.error('Error posting to pagerduty: %s' % e)
+            logger.error('Error posting message to pagerduty: %s' % e)
 
 
 

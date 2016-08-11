@@ -9,7 +9,7 @@ import tattle.alert
 import json
 from tattle.result import results_to_df
 import random
-from tattle.alert import EmailAlert, PPrintAlert, PagerDutyAlert
+from tattle.alert import EmailAlert, PPrintAlert, PagerDutyAlert, ScriptAlert
 from datemath import dm, datemath
 
 TATTLE_HOME = os.environ.get('TATTLE_HOME')
@@ -29,7 +29,8 @@ def tnd(es, alert):
     should_alert = False
     matches = None
 
-    if tattle.normalize_boolean(alert.get('disabled')) == True: 
+    #if tattle.normalize_boolean(alert.get('disabled')) == True: 
+    if tattle.normalize_boolean(alert.get('enabled')) == False or tattle.normalize_boolean(alert.get('disabled')) == True: 
         logger.debug('Alert: {} is disabled.  Moving on...'.format(alert.get('name')))
         return
 
@@ -106,7 +107,7 @@ def tnd(es, alert):
             matches = tattle.filter.meets_threshold(filtered, alert['alert']['relation'], alert['alert']['qty'])
             if matches:
                 should_alert = True
-    elif 'agg_match' in alert_type:
+    elif alert_type in ('agg_match', 'regex_match'):
         matches = tattle.filter.meets_in_field(results, alert['alert']['field'], alert['alert']['relation'], alert['alert']['qty'])
         if matches:
             should_alert = True
@@ -216,8 +217,14 @@ def tnd(es, alert):
                         logger.info("""msg="{}", name="{}" """.format("PagetDuty Alert Sent", alert['name']))
                     
             if alert['action'].has_key('script'):
-                SCRIPT_DIRS = tattle.get_bindirs(TATTLE_HOME)
-                print tattle.run_script(alert['alert']['action']['script']['filename'], matches)
+                if tattle.normalize_boolean(alert['action']['script']['enabled']) == True:
+                    mq = EventQueue(alert=alert, results=matches, matches=matches, intentions={'foo': 'bar'})
+                    script_name = alert['action']['script']['filename']
+                    salert = ScriptAlert(script_name, event_queue=mq)
+                    salert.fire()
+                    logger.info("""msg="{}", name="{}" """.format("Script Alert Triggered", alert['name']))
+
+
     else:
         logger.debug("Nope, i would not alert. Alert: {} Reason: {} was not {} {}".format(alert['name'], alert['alert']['type'], alert['alert']['relation'], alert['alert']['qty']))
 

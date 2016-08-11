@@ -1,0 +1,236 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Tales &amp; Alerts &mdash; Tattle latest documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Tattle latest documentation" href="index.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Tattle
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="home.html">Home</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Getting Started - Install &amp; Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tales.html">Tales, Alerts and Actions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tql.html">Tattle Query Language (TQL)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logging.html">Logging</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">Tattle</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>Tales &amp; Alerts</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/talesandalerts.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="tales-alerts">
+<h1>Tales &amp; Alerts<a class="headerlink" href="#tales-alerts" title="Permalink to this headline">¶</a></h1>
+<p>Tales are the heart and soul of what makes Tattle work.  Tales are definitions for what should qualify the alert, and what actions to take once we have a true positive.</p>
+<p>Here is an example Tale</p>
+<p>Example</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">name</span><span class="p">:</span> <span class="s2">&quot;Disk Usage over 90 %&quot;</span>
+<span class="n">description</span><span class="p">:</span> <span class="s2">&quot;Disk Usage High on a host or series of hosts&quot;</span>
+<span class="n">severity</span><span class="p">:</span> <span class="s2">&quot;High&quot;</span>
+<span class="n">tql_query</span><span class="p">:</span> <span class="s2">&quot;summary.fullest_disk:&gt;=90 | terms name=server, field=host.raw | avg name=fullest_disk, field=summary.fullest_disk&quot;</span>
+<span class="n">index</span><span class="p">:</span> <span class="s2">&quot;system-metrics-*&quot;</span>
+<span class="n">disabled</span><span class="p">:</span> <span class="mi">0</span>
+<span class="n">timeperiod</span><span class="p">:</span>
+    <span class="n">start</span><span class="p">:</span> <span class="s2">&quot;now-1h&quot;</span>
+    <span class="n">end</span><span class="p">:</span> <span class="s2">&quot;now&quot;</span>
+<span class="n">alert</span><span class="p">:</span>
+    <span class="nb">type</span><span class="p">:</span> <span class="s2">&quot;frequency&quot;</span>
+    <span class="n">relation</span><span class="p">:</span> <span class="s2">&quot;gt&quot;</span>
+    <span class="n">qty</span><span class="p">:</span> <span class="mi">0</span>
+    <span class="n">realert</span><span class="p">:</span> <span class="s2">&quot;10s&quot;</span>
+    <span class="n">return_matches</span><span class="p">:</span>
+        <span class="n">length</span><span class="p">:</span> <span class="mi">10</span>
+        <span class="n">random</span><span class="p">:</span> <span class="n">true</span>
+<span class="n">action</span><span class="p">:</span>
+    <span class="n">pagerduty</span><span class="p">:</span>
+        <span class="n">enabled</span><span class="p">:</span> <span class="mi">1</span>
+        <span class="n">service_key</span><span class="p">:</span> <span class="s2">&quot;TattleAlerts&quot;</span>
+        <span class="n">once_per_match</span><span class="p">:</span>
+            <span class="n">match_key</span><span class="p">:</span> <span class="s2">&quot;key&quot;</span>
+
+    <span class="n">email</span><span class="p">:</span>
+        <span class="n">enabled</span><span class="p">:</span> <span class="mi">1</span>
+        <span class="n">once_per_match</span><span class="p">:</span>
+            <span class="n">match_key</span><span class="p">:</span> <span class="s2">&quot;key&quot;</span>
+        <span class="n">to</span><span class="p">:</span> <span class="s1">&#39;my_email@company.com&#39;</span>
+</pre></div>
+</div>
+<p>In the above example, you will notice the <code class="docutils literal"><span class="pre">tql_query</span></code> config option.  This is a short hand query syntax that Tattle uses to create the Elasticsearch DSL Query with Aggregation support.  The first part (before the first <code class="docutils literal"><span class="pre">|</span></code>) is straight Lucene syntax.  You are probably familiar with this if you have ever used Kibana or worked with Lucene before.  The parts after the first <code class="docutils literal"><span class="pre">|</span></code> are aggregations in shorthand.
+You will notice there are two aggregations in this query.  The <code class="docutils literal"><span class="pre">|</span></code>&#8216;s denote these will be nested aggregations.  The <code class="docutils literal"><span class="pre">terms</span></code> query will run before the <code class="docutils literal"><span class="pre">avg</span></code> query.</p>
+<p>Next you will notice the timeperiod section.  This section denotes the start and end time for the &#8216;rolling&#8217; windows this alert will utilize.  In this case, the window for this search will be whatever time &#8216;now&#8217; is, minus 1 hour, and the end time for the query will be &#8216;now&#8217;.
+Then we have the alert type.  In this case it is <code class="docutils literal"><span class="pre">freqeuency</span></code> which means that if we have a &#8216;number_of_events&#8217; beyond our threshold, then we will use this to trigger our <code class="docutils literal"><span class="pre">action</span></code> below.  The thresholds in this case are a &#8216;number_of_events&#8217; that are <code class="docutils literal"><span class="pre">greater</span> <span class="pre">than</span> <span class="pre">or</span> <span class="pre">equal</span> <span class="pre">to</span></code> to <code class="docutils literal"><span class="pre">10</span></code> in the last <code class="docutils literal"><span class="pre">1</span> <span class="pre">hour</span></code> ( <code class="docutils literal"><span class="pre">now-1h</span></code> ).
+Next up is the <code class="docutils literal"><span class="pre">action</span></code>.  If our alert has triggered has met its threshold, the next thing to do is do something about it.  In this case we have two actions, one is to send the alert to PagerDuty, the second is to email us.
+For more information about the setup of an alert, please see the alerts section.</p>
+<p>Please be sure to check out the Tales &amp; Alerts section for more information on creating and configuring Tales.</p>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2014, Nick MacCarthy (nick@nickmaccarthy.com).
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'latest',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
