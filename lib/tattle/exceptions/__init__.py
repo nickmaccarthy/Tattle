@@ -3,3 +3,7 @@ class TQLException(Exception):
 
 class ESQueryException(Exception):
     pass
+
+
+class ConfigException(Exception):
+    pass
