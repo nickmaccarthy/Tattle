@@ -218,12 +218,13 @@ def tnd(es, alert):
                     
             if alert['action'].has_key('script'):
                 if tattle.normalize_boolean(alert['action']['script']['enabled']) == True:
-                    SCRIPT_DIRS = tattle.get_bindirs(TATTLE_HOME)
-                    mq = EventQueue(alert=alert, results=results, matches=m, intentions=esq['intentions'])
+                    mq = EventQueue(alert=alert, results=matches, matches=matches, intentions={'foo': 'bar'})
+                    script_name = alert['action']['script']['filename']
                     salert = ScriptAlert(script_name, event_queue=mq)
                     salert.fire()
                     logger.info("""msg="{}", name="{}" """.format("Script Alert Triggered", alert['name']))
-                    print tattle.run_script(alert['alert']['action']['script']['filename'], matches)
+
+
     else:
         logger.debug("Nope, i would not alert. Alert: {} Reason: {} was not {} {}".format(alert['name'], alert['alert']['type'], alert['alert']['relation'], alert['alert']['qty']))
 
