@@ -21,20 +21,19 @@ def load_yaml_file(filename):
 
 ## These configs should be able to by dynamically loaded and stored and referenced by a key
 ## And they should be found via glob so we dont have to depend on the exact yml vs yaml reference
-def load_pd_config():
-    pdconf = load_yaml_file(os.path.join(TATTLE_HOME, 'etc', 'tattle', 'pagerduty.yml'))
-    return pdconf
-
-def load_tattle_config():
-    ''' loads our tattle config '''
-    tattle_conf = load_yaml_file(os.path.join(TATTLE_HOME, 'etc', 'tattle', 'tattle.yml'))
-    return tattle_conf
+## Working on deprecating these
+#def load_pd_config():
+#    pdconf = load_yaml_file(os.path.join(TATTLE_HOME, 'etc', 'tattle', 'pagerduty.yml'))
+#    return pdconf
+#def load_email_config():
+#    ''' loads our email config '''
+#    emailconf = load_yaml_file(os.path.join(TATTLE_HOME, 'etc', 'tattle', 'email.yaml'))
+#    return emailconf
+#def load_tattle_config():
+#    ''' loads our tattle config '''
+#    tattle_conf = load_yaml_file(os.path.join(TATTLE_HOME, 'etc', 'tattle', 'tattle.yml'))
+#    return tattle_conf
     
-def load_email_config():
-    ''' loads our email config '''
-    emailconf = load_yaml_file(os.path.join(TATTLE_HOME, 'etc', 'tattle', 'email.yaml'))
-    return emailconf
-
 def get_taledirs():
     ''' directories where we can find tales '''
     TATTLE_HOME = tattle.get_tattlehome()
