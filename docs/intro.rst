@@ -24,7 +24,7 @@ Back in 2013 when ELK was farily new term in most people vocabularies, I couldnt
 
 Requirements
 -------------
-* Python 2.7
+* Python 2.7 or Python 3.3+
 * Virtualenv
 * Pip
 * Git

@@ -1,7 +1,9 @@
 Getting Started - Install & Setup
 =================================
 
-Installing Tattle is pretty simple process. Tattle was written in Python, and was designed to work within a `virtualenv <http://docs.python-guide.org/en/latest/dev/virtualenvs/>`_.  The first steps for getting Tattle installed are ensuring you have Python 2.7 installed on your system, as well as `pip <https://pypi.python.org/pypi/pip>`_ and `virtualenv <http://docs.python-guide.org/en/latest/dev/virtualenvs/>`_ ( typically installing python 2.7 on a modern linux system is as easy as ``apt-get install python27 python27-virtualenv python27-pip`` for Debian based systems (such as Ubuntu) or ``yum install python27 python27-pip python27-virtualenv`` for CentOS based users )
+Installing Tattle is pretty simple process. Tattle was written in Python, and was designed to work within a `virtualenv <http://docs.python-guide.org/en/latest/dev/virtualenvs/>`_.  Tattle works with both Python 2.7 and Python 3.3+ (it was tested against Python 3.5, which is the latest at the time of this writing).  
+
+The first steps for getting Tattle installed are ensuring you have either Python 2.7 or Python 3.3+ installed on your system, as well as `pip <https://pypi.python.org/pypi/pip>`_ and `virtualenv <http://docs.python-guide.org/en/latest/dev/virtualenvs/>`_ ( typically installing python 2.7 on a modern linux system is as easy as ``apt-get install python27 python27-virtualenv python27-pip`` for Debian based systems (such as Ubuntu) or ``yum install python27 python27-pip python27-virtualenv`` for CentOS based users )
 
 .. note::
     If you already have python 2.7.10 or above installed, then you should already have `pip`.  You can typically install virtualenv with pip as well
@@ -20,7 +22,7 @@ The source code for Tattle is located on Github:  https://github.com/nickmaccart
 
 Requirements
 --------------------
-* Python 2.7
+* Python 2.7 or Python 3.3+
 * Virtualenv
 * Pip
 * Git
