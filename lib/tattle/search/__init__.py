@@ -169,16 +169,20 @@ class TQL(DSLBase):
         # clean up commas out of the arg keys and vals
         args = { k.strip(','):v.strip(',') for k,v in args.items() }
 
-        if args.has_key('name') or args.has_key('title'):
+        #if args.has_key('name') or args.has_key('title'):
+        #if ('name', 'title') in args:
+        if 'name' in args or 'title' in args:
             agg_name = args.get('name') or args.get('title')
             try:
                 del(args['name'])
             except:
                 del(args['title'])
 
-        if args.has_key('order'):
+        #if args.has_key('order'):
+        if 'order' in args:
             args['order'] = eval(args['order'])
-        elif args.has_key('script'):
+        #elif args.has_key('script'):
+        if 'script' in args:
             args['script'] = eval(args['script'])
 
 

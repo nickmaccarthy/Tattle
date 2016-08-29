@@ -326,8 +326,8 @@ class TestTQL(unittest.TestCase):
         self.assertTrue(tattle.find_in_dict(r1, 'buckets'))
         self.assertTrue(tattle.find_in_dict(r2, 'buckets'))
         
-        r1key = q.results_aggs.keys()[0]
-        r2key = q2.results_aggs.keys()[0]
+        r1key = list(q.results_aggs.keys())[0]
+        r2key = list(q2.results_aggs.keys())[0]
 
         rdf1 = results_to_df(q.results_aggs[r1key]['buckets'])
         rdf2 = results_to_df(q2.results_aggs[r2key]['buckets'])

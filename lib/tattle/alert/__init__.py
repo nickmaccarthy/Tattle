@@ -59,9 +59,11 @@ class AlertBase(object):
     def set_title(self):
         if self.title:
             self.title = self.title
-        elif self.alert['alert'].has_key('title'):
+        #elif self.alert['alert'].has_key('title'):
+        if 'title' in self.alert['alert']:
             self.title = self.alert['alert']['title']
-        elif self.alert.has_key('name'):
+        #elif self.alert.has_key('name'):
+        elif 'name' in self.alert:
             self.title = self.alert['name']
         else:
             self.title = "Not Defined"
@@ -166,7 +168,8 @@ class EmailAlert(AlertBase):
                 logger.exception("Unable to send email, reason: {}".format(e))
 
     def set_subject(self, **kwargs):
-        if self.alert['action']['email'].has_key('subject'):
+        #if self.alert['action']['email'].has_key('subject'):
+        if 'subject' in self.alert['action']['email']:
             self.subject = self.alert['alert']['email']['subject']
         else: 
             self.subject = self.title
