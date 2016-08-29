@@ -1,4 +1,4 @@
-env/*
+env*
 etc/alerts/*.y*ml
 etc/tattle/*.y*ml
 !etc/tattle/logging.y*ml

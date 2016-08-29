@@ -87,7 +87,7 @@ class TQL(DSLBase):
             self._start_time = dm(self._start)
             self._end_time = dm(self._end)
             self._index = tattle.get_indexes(self._index_name_pattern, self._start_time, self._end_time, pattern=self._index_ts_pattern)
-        except TQLException, e:
+        except TQLException as e:
             raise TQLArgsException("Unable to set arguments for TQL, I am missing: %s" % (e))
 
         self._start_time_iso_str = self._start_time.format(self._ISO_TS)
@@ -169,16 +169,20 @@ class TQL(DSLBase):
         # clean up commas out of the arg keys and vals
         args = { k.strip(','):v.strip(',') for k,v in args.items() }
 
-        if args.has_key('name') or args.has_key('title'):
+        #if args.has_key('name') or args.has_key('title'):
+        #if ('name', 'title') in args:
+        if 'name' in args or 'title' in args:
             agg_name = args.get('name') or args.get('title')
             try:
                 del(args['name'])
             except:
                 del(args['title'])
 
-        if args.has_key('order'):
+        #if args.has_key('order'):
+        if 'order' in args:
             args['order'] = eval(args['order'])
-        elif args.has_key('script'):
+        #elif args.has_key('script'):
+        if 'script' in args:
             args['script'] = eval(args['script'])
 
 

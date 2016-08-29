@@ -9,7 +9,6 @@ import datetime
 import arrow
 import socket
 import platform
-import commands
 import logging
 import logging.handlers as logging_handler
 from autocast import autocast
@@ -92,7 +91,7 @@ def dict_to_html_table(ourl):
         table.append("</table>")
 
         return ''.join(table)
-    except Exception, e:
+    except Exception as e:
         return e
 
 
@@ -157,8 +156,8 @@ def relative_time_to_seconds(timestr):
             interval = m.group('interval')
             interval = int(interval.lstrip('-'))
             period = m.group('period')
-    except Exception, e:
-        print "unable to parse relative time string: %s" % e
+    except Exception as e:
+        print("unable to parse relative time string: %s" % e)
         return
 
     if 's' in period:
@@ -228,7 +227,7 @@ def run_script(script_name, matches, alert, intentions):
             #proc = subprocess.Popen(full_path, stdin=subprocess.PIPE)
             #proc.stdin.write(json.dumps(std_in['_results']))
             os.system("""%s '%s' '%s' '%s'""" % (full_path, matches, alert, intentions))
-        except Exception, e:
+        except Exception as e:
             logger.exception("Unable to run script.  Reason: %s" % (e))
 
         # We found our first match for the script, no need to go any further
@@ -288,10 +287,6 @@ def get_apps(PATH):
 def castem(e):
     return e
 
-def get_hostname():
-    import commands
-    return commands.getoutput("hostname -s")
-
 def pprint(obj):
     import pprint
     pp = pprint.PrettyPrinter(indent=4)
@@ -303,10 +298,10 @@ def pprint_as_json(blob):
 ''' pretty prints into json '''
 def pprint_json(blob):
     try:
-        print simplejson.dumps(blob, sort_keys=False, indent=4, ensure_ascii=False)
+        print( simplejson.dumps(blob, sort_keys=False, indent=4, ensure_ascii=False))
     except UnicodeDecodeError:
         # This blob contains non-unicode, so lets pretend it's Latin-1 to show something
-        print simplejson.dumps(blob, sort_keys=True, indent=4, encoding='Latin-1', ensure_ascii=False)
+        print( simplejson.dumps(blob, sort_keys=True, indent=4, encoding='Latin-1', ensure_ascii=False) )
 
 ''' returns an md5 hash from a given input '''
 def md5hash(input):

@@ -149,16 +149,15 @@ Certain Elasticserach aggregations, such as `terms` can order your results.  You
 
 Scripting
 -----------
-Like ordering, certain Elasticsearch aggs can contain `scripts` to enhance their values during search time.  Much like the `order` function, these are evaluated just like they are in the docs
+Like ordering, certain Elasticsearch aggs can contain `scripts` to enhance their values during search time.  Much like the `order` function, these are evaluated just like they are in the Elasticsearch docs.
 ::  
     .... | stats name=grades_stats, script={"inline": "_value * correction", "params": {"correction": 1.2}} 
 
 
-An example deomonstrating inline scripting with the choice of language, and converting bytes to MB
+An example demonstrating inline scripting with the choice of language, and converting bytes to MB
 ::
     host.raw:app-servers* | avg name=mb_sent, script="doc['body_bytes_sent']/1024/1024", lang=expression
 
 .. note::
     Groovy inline scripting is disabled by default in modern Elasticsearch clusters. As always, check out the scripting documentation on elastic.co for more examples: https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-scripting.html
-
-
+   

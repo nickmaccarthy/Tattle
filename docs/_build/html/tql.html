@@ -282,11 +282,11 @@
 </div>
 <div class="section" id="scripting">
 <h2>Scripting<a class="headerlink" href="#scripting" title="Permalink to this headline">¶</a></h2>
-<p>Like ordering, certain Elasticsearch aggs can contain <cite>scripts</cite> to enhance their values during search time.  Much like the <cite>order</cite> function, these are evaluated just like they are in the docs</p>
+<p>Like ordering, certain Elasticsearch aggs can contain <cite>scripts</cite> to enhance their values during search time.  Much like the <cite>order</cite> function, these are evaluated just like they are in the Elasticsearch docs.</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">....</span> <span class="o">|</span> <span class="n">stats</span> <span class="n">name</span><span class="o">=</span><span class="n">grades_stats</span><span class="p">,</span> <span class="n">script</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;inline&quot;</span><span class="p">:</span> <span class="s2">&quot;_value * correction&quot;</span><span class="p">,</span> <span class="s2">&quot;params&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;correction&quot;</span><span class="p">:</span> <span class="mf">1.2</span><span class="p">}}</span>
 </pre></div>
 </div>
-<p>An example deomonstrating inline scripting with the choice of language, and converting bytes to MB</p>
+<p>An example demonstrating inline scripting with the choice of language, and converting bytes to MB</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">host</span><span class="o">.</span><span class="n">raw</span><span class="p">:</span><span class="n">app</span><span class="o">-</span><span class="n">servers</span><span class="o">*</span> <span class="o">|</span> <span class="n">avg</span> <span class="n">name</span><span class="o">=</span><span class="n">mb_sent</span><span class="p">,</span> <span class="n">script</span><span class="o">=</span><span class="s2">&quot;doc[&#39;body_bytes_sent&#39;]/1024/1024&quot;</span><span class="p">,</span> <span class="n">lang</span><span class="o">=</span><span class="n">expression</span>
 </pre></div>
 </div>
