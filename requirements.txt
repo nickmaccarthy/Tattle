@@ -14,8 +14,8 @@ paramiko==1.15.1
 pbr==1.8.1
 py-dateutil==2.2
 pycrypto==2.6.1
-python-autocast==0.6
-python-datemath==1.4.3
+python-autocast>=1.0
+python-datemath>=1.4.3
 python-dateutil==2.5.3
 pytz==2014.10
 PyYAML==3.11

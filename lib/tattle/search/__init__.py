@@ -87,7 +87,7 @@ class TQL(DSLBase):
             self._start_time = dm(self._start)
             self._end_time = dm(self._end)
             self._index = tattle.get_indexes(self._index_name_pattern, self._start_time, self._end_time, pattern=self._index_ts_pattern)
-        except TQLException, e:
+        except TQLException as e:
             raise TQLArgsException("Unable to set arguments for TQL, I am missing: %s" % (e))
 
         self._start_time_iso_str = self._start_time.format(self._ISO_TS)

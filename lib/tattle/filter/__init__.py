@@ -114,6 +114,11 @@ def findindict(dct, regex):
                 ret = (k,v)
                 return ret
 
+def meets_spike(results, alert):
+    window1 = results
+    #window2 = 
+
+
 def meets_in_field(results, regex, op, number):
     retl = []
     opr = get_operator(op)

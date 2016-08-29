@@ -137,11 +137,11 @@ def tnd(es, alert):
         start = "%s||%s" % ( start_ts, alert['alert']['window']['start'])
         end = "%s||%s" % ( end_ts, alert['alert']['window']['end'])
 
-        print start_ts, start
-        print end_ts, end
+        print(start_ts, start)
+        print(end_ts, end)
         esq = s.tql_query(alert['tql_query'], exclude=alert.get('exclude', ''), start=start, end=end, index=alert.get('index', 'logstash-*'))
 
-        print "ESQuery2:"
+        print("ESQuery2:")
         tattle.pprint(esq['esquery'])
 
         search_args = dict(index=esq['search_indexes'], body=esq['esquery'])
@@ -150,8 +150,8 @@ def tnd(es, alert):
 
         q2 = EventQueue(alert=alert, results=r2, intentions=esq['intentions'])
 
-        print q.results_total
-        print q2.results_total
+        print(q.results_total)
+        print(q2.results_total)
 
     else:
         logger.error("Alert type not found, please specify a valid alert type. Alert: {}, reason: {} is what I got".format(alert['name'], alert_type))
