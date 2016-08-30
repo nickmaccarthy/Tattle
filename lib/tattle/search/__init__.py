@@ -339,14 +339,42 @@ class Search(object):
         args = {}
         for k,v in kwargs.items():
             args[k] = v
+
+        # All the logic below should be handled by get_index function in the tattle module 
+        #return tattle.get_indexes(index, datemath(args.get('start', 'now-1h')), datemath(args.get('end', 'now')))
+        return tattle.get_indexes(index, datemath(kwargs.get('start', 'now-1h')), datemath(kwargs.get('end', 'now')))
+
         # get a list of our indexes for searching against
-        if '*' in index:
-            index_name = index.strip('*')
-            # todo - the interval and format should be set via config variable in the alert.yml
-            search_indexes = tattle.get_indexes(index_name, datemath(args['start']), datemath(args['end']))
-        else:
-            search_indexes = index
-        return search_indexes
+        #if '*' in index:
+        #    index_name = index.strip('*')
+        #    # todo - the interval and format should be set via config variable in the alert.yml
+        #    search_indexes = tattle.get_indexes(index_name, datemath(args['start']), datemath(args['end']))
+        #elif '{' in index:
+        #    # We have a specified index pattern
+        #    try:
+        #        m = re.match('(.*?)?(?:%)?\{(?:\+)?(.*?)\}', index)
+        #        index_name = m.group(1)
+        #        index_pattern = m.group(2)
+
+        #        # Figure out index interval based off of pattern given
+        #        # todo: this should be figured in a more efficent way 
+        #        interval = 'day'
+        #        if index_pattern in ('YYYY', 'YY'):
+        #            interval = 'year'
+        #        elif index_pattern in ('YYYY.MM', 'YY.MM'):
+        #            interval = 'month'
+        #        elif index_pattern in ('YYYY.MM.DD', 'YY.MM.DD'):
+        #            interval= 'day'
+        #        elif index_pattern in ('YYYY.MM.DD.HH', 'YY.MM.DD.HH'):
+        #            interval = 'hour'
+        #        search_indexes = tattle.get_indexes(index_name, datemath(args['start']), datemath(args['end']), pattern=index_pattern, interval=interval)
+        #        logger.debug(search_indexes)
+        #    except Exception as e:
+        #        raise Exception("Unable to parse index pattern: {}, reason: {}".format(index, e))
+        #        
+        #else:
+        #    search_indexes = index
+        #return search_indexes
         
     def es_query(self, query, **qargs):
         self.set_vars(**qargs)

@@ -310,7 +310,7 @@ def md5hash(input):
         input = str(''.join(map(str,input)))
     input = str(input)
     m = hashlib.md5()
-    m.update(input)
+    m.update(input.encode('utf-8'))
     return m.hexdigest()
 
 ''' alias to md5hash '''
@@ -318,21 +318,62 @@ def make_md5(input):
     return md5hash(input)
 
 ''' returns a list of indexes bases from a start and end time with a index time pattern '''
-def get_indexes(index_name, start, end, interval='day', pattern='YYYY.MM.DD'):
-    if '*' in index_name:
-        index_name = index_name.strip('*')
+#def get_indexes_old(index_name, start, end, interval='day', pattern='YYYY.MM.DD'):
+#    if '*' in index_name:
+#        index_name = index_name.strip('*')
+#    retl = []
+#    for r in arrow.Arrow.range(interval, start, end):
+#        idx_name = "%s%s" % ( index_name, r.format(pattern) )
+#        retl.append(idx_name)
+#    return ','.join(retl)
+
+''' returns a list of indexes bases from a start and end time with a index time pattern '''
+def get_indexes(index, start, end, interval='day', pattern='YYYY.MM.DD', base_name=None):
+   
+    if isinstance(index, dict):
+        pattern = index.get('pattern', pattern)
+        interval = index.get('interval', interval)
+        base_name = index.get('name') or index.get('base_name')
+        index = '{index_basename}%{{+{pattern}}}:{interval}'.format(index_basename=base_name, pattern=pattern, interval=interval)
+
+
+    if '*' in index:
+        base_name = index.strip('*')
+
+    elif '{' in index: # then we have a pattern, like: 'some-index-%{+YYYY.MM.DD}'
+        m = re.search('(.*?)?(?:%)?\{(?:\+)?(.*?)\}(?:[:\+](\w+))?', index)
+        base_name = m.group(1)
+        pattern = m.group(2)
+
+        # if we the interval wansnt specified in the pattern, then lets try to guess it
+        if not m.group(3):
+            if pattern in ('YYYY', 'YY'):
+                interval = 'year'
+            elif pattern in ('YYYY.MM', 'YY.MM', 'YYYY.M', 'YY.M'):
+                interval = 'month'
+            elif pattern in ('YYYY.MM.DD', 'YY.MM.DD'):
+                interval = 'day'
+            elif pattern in ('YYYY.MM.DD.HH', 'YY.MM.DD.HH'):
+                interval = 'hour'
+        else:
+            interval = m.group(3) # the interval was specified, we dont need to guess
+
+    if base_name is None:
+        raise Exception("Base name for index could not be found, please specify a base name like: 'some-index-name-'")
+
     retl = []
     for r in arrow.Arrow.range(interval, start, end):
-        idx_name = "%s%s" % ( index_name, r.format(pattern) )
+        idx_name = "%s%s" % ( base_name, r.format(pattern) )
         retl.append(idx_name)
     return ','.join(retl)
+            
 
 '''
     Normalized boolean variables for us
 '''
 def normalize_boolean(input):
-    true_things = [True, 'True', 't', '1', 1, 'yes', 'y', 'on']
-    false_things = [None, False, 'False', 'f', '0', 0, 'no', 'n', 'off']
+    true_things = [True, 'true', 'True', 't', '1', 1, 'yes', 'y', 'on']
+    false_things = [None, False, 'false', 'False', 'f', '0', 0, 'no', 'n', 'off']
 
     def norm(input):
         if input == True: return True

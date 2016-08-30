@@ -92,7 +92,7 @@ class PPrintAlert(AlertBase):
     def run(self):
         tattle.pprint(vars(self.eq))
         print("\n\n")
-        print("-==== PPRINTED ALERT: ====-")
+        print("-======= PPRINTED ALERT: =======-")
         print("TITLE: {}".format(self.title))
         print("alert defiition:")
         tattle.pprint(self.eq.alert)
@@ -102,7 +102,7 @@ class PPrintAlert(AlertBase):
         print(self.eq.count('matches'))
         print("event queue:")
         print(tattle.pprint(vars(self.eq)))
-        print("-==== END ALERT ====-")
+        print("-====== END ALERT ======-")
         print("\n\n")
 
 
