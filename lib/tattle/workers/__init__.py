@@ -11,6 +11,8 @@ from tattle.result import results_to_df
 import random
 from tattle.alert import EmailAlert, PPrintAlert, PagerDutyAlert, ScriptAlert
 from datemath import dm, datemath
+from elasticsearch.exceptions import NotFoundError
+
 
 TATTLE_HOME = os.environ.get('TATTLE_HOME')
 
@@ -19,7 +21,12 @@ s = Search()
 logger = tattle.get_logger('tattle.workers')
 
 def es_search(es, *args, **kwargs):
-    results = es.search(request_timeout=10, **kwargs) 
+    try:
+        results = es.search(request_timeout=10, **kwargs) 
+    except NotFoundError:
+        logger.debug('Index not found: args: {}, kwargs: {}'.format(args, kwargs))
+        return
+
     return results
 
 def tnd(es, alert):
