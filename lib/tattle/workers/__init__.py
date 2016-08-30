@@ -49,7 +49,7 @@ def tnd(es, alert):
             # No need to go any further, we havent hit our threshold yet
             logger.debug("Alert is within re-alert threshold.  Name: {}, re-alert threshold: {}, last run: {}, human: {}".format(alert['name'], alert['alert']['realert'], last_run, tattle.humanize_ts(last_run)))
             return
-
+    
     if alert.get('tql_query'):
         try:
             esq = s.tql_query(alert['tql_query'], exclude=alert.get('exclude', ''), start=alert['timeperiod'].get('start', '-1m'), end=alert['timeperiod'].get('end', 'now'), index=alert.get('index', 'logstash-*'))
@@ -85,7 +85,7 @@ def tnd(es, alert):
 
     if results_aggs and len(results_aggs) > 0:
         if tattle.find_in_dict(results_aggs, 'buckets'):
-            ourkey = results_aggs.keys()[0]
+            ourkey = list(results_aggs.keys())[0]
             results = results_to_df(results_aggs[ourkey]['buckets'])
         else:
             results = [results_aggs]
@@ -168,16 +168,15 @@ def tnd(es, alert):
             #es.index(index='tattle-int', doc_type='alert-fired', id=tattle.md5hash("{0}{1}".format(alert['name'], tattle.get_current_utc())), body={'alert-name': alert['name'], '@timestamp': datetime.datetime.utcnow(), 'time_unix': tattle.get_current_utc(), 'alert-matches': q.matches, 'alert-args': alert})
             es.index(index='tattle-int', doc_type='alert-fired', id=tattle.md5hash("{0}{1}".format(alert['name'], tattle.get_current_utc())), body={'alert-name': alert['name'], '@timestamp': datetime.datetime.utcnow(), 'time_unix': tattle.get_current_utc()} )
 
-            #if alert['action'].has_key('email'):
             if 'email' in alert['action']:
-                should_email = tattle.normalize_boolean(alert['action']['email']['enabled'])
-                if should_email:
-                    #if alert['action']['email'].has_key('once_per_match'):
-                    if 'once_per_match' in alert['action']['email']:
+                action = alert['action']['email']
+                logger.debug(action) 
+                if tattle.normalize_boolean(action.get('enabled', 1)) == True:
+                    if 'once_per_match' in action:
                         for m in q.matches:
                             mq = EventQueue(alert=alert, results=results, matches=m, intentions=esq['intentions'])
                             email_alert = EmailAlert(event_queue=mq)
-                            email_alert.subject = "{} - {}".format(alert['name'], m[alert['action']['email']['once_per_match'].get('match_key', 'key')])
+                            email_alert.subject = "{} - {}".format(alert['name'], m[action['once_per_match'].get('match_key', 'key')])
                             email_alert.fire()
                             email_it = True
                             if email_it:
@@ -188,34 +187,37 @@ def tnd(es, alert):
                         email_it = True
                         if email_it:
                             logger.info("""msg="{0}", email_to="{1}", name="{2}", subject="{3}" """.format( "Email Sent", email_alert.to, alert['name'], email_alert.subject ))
+                else:
+                    logger.debug('Email alerting is disabled...')
 
-            #if alert['action'].has_key('pprint'):
             if 'pprint' in alert['action']:
-                if tattle.normalize_boolean(alert['action']['pprint']['enabled']) == True:
-                    #if alert['action']['pprint'].has_key('once_per_match'):
-                    if 'once_per_match' in alert['action']['pprint']:
+                action = alert['action']['pprint']
+                if tattle.normalize_boolean(action.get('enabled', 1)) == True:
+                    logger.debug('pprint is enabled...')
+                    if 'once_per_match' in action:
                         for m in q.matches:
                             mq = EventQueue(alert=alert, results=results, matches=m, intentions=esq['intentions'])
                             pp_alert = PPrintAlert(event_queue=mq)
-                            pp_alert.title = "{} - {}".format(alert['name'], m[alert['action']['pprint']['once_per_match'].get('match_key', 'key')])
+                            pp_alert.title = "{} - {}".format(alert['name'], m[action['once_per_match'].get('match_key', 'key')])
                             pp_alert.fire()
                     else:
                         pp_alert = PPrintAlert(event_queue=q)
                         pp_alert.fire()
+                else:
+                    logger.debug('pprint alert action is disabled...')
                 
-            #if alert['action'].has_key('pagerduty'):
             if 'pagerduty' in alert['action']: 
-                if tattle.normalize_boolean(alert['action']['pagerduty']['enabled']) == True:
-                    service_name = alert['action']['pagerduty'].get('service_name') or alert['action']['pagerduty'].get('service_key')
+                action = alert['action']['pagerduty']
+                if tattle.normalize_boolean(action.get('enabled', True)) == True:
+                    service_name = action.get('service_name') or action.get('service_key')
                     if not service_name:
                         logger.error('Service name was not set for pagerduty alert, cannot continue with this alert method. ')
                         return
-                    #if alert['action']['pagerduty'].has_key('once_per_match'):
-                    if 'once_per_match' in alert['action']['pagerduty']:
+                    if 'once_per_match' in action:
                         for m in q.matches:
                             mq = EventQueue(alert=alert, results=results, matches=m, intention=esq['intentions'])
                             pdalert = PagerDutyAlert(service_name, event_queue=mq)
-                            pdalert.title = "{} - {}".format(alert['name'], m[alert['action']['email']['once_per_match'].get('match_key', 'key')])
+                            pdalert.title = "{} - {}".format(alert['name'], m[action['once_per_match'].get('match_key', 'key')])
                             pdalert.fire()
                             logger.info("""msg="{}", name="{}" """.format("PagerDuty Alert Sent", pdalert.title))
                     else:
@@ -223,14 +225,14 @@ def tnd(es, alert):
                         pdalert.fire()
                         logger.info("""msg="{}", name="{}" """.format("PagetDuty Alert Sent", alert['name']))
                     
-            #if alert['action'].has_key('script'):
             if 'script' in alert['action']:
+                action = alert['action']['script']
                 if tattle.normalize_boolean(alert['action']['script']['enabled']) == True:
                     mq = EventQueue(alert=alert, results=matches, matches=matches, intentions={'foo': 'bar'})
                     script_name = alert['action']['script']['filename']
                     salert = ScriptAlert(script_name, event_queue=mq)
                     salert.fire()
-                    logger.info("""msg="{}", name="{}" """.format("Script Alert Triggered", alert['name']))
+                    logger.info("""msg="{}", name="{}", script_name="{}" """.format("Script Alert Triggered", alert['name'], action['filename']))
 
 
     else:

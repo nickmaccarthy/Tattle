@@ -319,18 +319,60 @@
 </li>
 <li><dl class="first docutils">
 <dt>More information:</dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt>Builds the index names that Tattle will search data against</dt>
 <dd><ul class="first last simple">
-<li>Currently Tattle expects your indexes to be in daily format <code class="docutils literal"><span class="pre">YYYY.MM.DD</span></code> which is pretty standard/common.  The <code class="docutils literal"><span class="pre">*</span></code> at the end of the index name tells Tattle to figure out which indexes to search against based on the timeperiod.  Lets use the example of <code class="docutils literal"><span class="pre">now-1h</span></code> as our start time, and assume our current time is <code class="docutils literal"><span class="pre">2016/02/02</span> <span class="pre">00:01:00</span></code>; when Tattle runs it will actually search against two indexes:  <code class="docutils literal"><span class="pre">system-metrics-2016.02.02</span></code> and <code class="docutils literal"><span class="pre">system-metrics-2016.02.01</span></code> since <code class="docutils literal"><span class="pre">-1h</span></code> from now would have technically been yesterday.</li>
-<li>If you do not specify a <code class="docutils literal"><span class="pre">*</span></code> Tattle will use just that index name, with no time</li>
-<li>In the future we plan to add the definition of index pattern</li>
+<li>It uses the  <code class="docutils literal"><span class="pre">start</span></code> and <code class="docutils literal"><span class="pre">end</span></code> time in <code class="docutils literal"><span class="pre">timeperiod</span></code> of the Tale to determine which indexes to build/query against.</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p class="first">Its common to store <cite>timeseries</cite> based indexes in Elasticsearch.  The most common format is store your data by day and append a date timestamp at the end of index.  The most common format is <code class="docutils literal"><span class="pre">YYYY.MM.DD</span></code>.  If you specify a <code class="docutils literal"><span class="pre">*</span></code> at the end of the index pattern in Tattle, ie <code class="docutils literal"><span class="pre">logstash-*</span></code>, then Tattle will build the indexs for you by <code class="docutils literal"><span class="pre">day</span></code> when it does its search.</p>
+</li>
+<li><p class="first">If you store your indexes in a different time pattern or interval other than daily, then you can specify the time pattern and interval.  See examples 2-4</p>
+</li>
+<li><p class="first">If you done specify a pattern or interval or a <code class="docutils literal"><span class="pre">*</span></code>, then Tattle will search just that single index.</p>
+</li>
+<li><p class="first">For more information on the tokens allowd for the patterns, please see the documentation for <a class="reference external" href="http://crsmithdev.com/arrow/#tokens">Arrow</a>.</p>
+</li>
 </ul>
 </dd>
 </dl>
 </li>
 </ul>
 </div></blockquote>
-<p>Example:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">index</span><span class="p">:</span> <span class="s2">&quot;system-metrics-*</span>
+<p>Example 1:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">index</span><span class="p">:</span> <span class="s2">&quot;system-metrics-*&quot;</span>
+</pre></div>
+</div>
+<p>Makes index names similar to:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">system</span><span class="o">-</span><span class="n">metrics</span><span class="o">-</span><span class="mf">2016.01</span><span class="o">.</span><span class="mi">01</span><span class="p">,</span> <span class="n">system</span><span class="o">-</span><span class="n">metrics</span><span class="o">-</span><span class="mf">2016.12</span><span class="o">.</span><span class="mi">29</span> <span class="o">....</span> <span class="n">etc</span>
+</pre></div>
+</div>
+<p>Example 2 - specifying pattern and interval:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">index</span><span class="p">:</span>
+    <span class="n">name</span><span class="p">:</span> <span class="s2">&quot;system-metrics-&quot;</span>
+    <span class="n">pattern</span><span class="p">:</span> <span class="s2">&quot;YYYY.MM.DD&quot;</span>
+    <span class="n">interval</span><span class="p">:</span> <span class="s2">&quot;day&quot;</span>
+</pre></div>
+</div>
+<p>This would give us index names such as:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">system</span><span class="o">-</span><span class="n">metrics</span><span class="o">-</span><span class="mf">2016.01</span><span class="o">.</span><span class="mi">01</span><span class="p">,</span> <span class="n">system</span><span class="o">-</span><span class="n">metrics</span><span class="o">-</span><span class="mf">2015.12</span><span class="o">.</span><span class="mi">29</span><span class="p">,</span> <span class="n">etc</span>
+</pre></div>
+</div>
+<p>Example 3 - specifying pattern as string:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">index</span><span class="p">:</span> <span class="s2">&quot;system-metrics-%{+YYYY.MM.DD}</span>
+</pre></div>
+</div>
+<p>This would give us the same index names as Example 1 and 2
+Example 4 - specifying pattern and interval as a string, not the interval at the end of the string after the <code class="docutils literal"><span class="pre">:</span></code> :</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">index</span><span class="p">:</span> <span class="s2">&quot;system-metrics-%{+YYYY.MM.DD.HH}:hour&quot;</span>
+</pre></div>
+</div>
+<p>Valid intervals are python datetime - <code class="docutils literal"><span class="pre">year</span></code>, <code class="docutils literal"><span class="pre">month</span></code>, <code class="docutils literal"><span class="pre">week</span></code>, <code class="docutils literal"><span class="pre">day</span></code>, <code class="docutils literal"><span class="pre">hour</span></code>, <code class="docutils literal"><span class="pre">second</span></code>
+This would build index names with hour intervals such as:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">some</span><span class="o">-</span><span class="n">index</span><span class="o">-</span><span class="mf">2015.12</span><span class="o">.</span><span class="mf">29.00</span><span class="p">,</span><span class="n">some</span><span class="o">-</span><span class="n">index</span><span class="o">-</span><span class="mf">2015.12</span><span class="o">.</span><span class="mf">29.01</span><span class="p">,</span><span class="n">some</span><span class="o">-</span><span class="n">index</span><span class="o">-</span><span class="mf">2015.12</span><span class="o">.</span><span class="mf">29.02</span><span class="p">,</span><span class="n">some</span><span class="o">-</span><span class="n">index</span><span class="o">-</span><span class="mf">2015.12</span><span class="o">.</span><span class="mf">29.03</span><span class="p">,</span><span class="n">some</span><span class="o">-</span><span class="n">index</span><span class="o">-</span><span class="mf">2015.12</span><span class="o">.</span><span class="mf">29.04</span><span class="p">,</span><span class="n">some</span><span class="o">-</span><span class="n">index</span><span class="o">-</span><span class="mf">2015.12</span><span class="o">.</span><span class="mf">29.05</span><span class="p">,</span><span class="n">some</span><span class="o">-</span><span class="n">index</span><span class="o">-</span><span class="mf">2015.12</span><span class="o">.</span><span class="mf">29.06</span><span class="p">,</span><span class="n">some</span><span class="o">-</span><span class="n">index</span><span class="o">-</span><span class="mf">2015.12</span><span class="o">.</span><span class="mf">29.07</span><span class="p">,</span> <span class="o">...</span> <span class="n">etc</span>
 </pre></div>
 </div>
 </div>

@@ -120,12 +120,40 @@ index
     * Required `Yes`
     * Description: The index pattern where you the events you are searching reside.  Default is ``logstash-*``
     * More information:  
-        * Currently Tattle expects your indexes to be in daily format ``YYYY.MM.DD`` which is pretty standard/common.  The ``*`` at the end of the index name tells Tattle to figure out which indexes to search against based on the timeperiod.  Lets use the example of ``now-1h`` as our start time, and assume our current time is ``2016/02/02 00:01:00``; when Tattle runs it will actually search against two indexes:  ``system-metrics-2016.02.02`` and ``system-metrics-2016.02.01`` since ``-1h`` from now would have technically been yesterday.
-        * If you do not specify a ``*`` Tattle will use just that index name, with no time
-        * In the future we plan to add the definition of index pattern
-Example:
+        * Builds the index names that Tattle will search data against
+            *   It uses the  ``start`` and ``end`` time in ``timeperiod`` of the Tale to determine which indexes to build/query against.  
+        * Its common to store `timeseries` based indexes in Elasticsearch.  The most common format is store your data by day and append a date timestamp at the end of index.  The most common format is ``YYYY.MM.DD``.  If you specify a ``*`` at the end of the index pattern in Tattle, ie ``logstash-*``, then Tattle will build the indexs for you by ``day`` when it does its search.
+        * If you store your indexes in a different time pattern or interval other than daily, then you can specify the time pattern and interval.  See examples 2-4
+        * If you done specify a pattern or interval or a ``*``, then Tattle will search just that single index.
+        * For more information on the tokens allowd for the patterns, please see the documentation for `Arrow <http://crsmithdev.com/arrow/#tokens>`_.
+Example 1:
 ::
-    index: "system-metrics-*
+    index: "system-metrics-*"
+Makes index names similar to:
+::
+    system-metrics-2016.01.01, system-metrics-2016.12.29 .... etc
+Example 2 - specifying pattern and interval:
+::
+    index:
+        name: "system-metrics-"
+        pattern: "YYYY.MM.DD"
+        interval: "day"
+
+This would give us index names such as:
+::
+    system-metrics-2016.01.01, system-metrics-2015.12.29, etc
+
+Example 3 - specifying pattern as string:
+::
+    index: "system-metrics-%{+YYYY.MM.DD}
+This would give us the same index names as Example 1 and 2
+Example 4 - specifying pattern and interval as a string, not the interval at the end of the string after the ``:`` :
+::
+    index: "system-metrics-%{+YYYY.MM.DD.HH}:hour"
+Valid intervals are python datetime - ``year``, ``month``, ``week``, ``day``, ``hour``, ``second``
+This would build index names with hour intervals such as:
+::
+    some-index-2015.12.29.00,some-index-2015.12.29.01,some-index-2015.12.29.02,some-index-2015.12.29.03,some-index-2015.12.29.04,some-index-2015.12.29.05,some-index-2015.12.29.06,some-index-2015.12.29.07, ... etc
 
 timeperiod
 ~~~~~~~~~~
