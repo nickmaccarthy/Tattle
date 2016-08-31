@@ -348,7 +348,7 @@ def email_basic(to, subject, body, **kwargs):
 def last_run(es, alert_name):
     
     try:
-        res = es.search(index='tattle-int', doc_type='alert_trigger', q='alert-name:%s' % (alert_name), sort='time:desc')
+        res = es.search(index='tattle-int', doc_type='alert_trigger', q='alert-name:"%s"' % (alert_name), sort='time:desc')
     except:
         res = None
 
