@@ -170,6 +170,37 @@ Example:
         # The end of our alert window
         end: 'now'
 
+exclude
+~~~~~~~~
+    * Required: `No`
+    * Description: Allows you to specify query parameters to exclude form this Tale
+    * More information:  For this example, lets say we dont want to see alerts for the host ``database4.company.com`` because its supposed to have a full disk, we can use this to parameter to exclude that host from the tale.  This parameter accepts Lucne query syntax
+Example:
+::
+    host:database4.company.com OR host:database5.company.com
+
+exclude_schedule
+~~~~~~~~~~~~~~~~~
+    * Required `No`
+    * Description: Allows you to specify a time period for when this Tale will not run, in cron format.  
+    * More information:  Lets say you have a something that runs every saturday and sunday morning between 4am and 7am.  You know its normal so you dont want to be alerted about it, but any other time you do.  This parameter allows you to specify a window for Tale to not run at.
+    * Credit:  This is using the parse-crontab module by Josiah Carlson which can be found `here <https://github.com/josiahcarlson/parse-crontab>`_
+Example:
+::
+    exclude_schedule: '* 4-7 * sat * '
+
+Cron Examples:
+::
+    30 \*/2 * * * -> 30 minutes past the hour every 2 hours
+    15,45 23 * * * -> 11:15PM and 11:45PM every day
+    0 1 ? * SUN -> 1AM every Sunday
+    0 1 * * SUN -> 1AM every Sunday (same as above)
+    0 0 1 jan/2 * 2011-2013 -> midnight on January 1, 2011 and the first of every odd month until the end of 2013
+    24 7 L * * -> 7:24 AM on the last day of every month
+    24 7 * * L5 -> 7:24 AM on the last friday of every month
+    24 7 * * Lwed-fri -> 7:24 AM on the last wednesday, thursday, and friday of every month
+
+
 alert
 ~~~~~
 type 
