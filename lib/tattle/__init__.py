@@ -18,6 +18,9 @@ import collections
 import subprocess
 import json
 import simplejson
+from crontab import CronTab
+from datemath import datemath
+from tattle.exceptions import CronException
 
 from pprint import pprint 
 
@@ -318,16 +321,6 @@ def make_md5(input):
     return md5hash(input)
 
 ''' returns a list of indexes bases from a start and end time with a index time pattern '''
-#def get_indexes_old(index_name, start, end, interval='day', pattern='YYYY.MM.DD'):
-#    if '*' in index_name:
-#        index_name = index_name.strip('*')
-#    retl = []
-#    for r in arrow.Arrow.range(interval, start, end):
-#        idx_name = "%s%s" % ( index_name, r.format(pattern) )
-#        retl.append(idx_name)
-#    return ','.join(retl)
-
-''' returns a list of indexes bases from a start and end time with a index time pattern '''
 def get_indexes(index, start, end, interval='day', pattern='YYYY.MM.DD', base_name=None):
    
     if isinstance(index, dict):
@@ -429,3 +422,18 @@ def makecsvfromlist(lst, filename=None):
 '''
 def get_tattlehome():
     return os.environ['TATTLE_HOME']
+
+''' Tests to see if are with a current cron string or not '''
+def check_cron_schedule(cronstr, now=datemath('now')):
+    try:
+        entry = CronTab(cronstr)
+    except Exception as e:
+        raise CronException("Unable to parse cron expression, reason: %s" % e)
+
+    seconds_until_next_run = entry.next(now)
+
+    if seconds_until_next_run <= 60:
+        return True
+    else:
+        return False
+

@@ -36,10 +36,16 @@ def tnd(es, alert):
     should_alert = False
     matches = None
 
-    #if tattle.normalize_boolean(alert.get('disabled')) == True: 
     if tattle.normalize_boolean(alert.get('enabled')) == False or tattle.normalize_boolean(alert.get('disabled')) == True: 
         logger.debug('Alert: {} is disabled.  Moving on...'.format(alert.get('name')))
         return
+
+            
+    # If we are in an exclude schedule, then we dont need to go any futher 
+    if 'exclude_schedule' in alert:
+        if tattle.check_cron_schedule(alert.get('exclude_schedule')) == True:
+            logger.debug('Alert: {} is currently in an exclude schdule. Moving on...'.format(alert.get('name')))
+            return
 
     realert_threshold = tattle.relative_time_to_seconds(alert['alert']['realert'])
 
