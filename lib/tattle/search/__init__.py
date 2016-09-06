@@ -22,7 +22,7 @@ logger = tattle.get_logger('tattle.search.Search')
 class DSLBase(object):
     def __init__(self, **kwargs):
         self._ISO_TS = 'YYYY-MM-DDTHH:mm:ssZZ'
-        self._PRETTY_TS = 'MMM d YYYY, HH:mm:ss ZZ'
+        self._PRETTY_TS = 'MMM D YYYY, HH:mm:ss ZZ'
         self.agg_size_from = 0
         self.agg_size = 0
         self.hit_size_from = 0
