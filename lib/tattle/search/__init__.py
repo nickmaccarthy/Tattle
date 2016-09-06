@@ -1,5 +1,3 @@
-
-
 import sys
 import os
 import datetime
@@ -169,8 +167,6 @@ class TQL(DSLBase):
         # clean up commas out of the arg keys and vals
         args = { k.strip(','):v.strip(',') for k,v in args.items() }
 
-        #if args.has_key('name') or args.has_key('title'):
-        #if ('name', 'title') in args:
         if 'name' in args or 'title' in args:
             agg_name = args.get('name') or args.get('title')
             try:
@@ -178,77 +174,13 @@ class TQL(DSLBase):
             except:
                 del(args['title'])
 
-        #if args.has_key('order'):
         if 'order' in args:
             args['order'] = eval(args['order'])
-        #elif args.has_key('script'):
         if 'script' in args:
             args['script'] = eval(args['script'])
 
 
-        #print string
-
-        #print re.search('(\[\s*\{.*?\])', string)
-
-        ## extract our order by, etc
-        #if re.search('(\[\s*\{.*?\])', string): 
-        #    regex = '(\[\s*\{.*?\])'
-        #    m = re.search(regex,string)
-        #elif re.search('(\{.*?\})', string):
-        #    regex = '(\{.*?\})'
-        #    m = re.search(regex,string)
-
-        #if m:
-        #    order = m.group(1)
-        #    try:
-        #        order = eval(order)
-        #    except Exception as e:
-        #        msg = 'Unable to eval json into dict: %s' % (e)
-        #        logger.exception(msg)
-        #        raise Exception(msg)
-
-        #    args['order'] = order
-        #    # strip it out of the query arg
-        #    string = re.sub(regex, '', string)
-
-        #parts = string.split(" ")
-        #tattle.pprint(parts)
-        #for part in parts:
-        #    splitkey = None
-        #    if ":" in part:
-        #        splitkey = ':'
-        #    elif "=" in part:
-        #        splitkey = '='
-
-        #    if splitkey:
-        #        k,v = part.split(splitkey, 1)
-        #        # extract our order by, etc
-        #        if re.search('(\[\s*\{.*?\])', string): 
-        #            print "WTF"
-        #            regex = '(\[\s*\{.*?\])'
-        #            m = re.search(regex,string)
-        #        elif re.search('(\{.*?\})', string):
-        #            regex = '(\{.*?\})'
-        #            m = re.search(regex,string)
-
-        #        if m:
-        #            order = m.group(1)
-        #            try:
-        #                order = eval(order)
-        #            except Exception as e:
-        #                msg = 'Unable to eval json into dict: %s' % (e)
-        #                logger.exception(msg)
-        #                raise Exception(msg)
-
-        #            args['order'] = order
-        #            # strip it out of the query arg
-        #            string = re.sub(regex, '', string)
-
-        #        print string
-        #        args[k] = v
-
         thed = { 'title': agg_name or agg_type, 'args': args, 'type': agg_type }
-        #tattle.pprint(thed)
         return thed
 
     def build_main_query(self, lquery):
@@ -339,42 +271,8 @@ class Search(object):
         args = {}
         for k,v in kwargs.items():
             args[k] = v
-
-        # All the logic below should be handled by get_index function in the tattle module 
-        #return tattle.get_indexes(index, datemath(args.get('start', 'now-1h')), datemath(args.get('end', 'now')))
         return tattle.get_indexes(index, datemath(kwargs.get('start', 'now-1h')), datemath(kwargs.get('end', 'now')))
 
-        # get a list of our indexes for searching against
-        #if '*' in index:
-        #    index_name = index.strip('*')
-        #    # todo - the interval and format should be set via config variable in the alert.yml
-        #    search_indexes = tattle.get_indexes(index_name, datemath(args['start']), datemath(args['end']))
-        #elif '{' in index:
-        #    # We have a specified index pattern
-        #    try:
-        #        m = re.match('(.*?)?(?:%)?\{(?:\+)?(.*?)\}', index)
-        #        index_name = m.group(1)
-        #        index_pattern = m.group(2)
-
-        #        # Figure out index interval based off of pattern given
-        #        # todo: this should be figured in a more efficent way 
-        #        interval = 'day'
-        #        if index_pattern in ('YYYY', 'YY'):
-        #            interval = 'year'
-        #        elif index_pattern in ('YYYY.MM', 'YY.MM'):
-        #            interval = 'month'
-        #        elif index_pattern in ('YYYY.MM.DD', 'YY.MM.DD'):
-        #            interval= 'day'
-        #        elif index_pattern in ('YYYY.MM.DD.HH', 'YY.MM.DD.HH'):
-        #            interval = 'hour'
-        #        search_indexes = tattle.get_indexes(index_name, datemath(args['start']), datemath(args['end']), pattern=index_pattern, interval=interval)
-        #        logger.debug(search_indexes)
-        #    except Exception as e:
-        #        raise Exception("Unable to parse index pattern: {}, reason: {}".format(index, e))
-        #        
-        #else:
-        #    search_indexes = index
-        #return search_indexes
         
     def es_query(self, query, **qargs):
         self.set_vars(**qargs)
