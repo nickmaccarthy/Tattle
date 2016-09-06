@@ -1,14 +1,19 @@
 # Changelog
 
+### v1.0.4
+* Added a schedule, in cron format.  Just like the exclude_schedule in v1.0.3, but specifies when the Tale should run instead
+* Adjusted better logging for debug events in tattle.workers.tnd
+* Code cleanup ( removed, older commented code no longer needed ) 
+
 ### v1.0.3
-Added exclude_schedule to exclude a Tale during a specified cron window.  For example, if you dont want a Tale to run between the hours of 2am and 8am every saturday, you could specify this cron string:  '* 2-8 * sat *'
+* Added exclude_schedule to exclude a Tale during a specified cron window.  For example, if you dont want a Tale to run between the hours of 2am and 8am every saturday, you could specify this cron string:  '* 2-8 * sat *'
 
 ### v1.0.2
-Added index patterns.  Allows user to speicfy interval and index pattern for Tattle to search against.  See Tales section of the documentation for more details
+* Added index patterns.  Allows user to speicfy interval and index pattern for Tattle to search against.  See Tales section of the documentation for more details
 
 ### v1.0.1
-Added support for python 3.3+
+* Added support for python 3.3+
 
 ### v1.0
-First version deployed
+* First version deployed
 

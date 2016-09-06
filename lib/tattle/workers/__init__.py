@@ -44,8 +44,16 @@ def tnd(es, alert):
     # If we are in an exclude schedule, then we dont need to go any futher 
     if 'exclude_schedule' in alert:
         if tattle.check_cron_schedule(alert.get('exclude_schedule')) == True:
-            logger.debug('Alert: {} is currently in an exclude schdule. Moving on...'.format(alert.get('name')))
+            logger.debug('Exclude Schedule - Alert: {} is currently in an exclude schdule. Moving on...'.format(alert.get('name')))
             return
+
+    # If we have a schedule, then lets check it, otherwise we assume the tale should be run/checked everytime Tattle runs
+    if 'schedule' in alert:
+        schedule = alert.get('schedule')
+        if tattle.check_cron_schedule(schedule) == False:
+            logger.debug('Schedule - Alert: "{}" has a schedule, but it not currently scheduled run.  schedule: "{}", next_run: {} seconds. Moving on...'.format(alert.get('name'), schedule, tattle.cron_check(schedule)))
+            return
+
 
     realert_threshold = tattle.relative_time_to_seconds(alert['alert']['realert'])
 
@@ -144,7 +152,7 @@ def tnd(es, alert):
             else:
                 matches = "<br />I have found a total of <b>{}</b> matches. <br /> Note: Matches not returned because 'return_matches' was false.".format(total)
             should_alert = True
-    elif '_event_spike' in alert_type:
+    elif alert_type in ('spike', 'event_spike', '_event_spike'):
         start_ts = esq['intentions']['_start_time_iso_str']
         end_ts = esq['intentions']['_end_time_iso_str']
 

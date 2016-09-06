@@ -17,7 +17,6 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from jinja2 import Environment, FileSystemLoader 
 
-#tcfg = tattle.config.load_tattle_config()
 tcfg = tattle.config.load_configs().get('tattle')
 
 from pprint import pprint
@@ -44,7 +43,6 @@ class AlertBase(object):
         if not self.event_queue:
             raise AlertException("Alerts require an EventQueue")
         self.eq = self.event_queue
-        #self.matches, self.intentions = self.matches
         self.matches = self.eq.matches
         self.intentions = self.eq.intentions
         self.alert = self.eq.alert
@@ -78,7 +76,7 @@ class AlertBase(object):
         return body
 
  
-    def __repr__(self,):
+    def __repr__(self):
        return "<AlertClass: %s - Name: %s>" % ( self.__class__.__name__,  self.alert['name'] )
             
     
@@ -160,7 +158,7 @@ class EmailAlert(AlertBase):
         self.build_msg()
         self.send_email()
 
-    def send_email(self,):
+    def send_email(self):
             try: 
                 self.server.sendmail(self.sender, self.to, self.msg.as_string())
                 self.server.quit()
@@ -168,13 +166,12 @@ class EmailAlert(AlertBase):
                 logger.exception("Unable to send email, reason: {}".format(e))
 
     def set_subject(self, **kwargs):
-        #if self.alert['action']['email'].has_key('subject'):
         if 'subject' in self.alert['action']['email']:
             self.subject = self.alert['alert']['email']['subject']
         else: 
             self.subject = self.title
 
-    def make_email_body(self, ):
+    def make_email_body(self):
         template_dir = os.path.join(TATTLE_HOME, 'usr', 'share', 'templates', 'html')
         env = Environment(loader=FileSystemLoader(template_dir))
         template = env.get_template('email.html')

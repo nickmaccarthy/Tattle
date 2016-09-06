@@ -423,14 +423,23 @@ def makecsvfromlist(lst, filename=None):
 def get_tattlehome():
     return os.environ['TATTLE_HOME']
 
-''' Tests to see if are with a current cron string or not '''
-def check_cron_schedule(cronstr, now=datemath('now')):
+
+
+''' Runs the actual cron check, returns the next time it will run '''
+def cron_check(cronstr, now=datemath('now')):
     try:
         entry = CronTab(cronstr)
     except Exception as e:
         raise CronException("Unable to parse cron expression, reason: %s" % e)
 
-    seconds_until_next_run = entry.next(now)
+    # returns how many secondsd are left until the next run
+    return entry.next(now)
+
+
+
+''' Tests to see if are with a current cron string or not '''
+def check_cron_schedule(cronstr, now=datemath('now')):
+    seconds_until_next_run = cron_check(cronstr, now)
 
     if seconds_until_next_run <= 60:
         return True
