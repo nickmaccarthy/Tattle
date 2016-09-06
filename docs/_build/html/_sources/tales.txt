@@ -155,6 +155,52 @@ This would build index names with hour intervals such as:
 ::
     some-index-2015.12.29.00,some-index-2015.12.29.01,some-index-2015.12.29.02,some-index-2015.12.29.03,some-index-2015.12.29.04,some-index-2015.12.29.05,some-index-2015.12.29.06,some-index-2015.12.29.07, ... etc
 
+schedule
+~~~~~~~~
+    * Required `No`
+    * Description: Specifies when a Tale should run, using cron syntax. 
+    * More Information: Sometimes you may only want to have a Tale run during business hours ( 8am - 6pm , mon-fri ).  This allows you to specify when this Tale will run in cron format ( see example below )
+    * Credit:  This is using the parse-crontab module by Josiah Carlson which can be found `here <https://github.com/josiahcarlson/parse-crontab>`_
+
+.. note::
+    If you do not specify a ``schedule`` for your Tale, then Tattle will run this Tale every time it runs. 
+
+Example:
+::
+    schedule: "* 8-18 * * mon-fri"
+
+Cron Examples:
+::
+    30 \*/2 * * * -> 30 minutes past the hour every 2 hours
+    15,45 23 * * * -> 11:15PM and 11:45PM every day
+    0 1 ? * SUN -> 1AM every Sunday
+    0 1 * * SUN -> 1AM every Sunday (same as above)
+    0 0 1 jan/2 * 2011-2013 -> midnight on January 1, 2011 and the first of every odd month until the end of 2013
+    24 7 L * * -> 7:24 AM on the last day of every month
+    24 7 * * L5 -> 7:24 AM on the last friday of every month
+    24 7 * * Lwed-fri -> 7:24 AM on the last wednesday, thursday, and friday of every month
+
+exclude_schedule
+~~~~~~~~~~~~~~~~~
+    * Required `No`
+    * Description: Allows you to specify a time period for when this Tale will not run, in cron format.  This would be the opposite of the ``schedule`` option
+    * More information:  Lets say you have a something that runs every saturday and sunday morning between 4am and 7am.  You know its normal so you dont want to be alerted about it, but any other time you do.  This parameter allows you to specify a window for Tale to not run at.
+    * Credit:  This is using the parse-crontab module by Josiah Carlson which can be found `here <https://github.com/josiahcarlson/parse-crontab>`_
+Example:
+::
+    exclude_schedule: '* 4-7 * sat * '
+
+Cron Examples:
+::
+    30 \*/2 * * * -> 30 minutes past the hour every 2 hours
+    15,45 23 * * * -> 11:15PM and 11:45PM every day
+    0 1 ? * SUN -> 1AM every Sunday
+    0 1 * * SUN -> 1AM every Sunday (same as above)
+    0 0 1 jan/2 * 2011-2013 -> midnight on January 1, 2011 and the first of every odd month until the end of 2013
+    24 7 L * * -> 7:24 AM on the last day of every month
+    24 7 * * L5 -> 7:24 AM on the last friday of every month
+    24 7 * * Lwed-fri -> 7:24 AM on the last wednesday, thursday, and friday of every month
+
 timeperiod
 ~~~~~~~~~~
     * ``start``, ``end``
@@ -178,28 +224,6 @@ exclude
 Example:
 ::
     host:database4.company.com OR host:database5.company.com
-
-exclude_schedule
-~~~~~~~~~~~~~~~~~
-    * Required `No`
-    * Description: Allows you to specify a time period for when this Tale will not run, in cron format.  
-    * More information:  Lets say you have a something that runs every saturday and sunday morning between 4am and 7am.  You know its normal so you dont want to be alerted about it, but any other time you do.  This parameter allows you to specify a window for Tale to not run at.
-    * Credit:  This is using the parse-crontab module by Josiah Carlson which can be found `here <https://github.com/josiahcarlson/parse-crontab>`_
-Example:
-::
-    exclude_schedule: '* 4-7 * sat * '
-
-Cron Examples:
-::
-    30 \*/2 * * * -> 30 minutes past the hour every 2 hours
-    15,45 23 * * * -> 11:15PM and 11:45PM every day
-    0 1 ? * SUN -> 1AM every Sunday
-    0 1 * * SUN -> 1AM every Sunday (same as above)
-    0 0 1 jan/2 * 2011-2013 -> midnight on January 1, 2011 and the first of every odd month until the end of 2013
-    24 7 L * * -> 7:24 AM on the last day of every month
-    24 7 * * L5 -> 7:24 AM on the last friday of every month
-    24 7 * * Lwed-fri -> 7:24 AM on the last wednesday, thursday, and friday of every month
-
 
 alert
 ~~~~~

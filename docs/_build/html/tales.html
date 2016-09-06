@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                1.0.2
+                1.0.4
               </div>
             
           
@@ -95,9 +95,10 @@
 <li class="toctree-l3"><a class="reference internal" href="#disabled">disabled</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#tql-query">tql_query</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#index">index</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#schedule">schedule</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#exclude-schedule">exclude_schedule</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#timeperiod">timeperiod</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#exclude">exclude</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#exclude-schedule">exclude_schedule</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#alert">alert</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#type">type</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#relation">relation</a></li>
@@ -378,6 +379,62 @@ This would build index names with hour intervals such as:</p>
 </pre></div>
 </div>
 </div>
+<div class="section" id="schedule">
+<h3>schedule<a class="headerlink" href="#schedule" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><ul class="simple">
+<li>Required <cite>No</cite></li>
+<li>Description: Specifies when a Tale should run, using cron syntax.</li>
+<li>More Information: Sometimes you may only want to have a Tale run during business hours ( 8am - 6pm , mon-fri ).  This allows you to specify when this Tale will run in cron format ( see example below )</li>
+<li>Credit:  This is using the parse-crontab module by Josiah Carlson which can be found <a class="reference external" href="https://github.com/josiahcarlson/parse-crontab">here</a></li>
+</ul>
+</div></blockquote>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If you do not specify a <code class="docutils literal"><span class="pre">schedule</span></code> for your Tale, then Tattle will run this Tale every time it runs.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">schedule</span><span class="p">:</span> <span class="s2">&quot;* 8-18 * * mon-fri&quot;</span>
+</pre></div>
+</div>
+<p>Cron Examples:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>30 \*/2 * * * -&gt; 30 minutes past the hour every 2 hours
+15,45 23 * * * -&gt; 11:15PM and 11:45PM every day
+0 1 ? * SUN -&gt; 1AM every Sunday
+0 1 * * SUN -&gt; 1AM every Sunday (same as above)
+0 0 1 jan/2 * 2011-2013 -&gt; midnight on January 1, 2011 and the first of every odd month until the end of 2013
+24 7 L * * -&gt; 7:24 AM on the last day of every month
+24 7 * * L5 -&gt; 7:24 AM on the last friday of every month
+24 7 * * Lwed-fri -&gt; 7:24 AM on the last wednesday, thursday, and friday of every month
+</pre></div>
+</div>
+</div>
+<div class="section" id="exclude-schedule">
+<h3>exclude_schedule<a class="headerlink" href="#exclude-schedule" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><ul class="simple">
+<li>Required <cite>No</cite></li>
+<li>Description: Allows you to specify a time period for when this Tale will not run, in cron format.  This would be the opposite of the <code class="docutils literal"><span class="pre">schedule</span></code> option</li>
+<li>More information:  Lets say you have a something that runs every saturday and sunday morning between 4am and 7am.  You know its normal so you dont want to be alerted about it, but any other time you do.  This parameter allows you to specify a window for Tale to not run at.</li>
+<li>Credit:  This is using the parse-crontab module by Josiah Carlson which can be found <a class="reference external" href="https://github.com/josiahcarlson/parse-crontab">here</a></li>
+</ul>
+</div></blockquote>
+<p>Example:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">exclude_schedule</span><span class="p">:</span> <span class="s1">&#39;* 4-7 * sat * &#39;</span>
+</pre></div>
+</div>
+<p>Cron Examples:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>30 \*/2 * * * -&gt; 30 minutes past the hour every 2 hours
+15,45 23 * * * -&gt; 11:15PM and 11:45PM every day
+0 1 ? * SUN -&gt; 1AM every Sunday
+0 1 * * SUN -&gt; 1AM every Sunday (same as above)
+0 0 1 jan/2 * 2011-2013 -&gt; midnight on January 1, 2011 and the first of every odd month until the end of 2013
+24 7 L * * -&gt; 7:24 AM on the last day of every month
+24 7 * * L5 -&gt; 7:24 AM on the last friday of every month
+24 7 * * Lwed-fri -&gt; 7:24 AM on the last wednesday, thursday, and friday of every month
+</pre></div>
+</div>
+</div>
 <div class="section" id="timeperiod">
 <h3>timeperiod<a class="headerlink" href="#timeperiod" title="Permalink to this headline">¶</a></h3>
 <blockquote>
@@ -418,32 +475,6 @@ This would build index names with hour intervals such as:</p>
 </div></blockquote>
 <p>Example:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">host</span><span class="p">:</span><span class="n">database4</span><span class="o">.</span><span class="n">company</span><span class="o">.</span><span class="n">com</span> <span class="n">OR</span> <span class="n">host</span><span class="p">:</span><span class="n">database5</span><span class="o">.</span><span class="n">company</span><span class="o">.</span><span class="n">com</span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="exclude-schedule">
-<h3>exclude_schedule<a class="headerlink" href="#exclude-schedule" title="Permalink to this headline">¶</a></h3>
-<blockquote>
-<div><ul class="simple">
-<li>Required <cite>No</cite></li>
-<li>Description: Allows you to specify a time period for when this Tale will not run, in cron format.</li>
-<li>More information:  Lets say you have a something that runs every saturday and sunday morning between 4am and 7am.  You know its normal so you dont want to be alerted about it, but any other time you do.  This parameter allows you to specify a window for Tale to not run at.</li>
-<li>Credit:  This is using the parse-crontab module by Josiah Carlson which can be found <a class="reference external" href="https://github.com/josiahcarlson/parse-crontab">here</a></li>
-</ul>
-</div></blockquote>
-<p>Example:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">exclude_schedule</span><span class="p">:</span> <span class="s1">&#39;* 4-7 * sat * &#39;</span>
-</pre></div>
-</div>
-<p>Cron Examples:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>30 \*/2 * * * -&gt; 30 minutes past the hour every 2 hours
-15,45 23 * * * -&gt; 11:15PM and 11:45PM every day
-0 1 ? * SUN -&gt; 1AM every Sunday
-0 1 * * SUN -&gt; 1AM every Sunday (same as above)
-0 0 1 jan/2 * 2011-2013 -&gt; midnight on January 1, 2011 and the first of every odd month until the end of 2013
-24 7 L * * -&gt; 7:24 AM on the last day of every month
-24 7 * * L5 -&gt; 7:24 AM on the last friday of every month
-24 7 * * Lwed-fri -&gt; 7:24 AM on the last wednesday, thursday, and friday of every month
 </pre></div>
 </div>
 </div>
