@@ -191,8 +191,11 @@
 <span class="n">description</span><span class="p">:</span> <span class="s2">&quot;Disk Usage High on a host or series of hosts&quot;</span>
 <span class="n">severity</span><span class="p">:</span> <span class="s2">&quot;High&quot;</span>
 <span class="n">tql_query</span><span class="p">:</span> <span class="s2">&quot;summary.fullest_disk:&gt;=90 | terms name=server, field=host.raw | avg name=fullest_disk, field=summary.fullest_disk&quot;</span>
+<span class="n">exclude</span><span class="p">:</span> <span class="s1">&#39;host.raw:database4.mycompany.com&#39;</span>
 <span class="n">index</span><span class="p">:</span> <span class="s2">&quot;system-metrics-*&quot;</span>
 <span class="n">enabled</span><span class="p">:</span> <span class="mi">1</span>
+<span class="n">schedule</span><span class="p">:</span> <span class="s1">&#39;* 8-18 * * mon-fri&#39;</span>
+<span class="n">exclude_schedule</span><span class="p">:</span> <span class="s1">&#39;30 12 * * *</span>
 <span class="n">timeperiod</span><span class="p">:</span>
     <span class="n">start</span><span class="p">:</span> <span class="s2">&quot;now-1h&quot;</span>
     <span class="n">end</span><span class="p">:</span> <span class="s2">&quot;now&quot;</span>

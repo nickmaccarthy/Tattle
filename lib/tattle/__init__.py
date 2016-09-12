@@ -134,9 +134,9 @@ def datatable(ourl):
     logger.error("An error has happened: %s" % (error))
 '''
 def get_logger(name='tattle', type='default'):
-    import tattle.log as bnlog
+    import tattle.log as tlog
 
-    logger = bnlog.logger()
+    logger = tlog.logger()
     logobj = logger.get_logger(name)
     return logobj
 
@@ -423,26 +423,32 @@ def makecsvfromlist(lst, filename=None):
 def get_tattlehome():
     return os.environ['TATTLE_HOME']
 
-
+''' alias to get_tattlehome '''
+def home():
+    return get_tattlehome()
 
 ''' Runs the actual cron check, returns the next time it will run '''
-def cron_check(cronstr, now=datemath('now')):
+def cron_check(cronstr, now=datemath('now'), itertype='next'):
     try:
         entry = CronTab(cronstr)
     except Exception as e:
         raise CronException("Unable to parse cron expression, reason: %s" % e)
 
-    # returns how many secondsd are left until the next run
-    return entry.next(now)
+    # returns how many seconds are left until/from the {itertype} ( next or previous ) run
+    #return entry.next(now)
+    return getattr(entry, itertype)(now)
 
 
+''' runs a test of a datetime object against a cron entry to see if it should run (True) or not (False) '''
+def test_cron(cronstr, now=datemath('now')):
+    try:
+        entry = CronTab(cronstr)
+    except Exception as e:
+        raise CronException("Unable to parse cron expression, reason: %s" % e)
+
+    return entry.test(now)
 
 ''' Tests to see if are with a current cron string or not '''
 def check_cron_schedule(cronstr, now=datemath('now')):
-    seconds_until_next_run = cron_check(cronstr, now)
-
-    if seconds_until_next_run <= 60:
-        return True
-    else:
-        return False
+    return test_cron(cronstr, now)
 
