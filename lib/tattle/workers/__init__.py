@@ -136,7 +136,6 @@ def tnd(es, alert):
         matches = tattle.filter.meets_total(results, results_total, alert['alert']['relation'], alert['alert']['qty'])
         if matches:
             total, results = matches
-            #if alert['alert'].has_key('return_matches'):
             if 'return_matches' in alert['alert']:
                 # todo:  move this logic somewhere more robust
                 amatch = alert['alert']['return_matches']
