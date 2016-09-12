@@ -134,9 +134,9 @@ def datatable(ourl):
     logger.error("An error has happened: %s" % (error))
 '''
 def get_logger(name='tattle', type='default'):
-    import tattle.log as bnlog
+    import tattle.log as tlog
 
-    logger = bnlog.logger()
+    logger = tlog.logger()
     logobj = logger.get_logger(name)
     return logobj
 
@@ -423,6 +423,9 @@ def makecsvfromlist(lst, filename=None):
 def get_tattlehome():
     return os.environ['TATTLE_HOME']
 
+''' alias to get_tattlehome '''
+def home():
+    return get_tattlehome()
 
 ''' Runs the actual cron check, returns the next time it will run '''
 def cron_check(cronstr, now=datemath('now'), itertype='next'):

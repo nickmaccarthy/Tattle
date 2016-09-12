@@ -87,6 +87,24 @@ Example
 
 .. _running-tattle:
 
+
+Environment Variables
+-----------------------
+
+Tattle can also support `environment variables` for configuration locations.  This is useful if you wanted to place your Tattle configurations in a directory other than ``$TATTLE_HOME``, and makes container applications such a docker easier to implement.  
+
+$TATTLE_CONFIG_DIR
+~~~~~~~~~~~~~~~~~~~
+``$TATTLE_CONFIG_DIR`` is the location where Tattle will search for its config files like, ``tattle.yml``, ``elasticserach.yml``, ``pagerduty.yml``, etc
+
+$TATTLE_TALES
+~~~~~~~~~~~~~~~~~~~
+``$TATTLE_TALES`` is the location where Tattle will search for Tales. 
+
+.. note::
+    You can specify multiple directories in Environment Variables by delimiting them with a ``:``.  For example if we wanted to search our home dir and ``/etc/tattle/tatles``, we could use ``$TATTLE_TALES=/home/myuser/tales:/etc/tattle/tales``
+
+
 Running
 --------
 

@@ -3,11 +3,11 @@ Tales, Alerts and Actions
 
 Introduction
 ------------
-Tales are the heart and soul of the system.  Tales are definitions for alerts and define such things as our time window for the events we seek, what query will run, thresholds, actions to take, etc. 
+Tales are the heart and soul of the system.  Tales are definitions for alerts and define such things as our time window for the events we seek, what query will run, thresholds, actions to take, etc.
 
 
 .. note::
-    Tales are  kept in `yaml` files in ``$TATTLE_HOME/etc/tattle/tales``, ``$TATTLE_HOME/etc/tales`` or in ``$TATTLE_HOME/etc/alerts``. 
+    Tales are  kept in `yaml` files in ``$TATTLE_HOME/etc/tattle/tales``, ``$TATTLE_HOME/etc/tales`` or in ``$TATTLE_HOME/etc/alerts``.
 
 To understand `Tales`, lets take a look at an example below.  Please note, we will use this as a reference for the rest of the Tales documentation.
 
@@ -22,8 +22,11 @@ TQL Query with multiple aggregations and multiple actions example
     description: "Disk Usage High on a host or series of hosts"
     severity: "High"
     tql_query: "summary.fullest_disk:>=90 | terms name=server, field=host.raw | avg name=fullest_disk, field=summary.fullest_disk"
+    exclude: 'host.raw:database4.mycompany.com'
     index: "system-metrics-*"
     enabled: 1
+    schedule: '* 8-18 * * mon-fri'
+    exclude_schedule: '30 12 * * *
     timeperiod:
         start: "now-1h"
         end: "now"
@@ -44,13 +47,13 @@ TQL Query with multiple aggregations and multiple actions example
 
         email:
             enabled: 1
-            once_per_match: 
+            once_per_match:
                 match_key: "key"
-            to: 
+            to:
                 - 'my_email@company.com'
                 - 'alerts@company.com'
 
-For more breakdown on this Tale, lets look at the :ref:`tales-definitions` section. 
+For more breakdown on this Tale, lets look at the :ref:`tales-definitions` section.
 
 .. _tales-definitions:
 
@@ -67,7 +70,7 @@ Example:
 description
 ~~~~~~~~~~~
     * Required: `Yes`
-    * Description: A brief description of the tale.  
+    * Description: A brief description of the tale.
 Example:
 ::
     description: "The disk usage on the server >= 90% on the root filesystem``
@@ -84,7 +87,7 @@ enabled
 ~~~~~~~~
     * Required: `Yes`
     * Description: Whteher this Tale is enabled (1)(True) or disabled (0)(False)
-Example: 
+Example:
 ::
     # This alert is enabled
     enabled: 1
@@ -100,7 +103,7 @@ disabled
     * Required: `Yes` but only if you didnt specify an ``enabled``
     * Description:  The same thing as as ``enabled`` above, but with opposite logic.  Tattle used to use the term ``disabled`` instead of ``enabled``, but this old method is left in for legacy support.  Please use the ``enabled`` term going forward with new Tales.
 Example:
-::  
+::
     # This alert is enabled, not disabled
     disabled: 0
     # this alert is disabled
@@ -112,16 +115,16 @@ tql_query
     * Required: `Yes`
     * Description: The TQL query for the Tale.  See the :doc:`tql` page for more details on TQL
 Example:
-::    
+::
     tql_query: "summary.fullest_disk:>=90 | terms name=server, field=host.raw | avg name=fullest_disk, field=summary.fullest_disk"
 
 index
 ~~~~~
     * Required `Yes`
     * Description: The index pattern where you the events you are searching reside.  Default is ``logstash-*``
-    * More information:  
+    * More information:
         * Builds the index names that Tattle will search data against
-            *   It uses the  ``start`` and ``end`` time in ``timeperiod`` of the Tale to determine which indexes to build/query against.  
+            *   It uses the  ``start`` and ``end`` time in ``timeperiod`` of the Tale to determine which indexes to build/query against.
         * Its common to store `timeseries` based indexes in Elasticsearch.  The most common format is store your data by day and append a date timestamp at the end of index.  The most common format is ``YYYY.MM.DD``.  If you specify a ``*`` at the end of the index pattern in Tattle, ie ``logstash-*``, then Tattle will build the indexs for you by ``day`` when it does its search.
         * If you store your indexes in a different time pattern or interval other than daily, then you can specify the time pattern and interval.  See examples 2-4
         * If you done specify a pattern or interval or a ``*``, then Tattle will search just that single index.
@@ -158,12 +161,12 @@ This would build index names with hour intervals such as:
 schedule
 ~~~~~~~~
     * Required `No`
-    * Description: Specifies when a Tale should run, using cron syntax. 
+    * Description: Specifies when a Tale should run, using cron syntax.
     * More Information: Sometimes you may only want to have a Tale run during business hours ( 8am - 6pm , mon-fri ).  This allows you to specify when this Tale will run in cron format ( see example below )
     * Credit:  This is using the parse-crontab module by Josiah Carlson which can be found `here <https://github.com/josiahcarlson/parse-crontab>`_
 
 .. note::
-    If you do not specify a ``schedule`` for your Tale, then Tattle will run this Tale every time it runs. 
+    If you do not specify a ``schedule`` for your Tale, then Tattle will run this Tale every time it runs.
 
 Example:
 ::
@@ -205,9 +208,9 @@ timeperiod
 ~~~~~~~~~~
     * ``start``, ``end``
     * Required: `Yes`
-    * Description: The timeperiod for events this Tale searches for.  This is a rolling window using python-datemath as our start and end times.  
+    * Description: The timeperiod for events this Tale searches for.  This is a rolling window using python-datemath as our start and end times.
     * More information:
-        * More documentation on python-datemath can be found here: https://github.com/nickmaccarthy/python-datemath    
+        * More documentation on python-datemath can be found here: https://github.com/nickmaccarthy/python-datemath
 Example:
 ::
     timeperiod:
@@ -227,7 +230,7 @@ Example:
 
 alert
 ~~~~~
-type 
+type
 ~~~~
     * Required: `Yes`
     * Description: The type of the alert
@@ -262,7 +265,7 @@ realert
 ~~~~~~~
     * Required: `Yes`
     * Description:  How long Tattle will wait before it will re-alert on this Tale.  If Tattle is still finding matches for this Tale, but we are within the re-alert threshold, then Tattle will not alert.
-    * Notes: 
+    * Notes:
         * Every time Tattle fires an alert, it stores it in the Tattle index in Elasticserach ( default is ``tattle-int`` ).  When the Tale gets loaded, one of the first thing it does it check to see when the last time this Tale fired.  It then compares the last time to the realert threshold, diffs the two and if we are beyone our re-alert threshold, then Tattle will re-fire the Tale.
         * It uses simple datemath like so:
             * ``1h``
@@ -283,7 +286,7 @@ Example:
 ::
     # Assuming we could get hundreds of matches back
     return_matches:
-        # Return back a random sample of 20 results 
+        # Return back a random sample of 20 results
         random: true
         length: 20
 
@@ -295,7 +298,7 @@ Alert Types
 ------------
 Frequency
 ~~~~~~~~~
-Frequency alerts occur when a certain number of events ( as defined by ``relation`` and ``qty``) occur within a certain period of time.  
+Frequency alerts occur when a certain number of events ( as defined by ``relation`` and ``qty``) occur within a certain period of time.
 
 Here are some examples:
 
@@ -348,7 +351,7 @@ Agg Match alerts are useful for aggregation based alerts where the keys and valu
 
 When you use an agg_match, Tattle will flatten the aggregation returned so it can be iterated against and matched by a regular expression.
 
-Take this example a return 
+Take this example a return
 ::
     {
         "hits": {
@@ -395,7 +398,7 @@ Tattle would flatten the aggregations section this to
     aggregations.terms.buckets.1.key = someserver2.somecompany.net
 
 
-So if we wanted to look for any `values` in our aggs that are ``>= 90`` we would use the regular expression ``^.value$`` as our match key.  
+So if we wanted to look for any `values` in our aggs that are ``>= 90`` we would use the regular expression ``^.value$`` as our match key.
 
 Some examples
 
@@ -431,8 +434,8 @@ Probably the most common alert action.  Tattle sends a formatted, HTML email to 
 The email server properties are stored in ``$TATTLE_HOME/etc/tattle/tattle.yaml``, so please set that up first before you proceed with email alerts
 
 Tale Examples:
-    
-Example 
+
+Example
 ::
     action:
         email:
@@ -464,8 +467,8 @@ Arguments
 Your script must be in ``$TATTLE_HOME/bin/scripts`` and must be executable.
 
 .. note::
-    The script will run as whatever user Tattle runs as.  For example if you run Tattle under a user called `tattle`, then the script will run as the user `tattle`. 
-    
+    The script will run as whatever user Tattle runs as.  For example if you run Tattle under a user called `tattle`, then the script will run as the user `tattle`.
+
 Here is an example script that will echo out each of the ARGV's
 ::
     #!/bin/bash
@@ -482,7 +485,7 @@ Here is an example script that will echo out each of the ARGV's
 Pager Duty
 ~~~~~~~~~~
 
-Another very common use for Tattle is to send its alert direclty to Pager Duty.  
+Another very common use for Tattle is to send its alert direclty to Pager Duty.
 
 Pager Duty alerts can be setup to Service Key, as defined in Pager Duty itself.  The service Key definitions can be stored in the ``$TATTLE_HOME/etc/tattle/pagerduty.yaml`` and can be referenced in the action by thier title.
 
@@ -514,7 +517,7 @@ Multiple Tales
 ---------------
 
 Its often useful to group Tales by their purpose.  For example, you might want to group your `Nginx Access` Tales together, your `Nginx Error` Tales sperately, and your `Securelog` Tales together.  Lets say we have 20 differnt `Nginx` Tales, and 10 different `Securelog` Tales; that would mean we would have have at least 30 seperate `Tale` ``.yaml`` files in our ``$TATTLE_HOME/etc/tales`` directory.  As you can imagine, the more you use Tattle, the more unwieldy this can get.
- 
+
 
 Luckily Tattle allows you to define multiple Tales in one ``.yaml`` file to alleviate this issue.  Using the example below, you can see how we grouped two `Nginx` Tales into one file.  There can be as many Tales as you want this one in one ``yaml`` file.
 
@@ -522,7 +525,7 @@ Syntax
 ~~~~~~~
 
 multi_tale_example.yaml
-::  
+::
     tales:
         -
             <tale #1>
@@ -553,10 +556,10 @@ Example for NGINX logs
             alert:
                 type: "frequency"
                 relation: "ge"
-                qty: 10 
+                qty: 10
                 realert: "15m"
                 return_matches: false
-            action: 
+            action:
                 email:
                     enabled: 1
                     to: 'alerts@mycompany.com'
@@ -576,10 +579,10 @@ Example for NGINX logs
             alert:
                 type: "frequency"
                 relation: "ge"
-                qty: 400 
+                qty: 400
                 realert: "15m"
                 return_matches: false
-            action: 
+            action:
                 email:
                     enabled: 1
                     to: 'alerts@mycompany.com'
@@ -587,6 +590,4 @@ Example for NGINX logs
                     enabled: 1
                     service_key: "TattleAlerts"
                     once_per_match:
-                        match_key: "key" 
-
-
+                        match_key: "key"

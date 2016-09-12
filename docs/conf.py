@@ -58,7 +58,6 @@ author = u'Nick MacCarthy (nick@nickmaccarthy.com) - http://nickmaccarthy.com'
 #
 # The short X.Y version.
 with open('../VERSION.md', 'r') as f:
-    #version = u'1.0.3'
     version = list(f.readlines())[0].strip()
 
 # The full version, including alpha/beta/rc tags.

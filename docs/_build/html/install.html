@@ -88,6 +88,11 @@
 <li class="toctree-l2"><a class="reference internal" href="#requirements">Requirements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#setup-install">Setup &amp; Install</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#configuration">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#environment-variables">Environment Variables</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#tattle-config-dir">$TATTLE_CONFIG_DIR</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#tattle-tales">$TATTLE_TALES</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#running">Running</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#example-cron">Example Cron</a></li>
 </ul>
@@ -215,15 +220,31 @@ Create a new file called <code class="docutils literal"><span class="pre">$TATTL
 </div>
 <ol class="arabic simple" start="3">
 <li>Now we need to make <cite>Tale</cite>.  A <cite>Tale</cite> is a definition for our alert.  As Tales are specific to the type of data you need to alert on, they will require more a more in-depth explination then what we can provide in this section.   So please go check out the <a class="reference internal" href="tales.html"><span class="doc">Tales, Alerts and Actions</span></a> section on setting up a Tale, and come back to the next step once that is completed.</li>
-<li>Once you have configured your Tale, please look at the <a class="reference internal" href="#running-tattle"><span class="std std-ref">Running</span></a> section below.</li>
+<li>Once you have configured your Tale, please look at the <a class="reference internal" href="#running-tattle"><span class="std std-ref">Environment Variables</span></a> section below.</li>
 </ol>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">A note on yaml configuration files.  You can use use both <code class="docutils literal"><span class="pre">.yml</span></code> or <code class="docutils literal"><span class="pre">.yaml</span></code> as your file extension</p>
 </div>
 </div>
+<div class="section" id="environment-variables">
+<span id="running-tattle"></span><h2>Environment Variables<a class="headerlink" href="#environment-variables" title="Permalink to this headline">¶</a></h2>
+<p>Tattle can also support <cite>environment variables</cite> for configuration locations.  This is useful if you wanted to place your Tattle configurations in a directory other than <code class="docutils literal"><span class="pre">$TATTLE_HOME</span></code>, and makes container applications such a docker easier to implement.</p>
+<div class="section" id="tattle-config-dir">
+<h3>$TATTLE_CONFIG_DIR<a class="headerlink" href="#tattle-config-dir" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal"><span class="pre">$TATTLE_CONFIG_DIR</span></code> is the location where Tattle will search for its config files like, <code class="docutils literal"><span class="pre">tattle.yml</span></code>, <code class="docutils literal"><span class="pre">elasticserach.yml</span></code>, <code class="docutils literal"><span class="pre">pagerduty.yml</span></code>, etc</p>
+</div>
+<div class="section" id="tattle-tales">
+<h3>$TATTLE_TALES<a class="headerlink" href="#tattle-tales" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal"><span class="pre">$TATTLE_TALES</span></code> is the location where Tattle will search for Tales.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">You can specify multiple directories in Environment Variables by delimiting them with a <code class="docutils literal"><span class="pre">:</span></code>.  For example if we wanted to search our home dir and <code class="docutils literal"><span class="pre">/etc/tattle/tatles</span></code>, we could use <code class="docutils literal"><span class="pre">$TATTLE_TALES=/home/myuser/tales:/etc/tattle/tales</span></code></p>
+</div>
+</div>
+</div>
 <div class="section" id="running">
-<span id="running-tattle"></span><h2>Running<a class="headerlink" href="#running" title="Permalink to this headline">¶</a></h2>
+<h2>Running<a class="headerlink" href="#running" title="Permalink to this headline">¶</a></h2>
 <ol class="arabic simple">
 <li>Tattle is designed (in its current form) to run standalone.  Its best to run Tattle on a CRON job, typically with an interval of every minute.  You can run it manually yourself as well. Just run <code class="docutils literal"><span class="pre">$TATTLE_HOME/bin/tattled.py</span></code>.</li>
 </ol>
