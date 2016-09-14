@@ -235,6 +235,7 @@ class PagerDutyAlert(AlertBase):
 
         self.title = "Tattle - {}".format(self.title)
 
+        self.client_url = kwargs.get('client_url', '') or kwargs.get('view_in', '')
 
     def get_service_args(self, key):
         for k,args in self.pdcfg.items():
@@ -270,6 +271,7 @@ class PagerDutyAlert(AlertBase):
             'event_type': 'trigger',
             'incident_key': tattle.make_md5(self.title),
             'client': self.pagerduty_client_name,
+            'client_url': self.client_url,
             'details': {
                 'alert-info': self.alert,
                 'matches': self.matches

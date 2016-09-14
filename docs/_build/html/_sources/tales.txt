@@ -506,6 +506,8 @@ Example Tale action
             enabled: 1
             # The name of the service key to use, as defined in pagerduty.yaml
             service_key: "TattleAlerts"
+            # The URL to specify for the 'View In' part of Pagerduty.  This could be Kibana dashboard or any web application you wish
+            client_url: "https://kibana.company.com/app/kibana#/dashboard/OurAwesomeDashboard"
             # If we should compile seperate pagerduty alerts for each match.  If this is not set, then the all of the results are sent in one PD alert
             once_per_match:
                 # The match key, is the part of the result we use our primary key for sperating the results in seperate PD alerts

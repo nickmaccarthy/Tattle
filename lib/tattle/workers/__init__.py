@@ -236,12 +236,12 @@ def tnd(es, alert):
                     if 'once_per_match' in action:
                         for m in q.matches:
                             mq = EventQueue(alert=alert, results=results, matches=m, intention=esq['intentions'])
-                            pdalert = PagerDutyAlert(service_name, event_queue=mq)
+                            pdalert = PagerDutyAlert(service_name, event_queue=mq, **action)
                             pdalert.title = "{} - {}".format(alert['name'], m[action['once_per_match'].get('match_key', 'key')])
                             pdalert.fire()
                             logger.info("""msg="{}", name="{}" """.format("PagerDuty Alert Sent", pdalert.title))
                     else:
-                        pdalert = PagerDutyAlert(service_name, event_queue=q)
+                        pdalert = PagerDutyAlert(service_name, event_queue=q, **action)
                         pdalert.fire()
                         logger.info("""msg="{}", name="{}" """.format("PagetDuty Alert Sent", alert['name']))
                     
