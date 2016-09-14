@@ -4,6 +4,7 @@ import datetime
 import time
 import calendar
 import dateutil
+import collections
 from collections import defaultdict
 from dateutil.relativedelta import relativedelta
 from elasticsearch import Elasticsearch
@@ -116,7 +117,24 @@ class TQL(DSLBase):
             qd['query_opts'] = self.build_main_query(query_parts[0])
             qd['aggs'] = []
             for i,part in enumerate(query_parts):
-                if self.get_agg(part.split()[0]):
+                if '>>' in part:
+                    parts = part.split('>>')
+                    parts = [ q.strip() for q in parts ]
+                    #print("get_intentions() - Non nested parts after split: {}".format(parts))
+                    #tattle.pprint(parts)
+                    non_nested = []
+                    for part in parts:
+                        #print('get_intention() - part: {}'.format(part))
+                        #print('get_intention() - part0: {}'.format(part.split()[0]))
+                        base,fname,args = self.get_agg(part.split()[0])
+                        td = defaultdict(dict)
+                        td['type'] = fname
+                        td['agg'] = self.build_agg(part)
+                        non_nested.append(td)
+                    #print("get_intention() - Non nested:")
+                    #tattle.pprint_as_json(non_nested)
+                    qd['aggs'].append(non_nested)
+                elif self.get_agg(part.split()[0]):
                     base,fname,args = self.get_agg(part.split()[0])
                     td = defaultdict(dict)
                     td['type'] = fname
@@ -127,6 +145,10 @@ class TQL(DSLBase):
 
         else:
             qd['query_opts'] = self.build_main_query(query_base)
+
+        #print("get_intentions() - query dict:")
+        #tattle.pprint_as_json(qd) 
+        #print('\n\n\n')
 
         return qd
 
@@ -204,6 +226,54 @@ class TQL(DSLBase):
             return 'bucket'
 
 
+    def build_aggs(self, aggobj, aggs):
+        #print("build_aggs() - aggs that came in")
+        #tattle.pprint_as_json(aggs)
+        #print("build_aggs() - aggobj: {}".format(aggobj))
+
+        if isinstance(aggs, dict):
+            try:
+                agg = aggs['agg']
+                agg_type = aggs['type']
+                base, fname, params_def = self.get_agg(agg_type)
+                basename = self.find_method(base)
+                aggobj = getattr(aggobj, basename)(*[agg['title'], fname], **agg['args'])
+            except Exception as e:
+                raise TQLException("Unable to agg in a loop: reason: {}, agg: {}".format(e, agg))
+        elif isinstance(aggs, list):
+            for agg in aggs:
+                #print('build_aggs() - AGG:')
+                #tattle.pprint_as_json(agg)
+                #print('build_aggs() - type: {}'.format(type(agg)))
+                #if isinstance(agg, collections.defaultdict):
+                if isinstance(agg, dict):
+                    #print("build_aggs() - was a defaultdict: {}".format(agg))
+                    try:
+                        agg = agg['agg']
+                        agg_type = agg['type']
+                        base, fname, params_def = self.get_agg(agg_type)
+                        basename = self.find_method(base)
+                        #print('build_aggs() - basename: {}'.format(basename))
+                        aggobj = getattr(aggobj, basename)(*[agg['title'], fname], **agg['args'])
+                    except Exception as e:
+                        raise TQLException("Unable to agg in a loop: reason: {}, agg: {}".format(e, agg))
+                elif isinstance(agg, list):
+                    #print("build_aggs() - got a list, details below:")
+                    #tattle.pprint(aggobj)
+                    #tattle.pprint(agg)
+                    #print('\n\n')
+                    #self.build_aggs(aggobj, agg)
+                    for a in agg:
+                        #print('build_aggs() - list loop: {}'.format(a)) 
+                        agg = a['agg']
+                        agg_type = agg['type']
+                        base, fname, params_def = self.get_agg(agg_type)
+                        basename = self.find_method(base)
+                        #print('build_aggs() - basename: {}'.format(basename))
+                        getattr(aggobj, basename)(*[agg['title'], fname], **agg['args'])
+        return aggobj
+
+
     def build_es_query(self,):
         qd = self._qd 
 
@@ -219,33 +289,48 @@ class TQL(DSLBase):
         # aggs
         if 'aggs' in qd and len(qd.get('aggs')) >= 1:
             aggs = qd['aggs']
+
+            #try:
+            #    fa = aggs[0]['agg']
+            #    base, fname, params_def = self.get_agg(fa['type'])
+            #    basename = self.find_method(base)
+            #    aggobj = getattr(s.aggs, basename)(*[fa['title'] , fa['type']], **fa['args'])
+            #except Exception as e:
+            #    raise TQLException("Unable to agg base: reason: {}, agg: {}".format(e, aggs[0]))
+
+            #print('build_es_query() - aggs that came in:')
+            #tattle.pprint_as_json(aggs)
             try:
-                fa = aggs[0]['agg']
-                base, fname, params_def = self.get_agg(fa['type'])
-                basename = self.find_method(base)
-                aggobj = getattr(s.aggs, basename)(*[fa['title'] , fa['type']], **fa['args'])
+                #aggobj = self.build_aggs(s.aggs, aggs)
+                aggobj = self.build_aggs(s.aggs, aggs[0])
+
+                #print("build_es_query() - aggs[0]:")
+                #tattle.pprint_as_json(aggs[0])
             except Exception as e:
-                raise TQLException("Unable to agg base: reason: {}".format(e))
+                raise TQLException("Unable to agg base: reason: {}, agg: {}".format(e, aggs))
 
             if len(aggs) > 1:
-                for agg in aggs[1:]:
-                    try:
-                        agg = agg['agg']
-                        agg_type = agg['type']
-                        base, fname, params_def = self.get_agg(agg_type)
-                        basename = self.find_method(base)
-                        aggobj = getattr(aggobj, basename)(*[agg['title'], fname], **agg['args'])
+                aggobj = self.build_aggs(aggobj, aggs[1:])
+                
+            #if len(aggs) > 1:
+            #    for agg in aggs[1:]:
+            #        try:
+            #            agg = agg['agg']
+            #            agg_type = agg['type']
+            #            base, fname, params_def = self.get_agg(agg_type)
+            #            basename = self.find_method(base)
+            #            aggobj = getattr(aggobj, basename)(*[agg['title'], fname], **agg['args'])
 
-                        # todo: support pipelines
-                        #if basename == 'pipeline':
-                        #    print "pipeline"
-                        #    #s.aggs(agg_title, fname, **args)
-                        #    aggz = getattr(s.aggs, basename)(*[agg_title,fname], **args)
-                        #else:
-                        #    aggz = getattr(aggz, basename)(*[agg_title,fname], **args)
+            #            # todo: support pipelines
+            #            #if basename == 'pipeline':
+            #            #    print "pipeline"
+            #            #    #s.aggs(agg_title, fname, **args)
+            #            #    aggz = getattr(s.aggs, basename)(*[agg_title,fname], **args)
+            #            #else:
+            #            #    aggz = getattr(aggz, basename)(*[agg_title,fname], **args)
 
-                    except Exception as e:
-                        raise TQLException("Unable to agg base in a loop: reason: {}".format(e))
+            #        except Exception as e:
+            #            raise TQLException("Unable to agg base in a loop: reason: {}".format(e))
 
             s = s[self.agg_size_from:self.agg_size]
         else:
