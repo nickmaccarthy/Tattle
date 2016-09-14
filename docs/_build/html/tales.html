@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                1.0.4
+                1.0.5
               </div>
             
           
@@ -825,6 +825,8 @@ echo $3
         <span class="n">enabled</span><span class="p">:</span> <span class="mi">1</span>
         <span class="c1"># The name of the service key to use, as defined in pagerduty.yaml</span>
         <span class="n">service_key</span><span class="p">:</span> <span class="s2">&quot;TattleAlerts&quot;</span>
+        <span class="c1"># The URL to specify for the &#39;View In&#39; part of Pagerduty.  This could be Kibana dashboard or any web application you wish</span>
+        <span class="n">client_url</span><span class="p">:</span> <span class="s2">&quot;https://kibana.company.com/app/kibana#/dashboard/OurAwesomeDashboard&quot;</span>
         <span class="c1"># If we should compile seperate pagerduty alerts for each match.  If this is not set, then the all of the results are sent in one PD alert</span>
         <span class="n">once_per_match</span><span class="p">:</span>
             <span class="c1"># The match key, is the part of the result we use our primary key for sperating the results in seperate PD alerts</span>
