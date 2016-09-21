@@ -83,7 +83,6 @@ class AlertBase(object):
             self.title = "Not Defined"
 
     def set_trigger_reason(self):
-        #il.append({'title': 'Trigger Reason', 'value': 'Because {} was {} to {}'.format(self.alert['alert'].get('type'), self.alert['alert'].get('relation').upper(), self.alert['alert'].get('qty')), 'short': True })
         if self.alert['alert'].get('type') == 'agg_match':
             reason = 'Because {} field {} was {} to {}'.format(self.alert['alert']['type'], self.alert['alert']['field'], self.alert['alert'].get('relation').upper(), self.alert['alert'].get('qty'))
         else:
@@ -373,7 +372,6 @@ class SlackAlert(AlertBase):
         return emoji
 
     def fire(self):
-
         alert_msg = []
         for k,v in self.alert.items():
             alert_msg.append(dict(title=k,value=self.alert.get(k, ''),short=True))
@@ -385,14 +383,24 @@ class SlackAlert(AlertBase):
         il = []
         il.append({'title': 'Description', 'value': self.alert.get('description', '')})
         il.append({'title': 'Severity', 'value': '{} {}'.format(self.alert.get('severity', ''), severity_emoji), 'short': True}) 
-        #il.append({'title': 'Trigger Reason', 'value': 'Because {} was {} to {}'.format(self.alert['alert'].get('type'), self.alert['alert'].get('relation').upper(), self.alert['alert'].get('qty')), 'short': True })
         il.append({'title': 'Trigger Reason', 'value': self.trigger_reason, 'short': True})
         il.append({'title': 'Query', 'value': self.intentions.get('_query', '') })
 
-        il.append({'title': 'Times', 'value':''})
-        il.append({'title': 'Start', 'value': '{} ({})'.format(self.intentions['_start_time_pretty'], self.intentions['_start']), 'short': True})
-        il.append({'title': 'End', 'value': '{} ({})'.format(self.intentions['_end_time_pretty'], self.intentions['_end']), 'short': True})
-       
+        il.append({'title': 'Time Period', 'value':''})
+        il.append({'title': 'From', 'value': '{}\n({})'.format(self.intentions['_start_time_pretty'], self.intentions['_start']), 'short': True})
+        il.append({'title': 'To', 'value': '{}\n({})'.format(self.intentions['_end_time_pretty'], self.intentions['_end']), 'short': True})
+      
+        # convert a single dict into a list, so it can be built with dict_to_html_table()
+        if isinstance(self.matches, dict):
+            self.matches = [ self.matches ]
+
+        if isinstance(self.matches, list):
+            results_table = tattle.dict_to_html_table(self.matches)
+        elif isinstance(self.matches, str):
+            results_table = self.matches
+        else:
+            results_table = "No results found"
+
         rl = []
         for m in self.matches:
             keys = m.keys()

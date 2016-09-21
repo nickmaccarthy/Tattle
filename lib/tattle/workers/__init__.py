@@ -261,11 +261,11 @@ def tnd(es, alert):
                 if tattle.normalize_boolean(action.get('enabled', 1)) == True:
                     if 'once_per_match' in action:
                         for m in q.matches:
-                            mq = EventQueue(alert=alert, results=matches, matches=matches, intentions=esq['intentions'], **action)
+                            mq = EventQueue(alert=alert, results=matches, matches=m, intentions=esq['intentions'], **action)
                             slackalert = SlackAlert(event_queue=mq, **action)
                             slackalert.title = "{} - {}".format(alert['name'], m[action['once_per_match'].get('match_key', 'key')])
                             slackalert.fire()
-                            logger.info("""msg="{}", name="{}" """.format("Slack Alert Sent", pdalert.title))
+                            logger.info("""msg="{}", name="{}" """.format("Slack Alert Sent", slackalert.title))
                     else:
                         slackalert = SlackAlert(event_queue=q, **action)
                         slackalert.fire()
