@@ -16,6 +16,7 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from jinja2 import Environment, FileSystemLoader 
+import urllib
 
 tcfg = tattle.config.load_configs().get('tattle')
 
@@ -48,6 +49,21 @@ class AlertBase(object):
         self.alert = self.eq.alert
         self.set_title()
 
+        self.client_url = kwargs.get('client_url') 
+        self.url = kwargs.get('url')
+        # Create a link to a kibana dashboard with the times for our alert
+        self.kibana4_dashboard = kwargs.get('kibana4_dashboard') or kwargs.get('kibana_dashboard')
+        if self.kibana4_dashboard is not None:
+            dash = self.kibana4_dashboard 
+            dash_time_settings = "(refreshInterval:(display:Off,pause:!f,value:0),time:(from:'{start_time}',mode:absolute,to:'{end_time}'))".format(start_time=self.intentions['_start_time_iso_str'], end_time=self.intentions['_end_time_iso_str'])
+            dash_time_settings = urllib.quote(dash_time_settings)
+            self.kibana_dashboard = "{dash}?_g={time_settings}".format(dash=dash, time_settings=dash_time_settings) 
+        else:
+            self.kibana_dashboard = None
+
+        self.trigger_reason = self.set_trigger_reason()
+
+
     def fire(self, **kwargs):
         raise NotImplementedError()
 
@@ -66,6 +82,13 @@ class AlertBase(object):
         else:
             self.title = "Not Defined"
 
+    def set_trigger_reason(self):
+        if self.alert['alert'].get('type') == 'agg_match':
+            reason = 'Because {} field {} was {} to {}'.format(self.alert['alert']['type'], self.alert['alert']['field'], self.alert['alert'].get('relation').upper(), self.alert['alert'].get('qty'))
+        else:
+            reason = 'Because {} was {} to {}'.format(self.alert['alert'].get('type'), self.alert['alert'].get('relation').upper(), self.alert['alert'].get('qty'))
+        return reason
+    
     def create_alert_body(self, matches):
         body = '\n----------------------------------------\n'
         for match in matches:
@@ -130,6 +153,7 @@ class EmailAlert(AlertBase):
         if not self.subject:
             self.set_subject(**kwargs)
 
+        self.client_url = self.kibana_dashboard or self.client_url or self.url
 
     def connect(self):
         try:
@@ -188,7 +212,7 @@ class EmailAlert(AlertBase):
             results_table = "No results found"
 
         try:
-            rendered_html = template.render(ainfo=self.alert, results=self.matches, intentions=self.intentions, results_table=results_table, eq=self.eq)
+            rendered_html = template.render(ainfo=self.alert, results=self.matches, intentions=self.intentions, results_table=results_table, eq=self.eq, client_url=self.client_url)
             return rendered_html
         except Exception as e:
             log_msg = "Unable to render email template. <br /><b>Reason: </b>{}</br />".format(e)
@@ -235,7 +259,7 @@ class PagerDutyAlert(AlertBase):
 
         self.title = "Tattle - {}".format(self.title)
 
-        self.client_url = kwargs.get('client_url', '') or kwargs.get('view_in', '')
+        self.client_url = self.kibana_dashboard or kwargs.get('client_url', '') or kwargs.get('view_in', '')
 
     def get_service_args(self, key):
         for k,args in self.pdcfg.items():
@@ -286,6 +310,139 @@ class PagerDutyAlert(AlertBase):
             logger.error('Error posting message to pagerduty: %s' % e)
 
 
+class SlackAlert(AlertBase):
+    def __init__(self, **kwargs):
+        super(SlackAlert, self).__init__(**kwargs)
+   
+        self.webhook_url = kwargs.get('webhook_url') 
+        self.emoji = kwargs.get('emoji', ':speak_no_evil:')
+        self.channel = kwargs.get('channel', '')
+        self.username = kwargs.get('username', 'Tattle')
+        self.msg_color = kwargs.get('message_color', 'danger')
+        self.parse = kwargs.get('parse', 'none')
+
+        self.title_link = self.kibana_dashboard or kwargs.get('title_link') or kwargs.get('client_url') or kwargs.get('url')
+        self.title = 'Tattle - {}'.format(self.title)
+
+
+    def escape_body(self, body):
+        return body
+
+
+    def make_body(self):
+        template_dir = os.path.join(TATTLE_HOME, 'usr', 'share', 'templates', 'html')
+        env = Environment(loader=FileSystemLoader(template_dir))
+        template = env.get_template('slack.html')
+
+        # convert a single dict into a list, so it can be built with dict_to_html_table()
+        if isinstance(self.matches, dict):
+            self.matches = [ self.matches ]
+
+        if isinstance(self.matches, list):
+            results_table = tattle.dict_to_html_table(self.matches)
+        elif isinstance(self.matches, str):
+            results_table = self.matches
+        else:
+            results_table = "No results found"
+
+        try:
+            rendered_html = template.render(ainfo=self.alert, results=self.matches, intentions=self.intentions, results_table=results_table, eq=self.eq)
+            return rendered_html
+        except Exception as e:
+            log_msg = "Unable to render email template. <br /><b>Reason: </b>{}</br />".format(e)
+            logger.exception(log_msg)
+            return log_msg
+
+    def map_severity_emoji(self, level):
+        if isinstance(level, str):
+            level = level.lower()
+        if level in ('crit', 'critical', '5', 5):
+            emoji = ':fire:'
+        elif level in ('high', '4', 4):
+            emoji = ':rage:'
+        elif level in ('medium', '3', 3):
+            emoji = ':grimacing:'
+        elif level in ( 'low', '2', 2):
+            emoji = ':disappointed:'
+        elif level in ( 'info', 'informational', '1', 1):
+            emoji = ':sunglasses:' 
+        else:
+            emoji = ':question:'
+
+        return emoji
+
+    def fire(self):
+        alert_msg = []
+        for k,v in self.alert.items():
+            alert_msg.append(dict(title=k,value=self.alert.get(k, ''),short=True))
+
+        severity_emoji = self.map_severity_emoji(self.alert.get('severity', ''))
+        if severity_emoji != '':
+            self.title = "{} {}".format(self.title, severity_emoji)
+
+        il = []
+        il.append({'title': 'Description', 'value': self.alert.get('description', '')})
+        il.append({'title': 'Severity', 'value': '{} {}'.format(self.alert.get('severity', ''), severity_emoji), 'short': True}) 
+        il.append({'title': 'Trigger Reason', 'value': self.trigger_reason, 'short': True})
+        il.append({'title': 'Query', 'value': self.intentions.get('_query', '') })
+
+        il.append({'title': 'Time Period', 'value':''})
+        il.append({'title': 'From', 'value': '{}\n({})'.format(self.intentions['_start_time_pretty'], self.intentions['_start']), 'short': True})
+        il.append({'title': 'To', 'value': '{}\n({})'.format(self.intentions['_end_time_pretty'], self.intentions['_end']), 'short': True})
+      
+        # convert a single dict into a list, so it can be built with dict_to_html_table()
+        if isinstance(self.matches, dict):
+            self.matches = [ self.matches ]
+
+        if isinstance(self.matches, list):
+            results_table = tattle.dict_to_html_table(self.matches)
+        elif isinstance(self.matches, str):
+            results_table = self.matches
+        else:
+            results_table = "No results found"
+
+        rl = []
+        for m in self.matches:
+            keys = m.keys()
+            cols = []
+            for k in keys:
+                cols.append('*{}*:  _{}_'.format(k, m[k]))
+            rl.append(', '.join(cols))
+
+        attachments = [ 
+                {
+                    'title': self.title, 
+                    'title_link': self.title_link,
+                    'pretext': self.alert.get('description', ''), 
+                    'color': self.msg_color, 
+                    'fields': il, 
+                    'mrkdwn_in': ['value', 'fields', 'text'],
+                    'fallback': self.title, 
+                }, 
+                {
+                    'title': 'Results', 
+                    'text': '\n'.join(rl), 
+                    'mrkdwn_in': ['text'], 
+                    'color': self.msg_color, 
+                    'fallback': self.title,
+                    'footer': 'Sincerely, \nYour friendly neighborhood Tattle'
+                } 
+            ]
+        
+        headers = {'content-type': 'application/json'}
+        payload = {
+            'username': self.username,
+            'channel': self.channel,
+            'icon_emoji': self.emoji,
+            'parse': self.parse,
+            'attachments': attachments
+        }
+        
+        try:
+            response = requests.post(self.webhook_url, data=json.dumps(payload, ensure_ascii=False), headers=headers)
+            response.raise_for_status()
+        except RequestException as e:
+            logger.error("Error posting to slack, reaason: {}".format(e))
 
 def find_in_alerts(search_id):
     for al in alerts:

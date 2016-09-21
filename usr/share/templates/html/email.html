@@ -4,6 +4,9 @@
 <body>
         <div class="col-sm-12 col-md-12 main">
             <h3>Alert for: {{ainfo.name}}</h3>
+            {% if client_url %}
+            <h4>URL: <a href={{client_url}}>{{client_url}}</a></h4>
+            {% endif %}
             <p>
                 <strong>Severity:</strong> {{ ainfo.severity }} <br />
                 <strong>Alert Name:</strong> {{ainfo.name}}  <br />
@@ -15,8 +18,8 @@
                 <strong>Trigger Reason:</strong> Because <strong>{{ ainfo['alert']['type'] }}</strong> was <strong>{% filter upper %}{{ainfo['alert']['relation']}}{% endfilter %}</strong> to <strong>{{ainfo['alert']['qty']}}</strong> <br />
                 {% endif %}
                 <strong>Times:</strong> <br />
-                &nbsp;&nbsp;<b>Start:</b> {{intentions['_start_time_pretty']}} <br />
-                &nbsp;&nbsp;<b>End:</b> {{intentions['_end_time_pretty']}} <br />
+                &nbsp;&nbsp;<b>Start:</b> {{intentions['_start_time_pretty']}} ({{intentions['_start']}})<br />
+                &nbsp;&nbsp;<b>End:</b> {{intentions['_end_time_pretty']}} ({{intentions['_end']}})<br />
             </p>
             <p>
                 <strong>Results:</strong> <br />

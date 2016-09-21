@@ -9,7 +9,7 @@ import tattle.alert
 import json
 from tattle.result import results_to_df
 import random
-from tattle.alert import EmailAlert, PPrintAlert, PagerDutyAlert, ScriptAlert
+from tattle.alert import EmailAlert, PPrintAlert, PagerDutyAlert, ScriptAlert, SlackAlert
 from datemath import dm, datemath
 from elasticsearch.exceptions import NotFoundError
 
@@ -149,7 +149,8 @@ def tnd(es, alert):
                 else:
                     matches = results[0:matchlen]
             else:
-                matches = "<br />I have found a total of <b>{}</b> matches. <br /> Note: Matches not returned because 'return_matches' was false.".format(total)
+                #matches = "<br />I have found a total of <b>{}</b> matches. <br /> Note: Matches not returned because 'return_matches' was false.".format(total)
+                matches = { 'matches': total }
             should_alert = True
     elif alert_type in ('spike', 'event_spike', '_event_spike'):
         start_ts = esq['intentions']['_start_time_iso_str']
@@ -194,7 +195,7 @@ def tnd(es, alert):
                 if tattle.normalize_boolean(action.get('enabled', 1)) == True:
                     if 'once_per_match' in action:
                         for m in q.matches:
-                            mq = EventQueue(alert=alert, results=results, matches=m, intentions=esq['intentions'])
+                            mq = EventQueue(alert=alert, results=results, matches=m, intentions=esq['intentions'], **action)
                             email_alert = EmailAlert(event_queue=mq)
                             email_alert.subject = "{} - {}".format(alert['name'], m[action['once_per_match'].get('match_key', 'key')])
                             email_alert.fire()
@@ -202,7 +203,7 @@ def tnd(es, alert):
                             if email_it:
                                 logger.info("""msg="{0}", email_to="{1}", name="{2}", subject="{3}" """.format( "Email Sent", email_alert.to, alert['name'], email_alert.subject ))
                     else: 
-                        email_alert = EmailAlert(event_queue=q)
+                        email_alert = EmailAlert(event_queue=q, alert=alert, intention=esq['intentions'], **action)
                         email_alert.fire()
                         email_it = True
                         if email_it:
@@ -250,10 +251,25 @@ def tnd(es, alert):
                 if tattle.normalize_boolean(alert['action']['script']['enabled']) == True:
                     mq = EventQueue(alert=alert, results=matches, matches=matches, intentions={'foo': 'bar'})
                     script_name = alert['action']['script']['filename']
-                    salert = ScriptAlert(script_name, event_queue=mq)
+                    salert = ScriptAlert(script_name, event_queue=mq, **action)
                     salert.fire()
                     logger.info("""msg="{}", name="{}", script_name="{}" """.format("Script Alert Triggered", alert['name'], action['filename']))
 
+
+            if 'slack' in alert['action']:
+                action = alert['action']['slack']
+                if tattle.normalize_boolean(action.get('enabled', 1)) == True:
+                    if 'once_per_match' in action:
+                        for m in q.matches:
+                            mq = EventQueue(alert=alert, results=matches, matches=m, intentions=esq['intentions'], **action)
+                            slackalert = SlackAlert(event_queue=mq, **action)
+                            slackalert.title = "{} - {}".format(alert['name'], m[action['once_per_match'].get('match_key', 'key')])
+                            slackalert.fire()
+                            logger.info("""msg="{}", name="{}" """.format("Slack Alert Sent", slackalert.title))
+                    else:
+                        slackalert = SlackAlert(event_queue=q, **action)
+                        slackalert.fire()
+                        logger.info("""msg="{}", name="{}" """.format("Slack Alert Sent", alert['name']))
 
     else:
         logger.debug("Nope, i would not alert. Alert: {} Reason: {} was not {} {}".format(alert['name'], alert['alert']['type'], alert['alert']['relation'], alert['alert']['qty']))
