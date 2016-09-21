@@ -439,16 +439,20 @@ Example
 ::
     action:
         email:
-            # We can enable or disable this action with this flag
+            # Optional - We can enable or disable this action with this flag
             enabled: 1
-            # Who the email should go to
+            # Required - Who the email should go to
             to: [ 'alerts@company.com', 'manager@company.com' ]
-            # If we should send a sperate email for every match.  If this is not set, then the all of the results are sent in one email
+            # Optional - If we should send a sperate email for every match.  If this is not set, then the all of the results are sent in one email
             once_per_match:
                 # The match key, is the part of the result we use our primary key for sperating the results in seperate emails
                 # In this case its "key" since its the key of the aggregation.  In our case this will be the hostname
                 # If we had 4 hosts that matched then we would have 4 seperate emails.  Tattle will append the 'match_key' to the subject of the email as well
                 match_key: "key"
+            # Optional - A link to a external url to be shown in the email
+            client_url: 'https://someapp.company.com'
+            # Optional - kibana4_dashbaord to link to a kibana dashbaord.  When using this, Tattle will add the times from the Tale into the dashboard link, note this works for kibana4 dashbaords only
+            kibana4_dashboard: 'http://kibana.company.com/app/kibana#/dashboard/OurAwesomeDashboard'
 
 If you want to change the HTML for the email, add company logos etc, you can change the templates directly in ``$TATTLE_HOME/use/share/templates/html/email.html``
 
@@ -502,18 +506,47 @@ Example Tale action
 ::
     action:
         pagerduty:
-            # We can enable or disable this action here
+            # Optional - We can enable or disable this action here
             enabled: 1
-            # The name of the service key to use, as defined in pagerduty.yaml
+            # Required - The name of the service key to use, as defined in pagerduty.yaml
             service_key: "TattleAlerts"
-            # The URL to specify for the 'View In' part of Pagerduty.  This could be Kibana dashboard or any web application you wish
+            # Optional - The URL to specify for the 'View In' part of Pagerduty.  This could be Kibana dashboard or any web application you wish
             client_url: "https://kibana.company.com/app/kibana#/dashboard/OurAwesomeDashboard"
-            # If we should compile seperate pagerduty alerts for each match.  If this is not set, then the all of the results are sent in one PD alert
+            # Optional - kibana4_dashbaord to link to a kibana dashbaord which will be shown in 'View In'.  When using this, Tattle will add the times from the Tale into the dashboard link, note this works for kibana4 dashbaords only
+            kibana4_dashboard: 'http://kibana.company.com/app/kibana#/dashboard/OurAwesomeDashboard'
+            # Optional - If we should compile seperate pagerduty alerts for each match.  If this is not set, then the all of the results are sent in one PD alert
             once_per_match:
                 # The match key, is the part of the result we use our primary key for sperating the results in seperate PD alerts
                 # In this case its "key" since its the key of the aggregation.  In our case this will be the hostname
                 # If we had 4 hosts that matched then we would have 4 seperate Pagerduty alerts.  Tattle will append the 'match_key' to the subject of the Pagerduty alert as well
                 match_key: "key"
+
+Slack
+~~~~~~~
+
+You can post Tattle alerts into Slack
+
+To use this, all you need to do is add the ``webhook_url`` and ``channel`` in your Tale ``action``
+
+Example
+::
+    action:
+        slack:
+            # Optional - if the action is enabled or not ( default is True )
+            enabled: 1 
+            # Required - The webhook url to use for the slack intergration
+            webhook_url: 'https://hooks.slack.com/services/TTAsdfQ/asdfasdf/asdfasdfasdf'
+            # Required - the slack channel to post the alert to
+            channel: 'engineering-channel' 
+            once_per_match: # Optional
+                # The match key, is the part of the result we use our primary key for sperating the results in seperate PD alerts
+                # In this case its "key" since its the key of the aggregation.  In our case this will be the hostname
+                # If we had 4 hosts that matched then we would have 4 seperate Pagerduty alerts.  Tattle will append the 'match_key' to the subject of the Pagerduty alert as well
+                match_key: "key"
+            # optional - A link to a external url which will be displayed in the Title of the Slack alert
+            client_url: 'https://someapp.company.com'
+            # optional kibana4_dashbaord to link to a kibana dashbaord.  When using this, Tattle will add the times from the Tale into the dashboard link, note this works for kibana4 dashbaords only
+            kibana4_dashboard: 'http://kibana.company.com/app/kibana#/dashboard/OurAwesomeDashboard'
 
 Multiple Tales
 ---------------

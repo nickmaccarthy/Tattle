@@ -117,6 +117,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#email">Email</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#script">Script</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pager-duty">Pager Duty</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#slack">Slack</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#multiple-tales">Multiple Tales</a><ul>
@@ -760,16 +761,20 @@ This would build index names with hour intervals such as:</p>
 <p>Example</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">action</span><span class="p">:</span>
     <span class="n">email</span><span class="p">:</span>
-        <span class="c1"># We can enable or disable this action with this flag</span>
+        <span class="c1"># Optional - We can enable or disable this action with this flag</span>
         <span class="n">enabled</span><span class="p">:</span> <span class="mi">1</span>
-        <span class="c1"># Who the email should go to</span>
+        <span class="c1"># Required - Who the email should go to</span>
         <span class="n">to</span><span class="p">:</span> <span class="p">[</span> <span class="s1">&#39;alerts@company.com&#39;</span><span class="p">,</span> <span class="s1">&#39;manager@company.com&#39;</span> <span class="p">]</span>
-        <span class="c1"># If we should send a sperate email for every match.  If this is not set, then the all of the results are sent in one email</span>
+        <span class="c1"># Optional - If we should send a sperate email for every match.  If this is not set, then the all of the results are sent in one email</span>
         <span class="n">once_per_match</span><span class="p">:</span>
             <span class="c1"># The match key, is the part of the result we use our primary key for sperating the results in seperate emails</span>
             <span class="c1"># In this case its &quot;key&quot; since its the key of the aggregation.  In our case this will be the hostname</span>
             <span class="c1"># If we had 4 hosts that matched then we would have 4 seperate emails.  Tattle will append the &#39;match_key&#39; to the subject of the email as well</span>
             <span class="n">match_key</span><span class="p">:</span> <span class="s2">&quot;key&quot;</span>
+        <span class="c1"># Optional - A link to a external url to be shown in the email</span>
+        <span class="n">client_url</span><span class="p">:</span> <span class="s1">&#39;https://someapp.company.com&#39;</span>
+        <span class="c1"># Optional - kibana4_dashbaord to link to a kibana dashbaord.  When using this, Tattle will add the times from the Tale into the dashboard link, note this works for kibana4 dashbaords only</span>
+        <span class="n">kibana4_dashboard</span><span class="p">:</span> <span class="s1">&#39;http://kibana.company.com/app/kibana#/dashboard/OurAwesomeDashboard&#39;</span>
 </pre></div>
 </div>
 <p>If you want to change the HTML for the email, add company logos etc, you can change the templates directly in <code class="docutils literal"><span class="pre">$TATTLE_HOME/use/share/templates/html/email.html</span></code></p>
@@ -821,18 +826,45 @@ echo $3
 <p>Example Tale action</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">action</span><span class="p">:</span>
     <span class="n">pagerduty</span><span class="p">:</span>
-        <span class="c1"># We can enable or disable this action here</span>
+        <span class="c1"># Optional - We can enable or disable this action here</span>
         <span class="n">enabled</span><span class="p">:</span> <span class="mi">1</span>
-        <span class="c1"># The name of the service key to use, as defined in pagerduty.yaml</span>
+        <span class="c1"># Required - The name of the service key to use, as defined in pagerduty.yaml</span>
         <span class="n">service_key</span><span class="p">:</span> <span class="s2">&quot;TattleAlerts&quot;</span>
-        <span class="c1"># The URL to specify for the &#39;View In&#39; part of Pagerduty.  This could be Kibana dashboard or any web application you wish</span>
+        <span class="c1"># Optional - The URL to specify for the &#39;View In&#39; part of Pagerduty.  This could be Kibana dashboard or any web application you wish</span>
         <span class="n">client_url</span><span class="p">:</span> <span class="s2">&quot;https://kibana.company.com/app/kibana#/dashboard/OurAwesomeDashboard&quot;</span>
-        <span class="c1"># If we should compile seperate pagerduty alerts for each match.  If this is not set, then the all of the results are sent in one PD alert</span>
+        <span class="c1"># Optional - kibana4_dashbaord to link to a kibana dashbaord which will be shown in &#39;View In&#39;.  When using this, Tattle will add the times from the Tale into the dashboard link, note this works for kibana4 dashbaords only</span>
+        <span class="n">kibana4_dashboard</span><span class="p">:</span> <span class="s1">&#39;http://kibana.company.com/app/kibana#/dashboard/OurAwesomeDashboard&#39;</span>
+        <span class="c1"># Optional - If we should compile seperate pagerduty alerts for each match.  If this is not set, then the all of the results are sent in one PD alert</span>
         <span class="n">once_per_match</span><span class="p">:</span>
             <span class="c1"># The match key, is the part of the result we use our primary key for sperating the results in seperate PD alerts</span>
             <span class="c1"># In this case its &quot;key&quot; since its the key of the aggregation.  In our case this will be the hostname</span>
             <span class="c1"># If we had 4 hosts that matched then we would have 4 seperate Pagerduty alerts.  Tattle will append the &#39;match_key&#39; to the subject of the Pagerduty alert as well</span>
             <span class="n">match_key</span><span class="p">:</span> <span class="s2">&quot;key&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="slack">
+<h3>Slack<a class="headerlink" href="#slack" title="Permalink to this headline">¶</a></h3>
+<p>You can post Tattle alerts into Slack</p>
+<p>To use this, all you need to do is add the <code class="docutils literal"><span class="pre">webhook_url</span></code> and <code class="docutils literal"><span class="pre">channel</span></code> in your Tale <code class="docutils literal"><span class="pre">action</span></code></p>
+<p>Example</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">action</span><span class="p">:</span>
+    <span class="n">slack</span><span class="p">:</span>
+        <span class="c1"># Optional - if the action is enabled or not ( default is True )</span>
+        <span class="n">enabled</span><span class="p">:</span> <span class="mi">1</span>
+        <span class="c1"># Required - The webhook url to use for the slack intergration</span>
+        <span class="n">webhook_url</span><span class="p">:</span> <span class="s1">&#39;https://hooks.slack.com/services/TTAsdfQ/asdfasdf/asdfasdfasdf&#39;</span>
+        <span class="c1"># Required - the slack channel to post the alert to</span>
+        <span class="n">channel</span><span class="p">:</span> <span class="s1">&#39;engineering-channel&#39;</span>
+        <span class="n">once_per_match</span><span class="p">:</span> <span class="c1"># Optional</span>
+            <span class="c1"># The match key, is the part of the result we use our primary key for sperating the results in seperate PD alerts</span>
+            <span class="c1"># In this case its &quot;key&quot; since its the key of the aggregation.  In our case this will be the hostname</span>
+            <span class="c1"># If we had 4 hosts that matched then we would have 4 seperate Pagerduty alerts.  Tattle will append the &#39;match_key&#39; to the subject of the Pagerduty alert as well</span>
+            <span class="n">match_key</span><span class="p">:</span> <span class="s2">&quot;key&quot;</span>
+        <span class="c1"># optional - A link to a external url which will be displayed in the Title of the Slack alert</span>
+        <span class="n">client_url</span><span class="p">:</span> <span class="s1">&#39;https://someapp.company.com&#39;</span>
+        <span class="c1"># optional kibana4_dashbaord to link to a kibana dashbaord.  When using this, Tattle will add the times from the Tale into the dashboard link, note this works for kibana4 dashbaords only</span>
+        <span class="n">kibana4_dashboard</span><span class="p">:</span> <span class="s1">&#39;http://kibana.company.com/app/kibana#/dashboard/OurAwesomeDashboard&#39;</span>
 </pre></div>
 </div>
 </div>
