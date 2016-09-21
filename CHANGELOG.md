@@ -1,6 +1,11 @@
 # Changelog
 
-### v1.0.5 - 2015.09.12
+
+### v1.0.6 - 2016.09.21
+* Slack alerting/intergration.  There is not an alert action for alerting to a Slack channel
+* Kibana Dashboards.  If you use Kibana 4 for dashbaord, you can link your dashboard certain alert actions ( email, pagerduty and slack for now ), and Tattle will provide a link to the dashboard with a timefilter based on the times the alert was triggers
+
+### v1.0.5 - 2016.09.12
 * Support for Environment variables in setting $TATTLE_TALES and $TATTLE_CONFIG_DIR directories. More information available in documentation at tattle.io
 
 ### v1.0.4 - 2016.09.5
