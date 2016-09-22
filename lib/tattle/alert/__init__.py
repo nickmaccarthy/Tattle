@@ -17,6 +17,8 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from jinja2 import Environment, FileSystemLoader 
 import urllib
+import arrow
+import simplejson
 
 tcfg = tattle.config.load_configs().get('tattle')
 
@@ -63,6 +65,8 @@ class AlertBase(object):
 
         self.trigger_reason = self.set_trigger_reason()
 
+        self.firemsg = 'FireMSG Not Set for {}'.format(self.alert.get('name'))
+
 
     def fire(self, **kwargs):
         raise NotImplementedError()
@@ -103,9 +107,9 @@ class AlertBase(object):
        return "<AlertClass: %s - Name: %s>" % ( self.__class__.__name__,  self.alert['name'] )
             
     
-class PPrintAlert(AlertBase):
+class PprintAlert(AlertBase):
     def __init__(self, **kwargs):
-        super(PPrintAlert, self).__init__(**kwargs)
+        super(PprintAlert, self).__init__(**kwargs)
     
     def fire(self):
         self.run()
@@ -126,6 +130,8 @@ class PPrintAlert(AlertBase):
         print("-====== END ALERT ======-")
         print("\n\n")
 
+        self.firemsg = """msg="{}", tale_name="{}", title="{}" """.format("PPrint Alert Fired", self.alert.get('name'), self.title)
+
 
 class EmailAlert(AlertBase):
     
@@ -137,7 +143,8 @@ class EmailAlert(AlertBase):
         if self.mailcfg is None:
             raise ConfigException("Unable to load the email config.  Does it exist at $TATTLE_HOME/etc/tattle/email.yml?")
 
-        self.subject = None
+        #self.subject = None
+        self.subject = self.title
         self.cc = None
         self.bcc = None
 
@@ -181,6 +188,7 @@ class EmailAlert(AlertBase):
         self.subject = "{prefix}{subject}".format(prefix=self.subject_prefix, subject=self.subject)
         self.build_msg()
         self.send_email()
+        self.firemsg = """msg="{0}", email_to="{1}", tale_name="{2}", subject="{3}" """.format("Email Sent", self.to, self.alert.get('name'), self.subject)
 
     def send_email(self):
             try: 
@@ -220,24 +228,40 @@ class EmailAlert(AlertBase):
             return log_msg
 
 
+class IntentionsJSONEncoder(json.JSONEncoder):
+   
+    import elasticsearch_dsl
+    import arrow 
+    def default(self, obj):
+        if isinstance(obj, arrow.Arrow):
+            return obj.format('YYYY-MM-DD HH:mm:ss ZZ')
+        elif isinstance(obj, object):
+            return 'cant_serialize_object'
+        return json.JSONEncoder.default(self, obj)
 
 class ScriptAlert(AlertBase):
 
-    def __init__(self, script_name, **kwargs):
+    def __init__(self, **kwargs):
         super(ScriptAlert, self).__init__(**kwargs)
-        self.script_name = script_name
+        self.script_name = kwargs.get('filename') or kwargs.get('script_name') or kwargs.get('name')
+
+        if not self.script_name:
+            logger.error("Not able to find script name, please specify it with 'filename' in the action arguments")
+            return
 
     def fire(self):
         try:
-            tattle.run_script(self.script_name, json.dumps(self.matches), json.dumps(self.alert), json.dumps(self.intentions)) 
+            tattle.run_script(self.script_name, json.dumps(self.matches), json.dumps(self.alert), json.dumps(self.intentions, cls=IntentionsJSONEncoder)) 
         except Exception as e:
             logger.exception('Unable to run script: %s, reason: %s'.format(self.script_name, e))
+
+        self.firemsg = """msg="{}", tale_name="{}", script_name="{}" """.format("Script Alert Fired", self.alert.get('name'), self.script_name)
         
         
-class PagerDutyAlert(AlertBase):
+class PagerdutyAlert(AlertBase):
     
     def __init__(self, **action):
-        super(PagerDutyAlert, self).__init__(**action)
+        super(PagerdutyAlert, self).__init__(**action)
 
         self.service_name = action.get('service_name') or action.get('service_key')
         if not self.service_name:
@@ -313,6 +337,8 @@ class PagerDutyAlert(AlertBase):
         except RequestException as e:
             #raise RequestException("Error posting to pagerduty: %s" % e)
             logger.error('Error posting message to pagerduty: %s' % e)
+
+        self.firemsg = """msg="{}", tale_name="{}", title="{}" """.format("PagerDuty Alert Sent", self.alert.get('name'), self.title)
 
 
 class SlackAlert(AlertBase):
@@ -448,6 +474,8 @@ class SlackAlert(AlertBase):
             response.raise_for_status()
         except RequestException as e:
             logger.error("Error posting to slack, reaason: {}".format(e))
+
+        self.firemsg = """msg="{}", channel="{}", name="{}" """.format("Slack Alert Sent", self.channel, self.title)
 
 def find_in_alerts(search_id):
     for al in alerts:
