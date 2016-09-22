@@ -230,19 +230,16 @@ def tnd(es, alert):
             if 'pagerduty' in alert['action']: 
                 action = alert['action']['pagerduty']
                 if tattle.normalize_boolean(action.get('enabled', True)) == True:
-                    service_name = action.get('service_name') or action.get('service_key')
-                    if not service_name:
-                        logger.error('Service name was not set for pagerduty alert, cannot continue with this alert method. ')
-                        return
+
                     if 'once_per_match' in action:
                         for m in q.matches:
                             mq = EventQueue(alert=alert, results=results, matches=m, intention=esq['intentions'])
-                            pdalert = PagerDutyAlert(service_name, event_queue=mq, **action)
+                            pdalert = PagerDutyAlert(event_queue=mq, **action)
                             pdalert.title = "{} - {}".format(alert['name'], m[action['once_per_match'].get('match_key', 'key')])
                             pdalert.fire()
                             logger.info("""msg="{}", name="{}" """.format("PagerDuty Alert Sent", pdalert.title))
                     else:
-                        pdalert = PagerDutyAlert(service_name, event_queue=q, **action)
+                        pdalert = PagerDutyAlert(event_queue=q, **action)
                         pdalert.fire()
                         logger.info("""msg="{}", name="{}" """.format("PagetDuty Alert Sent", alert['name']))
                     
