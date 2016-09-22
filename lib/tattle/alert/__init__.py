@@ -236,8 +236,13 @@ class ScriptAlert(AlertBase):
         
 class PagerDutyAlert(AlertBase):
     
-    def __init__(self, service_name, **kwargs):
-        super(PagerDutyAlert, self).__init__(**kwargs)
+    def __init__(self, **action):
+        super(PagerDutyAlert, self).__init__(**action)
+
+        self.service_name = action.get('service_name') or action.get('service_key')
+        if not self.service_name:
+            logger.error('Service name was not set for pagerduty alert, cannot continue with this alert method. ')
+            return
 
         self.pdcfg = tattle.config.load_configs().get('pagerduty')
         if self.pdcfg is None:
@@ -245,7 +250,7 @@ class PagerDutyAlert(AlertBase):
 
 
         # Find our config options based on our service name
-        cfg = self.get_service_args(service_name)
+        cfg = self.get_service_args(self.service_name)
 
         if not cfg:
             msg = "Unable to find PagerDuty config for: {}, cannot continue.".format(service_name)
@@ -259,7 +264,7 @@ class PagerDutyAlert(AlertBase):
 
         self.title = "Tattle - {}".format(self.title)
 
-        self.client_url = self.kibana_dashboard or kwargs.get('client_url', '') or kwargs.get('view_in', '')
+        self.client_url = self.kibana_dashboard or action.get('client_url', '') or action.get('view_in', '')
 
     def get_service_args(self, key):
         for k,args in self.pdcfg.items():
