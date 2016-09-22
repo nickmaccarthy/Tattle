@@ -9,9 +9,11 @@ import tattle.alert
 import json
 from tattle.result import results_to_df
 import random
-from tattle.alert import EmailAlert, PPrintAlert, PagerDutyAlert, ScriptAlert, SlackAlert
+#from tattle.alert import EmailAlert, PPrintAlert, PagerDutyAlert, ScriptAlert, SlackAlert
+from tattle.alert import *
 from datemath import dm, datemath
 from elasticsearch.exceptions import NotFoundError
+import importlib
 
 
 TATTLE_HOME = os.environ.get('TATTLE_HOME')
@@ -189,84 +191,31 @@ def tnd(es, alert):
             #es.index(index='tattle-int', doc_type='alert-fired', id=tattle.md5hash("{0}{1}".format(alert['name'], tattle.get_current_utc())), body={'alert-name': alert['name'], '@timestamp': datetime.datetime.utcnow(), 'time_unix': tattle.get_current_utc(), 'alert-matches': q.matches, 'alert-args': alert})
             es.index(index='tattle-int', doc_type='alert-fired', id=tattle.md5hash("{0}{1}".format(alert['name'], tattle.get_current_utc())), body={'alert-name': alert['name'], 'alert-severity': alert.get('severity', 'not_found'), '@timestamp': datetime.datetime.utcnow(), 'time_unix': tattle.get_current_utc()} )
 
-            if 'email' in alert['action']:
-                action = alert['action']['email']
-                logger.debug(action) 
-                if tattle.normalize_boolean(action.get('enabled', 1)) == True:
-                    if 'once_per_match' in action:
-                        for m in q.matches:
-                            mq = EventQueue(alert=alert, results=results, matches=m, intentions=esq['intentions'], **action)
-                            email_alert = EmailAlert(event_queue=mq)
-                            email_alert.subject = "{} - {}".format(alert['name'], m[action['once_per_match'].get('match_key', 'key')])
-                            email_alert.fire()
-                            email_it = True
-                            if email_it:
-                                logger.info("""msg="{0}", email_to="{1}", name="{2}", subject="{3}" """.format( "Email Sent", email_alert.to, alert['name'], email_alert.subject ))
-                    else: 
-                        email_alert = EmailAlert(event_queue=q, alert=alert, intention=esq['intentions'], **action)
-                        email_alert.fire()
-                        email_it = True
-                        if email_it:
-                            logger.info("""msg="{0}", email_to="{1}", name="{2}", subject="{3}" """.format( "Email Sent", email_alert.to, alert['name'], email_alert.subject ))
-                else:
-                    logger.debug('Email alerting is disabled...')
+            for action, args in alert['action'].items():
 
-            if 'pprint' in alert['action']:
-                action = alert['action']['pprint']
-                if tattle.normalize_boolean(action.get('enabled', 1)) == True:
-                    logger.debug('pprint is enabled...')
-                    if 'once_per_match' in action:
-                        for m in q.matches:
-                            mq = EventQueue(alert=alert, results=results, matches=m, intentions=esq['intentions'])
-                            pp_alert = PPrintAlert(event_queue=mq)
-                            pp_alert.title = "{} - {}".format(alert['name'], m[action['once_per_match'].get('match_key', 'key')])
-                            pp_alert.fire()
-                    else:
-                        pp_alert = PPrintAlert(event_queue=q)
-                        pp_alert.fire()
-                else:
-                    logger.debug('pprint alert action is disabled...')
-                
-            if 'pagerduty' in alert['action']: 
-                action = alert['action']['pagerduty']
-                if tattle.normalize_boolean(action.get('enabled', True)) == True:
+                # are we enabled to run?
+                if tattle.normalize_boolean(args.get('enabled', 1)) == True:
+                    try:
+                        ''' 
+                            alert classnames always start with a capital letter
+                            pagerduty == PagerdutyAlert, slack == SlackAlert, etc 
+                        '''
+                        class_name = "{}Alert".format(action.title())
 
-                    if 'once_per_match' in action:
-                        for m in q.matches:
-                            mq = EventQueue(alert=alert, results=results, matches=m, intention=esq['intentions'])
-                            pdalert = PagerDutyAlert(event_queue=mq, **action)
-                            pdalert.title = "{} - {}".format(alert['name'], m[action['once_per_match'].get('match_key', 'key')])
-                            pdalert.fire()
-                            logger.info("""msg="{}", name="{}" """.format("PagerDuty Alert Sent", pdalert.title))
-                    else:
-                        pdalert = PagerDutyAlert(event_queue=q, **action)
-                        pdalert.fire()
-                        logger.info("""msg="{}", name="{}" """.format("PagetDuty Alert Sent", alert['name']))
-                    
-            if 'script' in alert['action']:
-                action = alert['action']['script']
-                if tattle.normalize_boolean(alert['action']['script']['enabled']) == True:
-                    mq = EventQueue(alert=alert, results=matches, matches=matches, intentions={'foo': 'bar'})
-                    script_name = alert['action']['script']['filename']
-                    salert = ScriptAlert(script_name, event_queue=mq, **action)
-                    salert.fire()
-                    logger.info("""msg="{}", name="{}", script_name="{}" """.format("Script Alert Triggered", alert['name'], action['filename']))
-
-
-            if 'slack' in alert['action']:
-                action = alert['action']['slack']
-                if tattle.normalize_boolean(action.get('enabled', 1)) == True:
-                    if 'once_per_match' in action:
-                        for m in q.matches:
-                            mq = EventQueue(alert=alert, results=matches, matches=m, intentions=esq['intentions'], **action)
-                            slackalert = SlackAlert(event_queue=mq, **action)
-                            slackalert.title = "{} - {}".format(alert['name'], m[action['once_per_match'].get('match_key', 'key')])
-                            slackalert.fire()
-                            logger.info("""msg="{}", name="{}" """.format("Slack Alert Sent", slackalert.title))
-                    else:
-                        slackalert = SlackAlert(event_queue=q, **action)
-                        slackalert.fire()
-                        logger.info("""msg="{}", name="{}" """.format("Slack Alert Sent", alert['name']))
+                        if 'once_per_match' in args:
+                            for m in q.matches:
+                                mq = EventQueue(alert=alert, results=results, matches=m, intentions=esq['intentions'], **args)
+                                alertobj = getattr(tattle.alert, class_name)(event_queue=mq, mathces=m, **args)
+                                alertobj.title = "{} - {}".format(alert['name'], m[args['once_per_match'].get('match_key', 'key')])
+                                alertobj.fire()
+                                logger.info(alertobj.firemsg)
+                        else:
+                            alertobj = getattr(tattle.alert, class_name)(event_queue=q, **args)
+                            alertobj.fire()
+                            logger.info(alertobj.firemsg)
+                    except Exception as e:
+                        msg = "Unable to initialize class: {}, reason: {}".format(class_name, e)
+                        logger.exception(msg)
 
     else:
         logger.debug("Nope, i would not alert. Alert: {} Reason: {} was not {} {}".format(alert['name'], alert['alert']['type'], alert['alert']['relation'], alert['alert']['qty']))
