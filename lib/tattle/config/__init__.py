@@ -98,10 +98,8 @@ def load_alerts():
             tale_key = None
             tale_filename = os.path.basename(tale) 
             loaded = load_yaml_file(tale)
-            #if loaded.has_key('alerts'):
             if 'alerts' in loaded:
                 tale_key = 'alerts'
-            #elif loaded.has_key('tales'):
             elif 'tales' in loaded:
                 tale_key = 'tales'
 
