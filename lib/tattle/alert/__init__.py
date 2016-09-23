@@ -155,10 +155,10 @@ class EmailAlert(AlertBase):
         self.sender = kwargs.get('sender', self.mailcfg['default_sender'])
         # sets our email subject
 
-        self.subject_prefix = self.mailcfg.get('subject_prefix', '')
+        #self.subject_prefix = self.mailcfg.get('subject_prefix', '')
 
-        if not self.subject:
-            self.set_subject(**kwargs)
+        #if not self.subject:
+        #    self.set_subject(**kwargs)
 
         self.client_url = self.kibana_dashboard or self.client_url or self.url
 
@@ -185,7 +185,8 @@ class EmailAlert(AlertBase):
 
     def fire(self):
         self.connect()
-        self.subject = "{prefix}{subject}".format(prefix=self.subject_prefix, subject=self.subject)
+        #self.subject = "{prefix}{subject}".format(prefix=self.subject_prefix, subject=self.subject)
+        self.subject = self.title
         self.build_msg()
         self.send_email()
         self.firemsg = """msg="{0}", email_to="{1}", tale_name="{2}", subject="{3}" """.format("Email Sent", self.to, self.alert.get('name'), self.subject)

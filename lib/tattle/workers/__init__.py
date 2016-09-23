@@ -6,11 +6,11 @@ from tattle.search import Search
 from tattle.utils import FlattenDict, EventQueue
 import tattle.filter
 import tattle.alert
+import tattle.config
 import json
 from tattle.result import results_to_df
 import random
-#from tattle.alert import EmailAlert, PPrintAlert, PagerDutyAlert, ScriptAlert, SlackAlert
-from tattle.alert import *
+#from tattle.alert import *
 from datemath import dm, datemath
 from elasticsearch.exceptions import NotFoundError
 import importlib
@@ -22,6 +22,8 @@ s = Search()
 
 logger = tattle.get_logger('tattle.workers')
 
+tcfg = tattle.config.load_configs().get('tattle')
+ 
 def es_search(es, *args, **kwargs):
     try:
         results = es.search(request_timeout=10, **kwargs) 
@@ -206,7 +208,7 @@ def tnd(es, alert):
                             for m in q.matches:
                                 mq = EventQueue(alert=alert, results=results, matches=m, intentions=esq['intentions'], **args)
                                 alertobj = getattr(tattle.alert, class_name)(event_queue=mq, mathces=m, **args)
-                                alertobj.title = "{} - {}".format(alert['name'], m[args['once_per_match'].get('match_key', 'key')])
+                                alertobj.title = "{}{} - {}".format(tcfg.get('title_prefix', 'Tattle - '), alert['name'], m[args['once_per_match'].get('match_key', 'key')])
                                 alertobj.fire()
                                 logger.info(alertobj.firemsg)
                         else:
