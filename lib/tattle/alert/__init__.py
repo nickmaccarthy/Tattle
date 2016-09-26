@@ -96,8 +96,6 @@ class AlertBase(object):
     def create_alert_body(self, matches):
         body = '\n----------------------------------------\n'
         for match in matches:
-           # body += unicode(BasicMatchString(self.rule, match))
-            # Separate text of aggregated alerts with dashes
             body += match
         body += '\n---------------------------------------\n'
         return body
