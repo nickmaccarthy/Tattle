@@ -208,13 +208,39 @@ def tnd(es, alert):
                             for m in q.matches:
                                 mq = EventQueue(alert=alert, results=results, matches=m, intentions=esq['intentions'], **args)
                                 alertobj = getattr(tattle.alert, class_name)(event_queue=mq, mathces=m, **args)
-                                alertobj.title = "{}{} - {}".format(tcfg.get('title_prefix', 'Tattle - '), alert['name'], m[args['once_per_match'].get('match_key', 'key')])
+                                alertobj.title = "{}{} - {}".format(tcfg.get('title_prefix', ''), alert['name'], m[args['once_per_match'].get('match_key', 'key')])
                                 alertobj.fire()
                                 logger.info(alertobj.firemsg)
+                                es.index(
+                                    index='tattle-int', 
+                                    doc_type='alert-action-taken', 
+                                    id=tattle.md5hash("{0}{1}".format(alertobj.title, tattle.get_current_utc())), 
+                                    body={
+                                            '@timestamp': datetime.datetime.utcnow(), 
+                                            'time_unix': tattle.get_current_utc(),
+                                            'alert': {
+                                                    'name': alertobj.title,
+                                                    'severity': alert.get('severity', 'not_found'), 
+                                                    'action': action
+                                            },
+                                        })
                         else:
                             alertobj = getattr(tattle.alert, class_name)(event_queue=q, **args)
                             alertobj.fire()
                             logger.info(alertobj.firemsg)
+                            es.index(
+                                index='tattle-int', 
+                                doc_type='alert-action-taken', 
+                                id=tattle.md5hash("{0}{1}".format(alertobj.title, tattle.get_current_utc())), 
+                                body={
+                                        '@timestamp': datetime.datetime.utcnow(), 
+                                        'time_unix': tattle.get_current_utc(),
+                                        'alert': {
+                                                'name': '{}{}'.format(tcfg.get('title_prefix', ''),alert['name']),
+                                                'severity': alert.get('severity', 'not_found'), 
+                                                'action': action
+                                        },
+                                    })
                     except Exception as e:
                         msg = "Unable to initialize class: {}, reason: {}".format(class_name, e)
                         logger.exception(msg)
