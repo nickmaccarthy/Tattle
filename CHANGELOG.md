@@ -1,5 +1,7 @@
 # Changelog
 
+### v1.0.7 - 2016-10-06
+* Better logic for handling script style in TQL. For example `percentile field=status percents=[85,99, 99.9]` should be evaluated correctly.  
 
 ### v1.0.6 - 2016.09.21
 * Slack alerting/intergration.  There is not an alert action for alerting to a Slack channel
