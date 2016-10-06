@@ -196,10 +196,17 @@ class TQL(DSLBase):
             except:
                 del(args['title'])
 
-        if 'order' in args:
-            args['order'] = eval(args['order'])
-        if 'script' in args:
-            args['script'] = eval(args['script'])
+        # If we have something like that looks like a script, or needs to be eval'd
+        for argname, value in args.items():
+            if re.match('[\[\{\]\}]', value):
+                args[argname] = eval(args[argname])
+        # The above logic replaces this
+        #if 'order' in args:
+        #    args['order'] = eval(args['order'])
+        #if 'script' in args:
+        #    args['script'] = eval(args['script'])
+        #if 'percents' in args:
+        #    args['percents'] = eval(args['percents'])
 
 
         thed = { 'title': agg_name or agg_type, 'args': args, 'type': agg_type }
