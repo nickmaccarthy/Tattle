@@ -160,4 +160,6 @@ An example demonstrating inline scripting with the choice of language, and conve
 
 .. note::
     Groovy inline scripting is disabled by default in modern Elasticsearch clusters. As always, check out the scripting documentation on elastic.co for more examples: https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-scripting.html
-   
+  
+.. note::
+    Script style syntax should be evauluted for most, if not all aggregations.  For example, ``percentiles field=status percents=[85, 99, 99.9]`` will be evauated into the correct JSON needed for the ES query 

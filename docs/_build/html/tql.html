@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                1.0.5
+                1.0.7
               </div>
             
           
@@ -293,6 +293,10 @@
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">Groovy inline scripting is disabled by default in modern Elasticsearch clusters. As always, check out the scripting documentation on elastic.co for more examples: <a class="reference external" href="https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-scripting.html">https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-scripting.html</a></p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Script style syntax should be evauluted for most, if not all aggregations.  For example, <code class="docutils literal"><span class="pre">percentiles</span> <span class="pre">field=status</span> <span class="pre">percents=[85,</span> <span class="pre">99,</span> <span class="pre">99.9]</span></code> will be evauated into the correct JSON needed for the ES query</p>
 </div>
 </div>
 </div>
