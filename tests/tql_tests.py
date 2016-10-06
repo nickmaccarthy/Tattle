@@ -276,8 +276,8 @@ class TestTQL(unittest.TestCase):
                             {
                                 "range": {
                                     "@timestamp": {
-                                        "from": "2015-12-31T22:00:00-00:00",
-                                        "to": "2016-01-01T00:00:00-00:00"
+                                            "from": "2015-12-31T22:00:00-00:00",
+                                            "to": "2016-01-01T00:00:00-00:00"
                                     }
                                 }
                             }
@@ -306,7 +306,67 @@ class TestTQL(unittest.TestCase):
             }
         """
         self.assertEqual(tqlq['esquery'], json.loads(expected)) 
-        
+       
+    def testPercentilesPercentsDefined(self):
+        """ ensures we can match the 'percents=[5,10,15]' in the a tql query so they can be evaled """
+        tqlq = self.tql_query("* | terms field=host.raw | percentiles field=status percents=[85]")
+        expected = """
+            {
+                "aggs": {
+                    "terms": {
+                        "aggs": {
+                            "percentiles": {
+                                "percentiles": {
+                                    "percents": [
+                                        85
+                                    ],
+                                    "field": "status"
+                                }
+                            }
+                        },
+                        "terms": {
+                            "field": "host.raw"
+                        }
+                    }
+                },
+                "query": {
+                    "bool": {
+                        "must_not": [
+                            {
+                                "query_string": {
+                                    "query": ""
+                                }
+                            }
+                        ],
+                        "must": [
+                            {
+                                "query_string": {
+                                    "query": "*"
+                                }
+                            },
+                            {
+                                "range": {
+                                    "@timestamp": {
+                                        "to": "2016-01-01T00:00:00-00:00",
+                                        "from": "2015-12-31T22:00:00-00:00"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                },
+                "size": 0,
+                "_source": {
+                    "include": [
+                        "*"
+                    ]
+                },
+                "from": 0
+            }
+        """
+        self.maxDiff = None
+        self.assertEqual(tqlq['esquery'], json.loads(expected)) 
+     
     def testSingleAggResults(self):
         from results import single_agg
         results = json.loads(single_agg)
