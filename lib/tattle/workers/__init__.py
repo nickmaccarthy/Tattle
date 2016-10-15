@@ -242,7 +242,7 @@ def tnd(es, alert):
                                         },
                                     })
                     except Exception as e:
-                        msg = "Unable to initialize class: {}, reason: {}".format(class_name, e)
+                        msg = "Unable to initialize alert class: {}, reason: {}, alert_name: {}".format(class_name, e, alert.get('name', 'not_found'))
                         logger.exception(msg)
 
     else:
