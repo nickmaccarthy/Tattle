@@ -65,7 +65,7 @@ def tnd(es, alert):
     
     last_run = tattle.alert.last_run(es, alert['name']) 
     if last_run is None:
-        logger.info("Last run was 'None; for: %s.  This is the first time we have seen it." % (alert['name']))
+        logger.debug("Last run was 'None; for: %s.  This is the first time we have seen it." % (alert['name']))
         last_run = 100000000
     
     if last_run > 0:
