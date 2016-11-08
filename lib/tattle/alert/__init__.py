@@ -345,7 +345,7 @@ class SlackAlert(AlertBase):
         super(SlackAlert, self).__init__(**kwargs)
    
         self.webhook_url = kwargs.get('webhook_url') 
-        self.emoji = kwargs.get('emoji', ':speak_no_evil:')
+        self.emoji = kwargs.get('emoji', ':squirrel:')
         self.channel = kwargs.get('channel', '')
         self.username = kwargs.get('username', 'Tattle')
         self.msg_color = kwargs.get('message_color', 'danger')
