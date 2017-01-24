@@ -391,8 +391,8 @@ class SlackAlert(AlertBase):
         emoji = ':question:'
         level = str(level)
 
-        if self.slackcfg.get('emoji_severity_map').items():
-            for regex, emoji in self.slackcfg.get('emoji_severity_map'):
+        if self.slackcfg.get('emoji_severity_map'):
+            for regex, emoji in self.slackcfg.get('emoji_severity_map').items():
                 if re.match(regex, level, re.I):
                     emoji = emoji
                     break # we found our match
