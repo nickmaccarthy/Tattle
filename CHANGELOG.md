@@ -1,5 +1,8 @@
 # Changelog
 
+### v.1.0.10 - 2017-01-24
+* Allows slack to have defaults ( webhook, channel, etc ) to eliniate tale clutter.  See docs for more info.
+
 ### v1.0.7 - 2016-10-06
 * Better logic for handling script style in TQL. For example `percentile field=status percents=[85,99, 99.9]` should be evaluated correctly.  
 
