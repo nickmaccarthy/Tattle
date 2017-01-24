@@ -524,9 +524,46 @@ Example Tale action
 Slack
 ~~~~~~~
 
-You can post Tattle alerts into Slack
+Tattle can post its alerts into a Slack channel of your choice
 
-To use this, all you need to do is add the ``webhook_url`` and ``channel`` in your Tale ``action``
+Before you go forward, please fill in the defaults ( which can be overridden on a per Tale/Action basis ) in ``$TATTLE_HOME/etc/tattle/slack.yml``
+
+In the defaults section, fill in the info with whatever makes sense for your envionment.  As stated, these can be overridden on a per-tale/action basis if you wish as well ( example below ).  
+Default
+::
+    default:
+        webhook_url: 'https://mywebhook.slack.com'
+        channel: 'eng-alerts'
+        username: 'Tattle'
+        msg_color: 'danger'
+        title_prefix: 'Tattle -'
+        emoji: ':squirrel:'
+
+Then in your Tale action, just specify slack
+Example
+::
+    action:
+        slack:
+            enabled: 1
+            once_per_match: # Optional
+                # The match key, is the part of the result we use our primary key for sperating the results in seperate PD alerts
+                # In this case its "key" since its the key of the aggregation.  In our case this will be the hostname
+                # If we had 4 hosts that matched then we would have 4 seperate Pagerduty alerts.  Tattle will append the 'match_key' to the subject of the Pagerduty alert as well
+                match_key: "key"
+            kibana4_dashboard: 'http://kibana.company.com/app/kibana#/dashboard/OurAwesomeDashboard'
+
+By default slack will map the severity of an alert to an emoji as specified in ``$TATTLE_HOME/etc/tattle/slack.yml``.  This can be customized by changing the regex keys in the ``emoji_severity_map`` to match your severity system in your environment.  
+The default is
+::
+    emoji_severity_map:
+        'crit|5': ':fire:'
+        'high|4': ':rage:'
+        'med|3': ':grimacing:'
+        'low|2': ':disappointed:'
+        'info|1': ':sunglasses:'
+
+
+If you want to override the defaults, you can do so on a per Tale/action basis like so:`
 
 Example
 ::

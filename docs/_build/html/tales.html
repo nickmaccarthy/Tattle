@@ -845,8 +845,43 @@ echo $3
 </div>
 <div class="section" id="slack">
 <h3>Slack<a class="headerlink" href="#slack" title="Permalink to this headline">¶</a></h3>
-<p>You can post Tattle alerts into Slack</p>
-<p>To use this, all you need to do is add the <code class="docutils literal"><span class="pre">webhook_url</span></code> and <code class="docutils literal"><span class="pre">channel</span></code> in your Tale <code class="docutils literal"><span class="pre">action</span></code></p>
+<p>Tattle can post its alerts into a Slack channel of your choice</p>
+<p>Before you go forward, please fill in the defaults ( which can be overridden on a per Tale/Action basis ) in <code class="docutils literal"><span class="pre">$TATTLE_HOME/etc/tattle/slack.yml</span></code></p>
+<p>In the defaults section, fill in the info with whatever makes sense for your envionment.  As stated, these can be overridden on a per-tale/action basis if you wish as well ( example below ).
+Default</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">default</span><span class="p">:</span>
+    <span class="n">webhook_url</span><span class="p">:</span> <span class="s1">&#39;https://mywebhook.slack.com&#39;</span>
+    <span class="n">channel</span><span class="p">:</span> <span class="s1">&#39;eng-alerts&#39;</span>
+    <span class="n">username</span><span class="p">:</span> <span class="s1">&#39;Tattle&#39;</span>
+    <span class="n">msg_color</span><span class="p">:</span> <span class="s1">&#39;danger&#39;</span>
+    <span class="n">title_prefix</span><span class="p">:</span> <span class="s1">&#39;Tattle -&#39;</span>
+    <span class="n">emoji</span><span class="p">:</span> <span class="s1">&#39;:squirrel:&#39;</span>
+</pre></div>
+</div>
+<p>Then in your Tale action, just specify slack
+Example</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">action</span><span class="p">:</span>
+    <span class="n">slack</span><span class="p">:</span>
+        <span class="n">enabled</span><span class="p">:</span> <span class="mi">1</span>
+        <span class="n">once_per_match</span><span class="p">:</span> <span class="c1"># Optional</span>
+            <span class="c1"># The match key, is the part of the result we use our primary key for sperating the results in seperate PD alerts</span>
+            <span class="c1"># In this case its &quot;key&quot; since its the key of the aggregation.  In our case this will be the hostname</span>
+            <span class="c1"># If we had 4 hosts that matched then we would have 4 seperate Pagerduty alerts.  Tattle will append the &#39;match_key&#39; to the subject of the Pagerduty alert as well</span>
+            <span class="n">match_key</span><span class="p">:</span> <span class="s2">&quot;key&quot;</span>
+        <span class="n">kibana4_dashboard</span><span class="p">:</span> <span class="s1">&#39;http://kibana.company.com/app/kibana#/dashboard/OurAwesomeDashboard&#39;</span>
+</pre></div>
+</div>
+<p>By default slack will map the severity of an alert to an emoji as specified in <code class="docutils literal"><span class="pre">$TATTLE_HOME/etc/tattle/slack.yml</span></code>.  This can be customized by changing the regex keys in the <code class="docutils literal"><span class="pre">emoji_severity_map</span></code> to match your severity system in your environment.
+The default is</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">emoji_severity_map</span><span class="p">:</span>
+    <span class="s1">&#39;crit|5&#39;</span><span class="p">:</span> <span class="s1">&#39;:fire:&#39;</span>
+    <span class="s1">&#39;high|4&#39;</span><span class="p">:</span> <span class="s1">&#39;:rage:&#39;</span>
+    <span class="s1">&#39;med|3&#39;</span><span class="p">:</span> <span class="s1">&#39;:grimacing:&#39;</span>
+    <span class="s1">&#39;low|2&#39;</span><span class="p">:</span> <span class="s1">&#39;:disappointed:&#39;</span>
+    <span class="s1">&#39;info|1&#39;</span><span class="p">:</span> <span class="s1">&#39;:sunglasses:&#39;</span>
+</pre></div>
+</div>
+<p>If you want to override the defaults, you can do so on a per Tale/action basis like so:`</p>
 <p>Example</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">action</span><span class="p">:</span>
     <span class="n">slack</span><span class="p">:</span>
