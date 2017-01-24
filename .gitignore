@@ -3,13 +3,14 @@ etc/alerts/*.y*ml
 etc/tattle/*.y*ml
 !etc/tattle/logging.y*ml
 !etc/tattle/tattle.y*ml
+!etc/tattle/slack.y*ml
 etc/reports/*.y*ml
 etc/tales/*.y*ml
 etc/tattle/tales/*.y*ml
 
 *.pyc
 *.sw*
-var/log/*.log
+var/log/*.log*
 misc/*
 bin/esq_test.py*
 bin/search_test.py*
