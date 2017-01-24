@@ -488,7 +488,7 @@ class SlackAlert(AlertBase):
             response = requests.post(self.webhook_url, data=json.dumps(payload, ensure_ascii=False), headers=headers)
             response.raise_for_status()
         except RequestException as e:
-            logger.error("Error posting to slack, reaason: {}".format(e))
+            logger.error("Error posting to slack, reason: {}".format(e))
 
         self.firemsg = """msg="{}", channel="{}", name="{}" """.format("Slack Alert Sent", self.channel, self.title)
 
