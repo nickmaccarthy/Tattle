@@ -13,6 +13,7 @@
                 <strong>Description:</strong> {{ainfo.description}} <br />
                 <strong>Query:</strong> {{intentions['_query']}} <br />
                 {% if ainfo['alert']['type'] in ( 'agg_match' ) %}
+                <strong>Index:</strong> {{intentions['_index']}} </br>
                 <strong>Trigger Reason:</strong> Because Field: <strong>{{ ainfo['alert']['field'] }}</strong> was <strong>{% filter upper %}{{ainfo['alert']['relation']}}{% endfilter %}</strong> to <strong>{{ainfo['alert']['qty']}}</strong> <br />
                 {% else %}
                 <strong>Trigger Reason:</strong> Because <strong>{{ ainfo['alert']['type'] }}</strong> was <strong>{% filter upper %}{{ainfo['alert']['relation']}}{% endfilter %}</strong> to <strong>{{ainfo['alert']['qty']}}</strong> <br />
