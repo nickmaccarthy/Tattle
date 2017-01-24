@@ -314,8 +314,8 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     (master_doc, 'Tattle', u'Tattle Documentation',
-     author, 'Tattle', 'One line description of project.',
-     'Miscellaneous'),
+     author, 'Tattle', 'Alerting for your Elasticsearch data.',
+     'Elasticsearch'),
 ]
 
 # Documents to append as an appendix to all manuals.
