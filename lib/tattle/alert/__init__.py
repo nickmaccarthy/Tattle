@@ -343,16 +343,20 @@ class PagerdutyAlert(AlertBase):
 class SlackAlert(AlertBase):
     def __init__(self, **kwargs):
         super(SlackAlert, self).__init__(**kwargs)
-   
-        self.webhook_url = kwargs.get('webhook_url') 
-        self.emoji = kwargs.get('emoji', ':squirrel:')
-        self.channel = kwargs.get('channel', '')
-        self.username = kwargs.get('username', 'Tattle')
-        self.msg_color = kwargs.get('message_color', 'danger')
+  
+        
+        self.slackcfg = tattle.config.load_configs().get('slack', {})
+        self.cfgdefaults = slackcfg.get('defaults', {})
+
+        self.webhook_url = kwargs.get('webhook_url') or self.cfgdefaults.get('webhook_url')
+        self.emoji = kwargs.get('emoji', ':squirrel:') or self.cfgdefaults.get('emoji')
+        self.channel = kwargs.get('channel', '') or self.cfgdefaults.get('channel')
+        self.username = kwargs.get('username', 'Tattle') or self.cfgdefaults.get('username')
+        self.msg_color = kwargs.get('message_color', 'danger') or self.cfgdefaults.get('danger')
         self.parse = kwargs.get('parse', 'none')
 
         self.title_link = self.kibana_dashboard or kwargs.get('title_link') or kwargs.get('client_url') or kwargs.get('url')
-        self.title = 'Tattle - {}'.format(self.title)
+        self.title = '{prefix} {title}'.format(self.cfgdefaults.get('title_prefix', 'Tattle -') or tcfg.get('title_prefix', 'Tattle -'),self.title)
 
 
     def escape_body(self, body):
@@ -384,22 +388,34 @@ class SlackAlert(AlertBase):
             return log_msg
 
     def map_severity_emoji(self, level):
-        if isinstance(level, str):
-            level = level.lower()
-        if level in ('crit', 'critical', '5', 5):
-            emoji = ':fire:'
-        elif level in ('high', '4', 4):
-            emoji = ':rage:'
-        elif level in ('medium', '3', 3):
-            emoji = ':grimacing:'
-        elif level in ( 'low', '2', 2):
-            emoji = ':disappointed:'
-        elif level in ( 'info', 'informational', '1', 1):
-            emoji = ':sunglasses:' 
+        emoji = ':question:'
+        level = str(level)
+
+        if self.slackcfg.get('emoji_severity_map'):
+            for regex, emoji in self.slackcfg.get('emoji_severity_map'):
+                if re.match(regex, level, re.I):
+                    emoji = emoji
+                    break # we found our match
         else:
-            emoji = ':question:'
+            if isinstance(level, str):
+                level = level.lower()
+            if level in ('crit', 'critical', '5', 5):
+                emoji = ':fire:'
+            elif level in ('high', '4', 4):
+                emoji = ':rage:'
+            elif level in ('medium', '3', 3):
+                emoji = ':grimacing:'
+            elif level in ( 'low', '2', 2):
+                emoji = ':disappointed:'
+            elif level in ( 'info', 'informational', '1', 1):
+                emoji = ':sunglasses:' 
+            else:
+                emoji = ':question:'
 
         return emoji
+
+
+
 
     def fire(self):
         alert_msg = []

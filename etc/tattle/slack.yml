@@ -1,0 +1,16 @@
+default:
+    webhook_url: ''
+    channel: ''
+    username: 'Tattle'
+    msg_color: 'danger'
+    title_prefix: 'Tattle -'
+    emoji: ':squirrel:'
+
+# Maps our severity level to an emoji
+# The keys are regex
+emoji_severity_map:
+    'crit|5': ':fire:'
+    'high|4': ':rage:'
+    'med|3': ':grimacing:'
+    'low|2': ':disappointed:'
+    'info|1': ':sunglasses:'
