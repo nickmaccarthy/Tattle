@@ -356,7 +356,7 @@ class SlackAlert(AlertBase):
         self.parse = kwargs.get('parse', 'none')
 
         self.title_link = self.kibana_dashboard or kwargs.get('title_link') or kwargs.get('client_url') or kwargs.get('url')
-        self.title = '{prefix} {title}'.format(self.cfgdefaults.get('title_prefix', 'Tattle -') or tcfg.get('title_prefix', 'Tattle -'),self.title)
+        self.title = '{prefix} {title}'.format(prefix=self.cfgdefaults.get('title_prefix', 'Tattle -') or tcfg.get('title_prefix', 'Tattle -'), title=self.title)
 
 
     def escape_body(self, body):
