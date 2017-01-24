@@ -346,7 +346,7 @@ class SlackAlert(AlertBase):
   
         
         self.slackcfg = tattle.config.load_configs().get('slack', {})
-        self.cfgdefaults = slackcfg.get('defaults', {})
+        self.cfgdefaults = self.slackcfg.get('defaults', {})
 
         self.webhook_url = kwargs.get('webhook_url') or self.cfgdefaults.get('webhook_url')
         self.emoji = kwargs.get('emoji', ':squirrel:') or self.cfgdefaults.get('emoji')
