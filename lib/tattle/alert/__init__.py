@@ -349,10 +349,17 @@ class SlackAlert(AlertBase):
         self.cfgdefaults = self.slackcfg.get('defaults', {})
 
         self.webhook_url = kwargs.get('webhook_url') or self.cfgdefaults.get('webhook_url')
-        self.emoji = kwargs.get('emoji', ':squirrel:') or self.cfgdefaults.get('emoji')
-        self.channel = kwargs.get('channel', '') or self.cfgdefaults.get('channel')
-        self.username = kwargs.get('username', 'Tattle') or self.cfgdefaults.get('username')
-        self.msg_color = kwargs.get('message_color', 'danger') or self.cfgdefaults.get('danger')
+        if self.webhook_url is None:
+            raise AlertException("Please specify a webhook url to use for your slack post.  Either in the Tale or in $TATTLE_HOME/etc/tattle/slack.yml")
+
+        self.emoji = kwargs.get('emoji') or self.cfgdefaults.get('emoji', ':squirrel:')
+
+        self.channel = kwargs.get('channel') or self.cfgdefaults.get('channel')
+        if self.channel is None:
+            raise AlertException("Please specify a channel for slack to use")
+
+        self.username = kwargs.get('username') or self.cfgdefaults.get('username', 'Tattle')
+        self.msg_color = kwargs.get('message_color') or self.cfgdefaults.get('message_color', 'danger')
         self.parse = kwargs.get('parse', 'none')
 
         self.title_link = self.kibana_dashboard or kwargs.get('title_link') or kwargs.get('client_url') or kwargs.get('url')
