@@ -346,7 +346,7 @@ class SlackAlert(AlertBase):
   
         
         self.slackcfg = tattle.config.load_configs().get('slack', {})
-        self.cfgdefaults = self.slackcfg.get('defaults', {})
+        self.cfgdefaults = self.slackcfg.get('default', {})
 
         self.webhook_url = kwargs.get('webhook_url') or self.cfgdefaults.get('webhook_url')
         if self.webhook_url is None:
