@@ -64,12 +64,63 @@ def clean_keys(string):
         string = string.replace(char, '__')
     return string
 
-''' returns a list of dicts into a html table '''
-def dict_to_html_table(ourl):
-    #print "List: {0}".format(ourl)
-    try:
-        headers = ourl[0].keys()
+# ''' returns a list of dicts into a html table '''
+# old and busted, remove soon
+# def dict_to_html_table(ourl):
+#     #print "List: {0}".format(ourl)
+#     try:
+#         headers = ourl[0].keys()
 
+#         table = []
+#         theaders = []
+#         for h in headers:
+#             print h
+#             theaders.append("<th>%s</th>" % h)
+
+#         table.append("<table border='1' cellpadding='1' cellspacing='1'>")
+#         table.append("<thead>")
+#         table.append("<tr>")
+#         for h in headers:
+#             table.append("<th>%s</th>" % h)
+#         table.append("</tr>")
+#         table.append("</thead>")
+
+#         table.append("<tbody>")
+#         tblst = []
+#         for l in ourl:
+#             print l
+#             table.append("<tr>")
+#             for h in headers:
+#                 table.append("<td><pre> %s </pre></td>" % (str(l[h])))
+#             table.append("</tr>")
+#         table.append("</tbody>")
+#         table.append("</table>")
+
+#         return ''.join(table)
+#     except Exception as e:
+#         return e
+
+
+def dict_to_html_table(ourl):
+    try:
+        json_data = json.dumps(ourl)
+    except Exception as e:
+        raise Exception("Unable to convert input object to JSON, reason %s" % (e))
+
+    from json2html import *
+    return json2html.convert(json=json_data)
+
+def dt2(ourl):
+    def get_headers(ourl):
+        headers = []
+        for item in ourl:
+            if isinstance(item, dict):
+                headers.append(item.keys())
+        print list(set(headers))
+        return list(set(headers))
+
+    try: 
+        headers = get_headers(ourl)
         table = []
         theaders = []
         for h in headers:
@@ -85,7 +136,7 @@ def dict_to_html_table(ourl):
 
         table.append("<tbody>")
         tblst = []
-        for l in ourl:
+        for l in tabified:
             table.append("<tr>")
             for h in headers:
                 table.append("<td><pre> %s </pre></td>" % (str(l[h])))

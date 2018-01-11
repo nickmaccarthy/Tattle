@@ -19,6 +19,7 @@ from jinja2 import Environment, FileSystemLoader
 import urllib
 import arrow
 import simplejson
+from tabify import tabify 
 
 tcfg = tattle.config.load_configs().get('tattle')
 
@@ -47,6 +48,8 @@ class AlertBase(object):
             raise AlertException("Alerts require an EventQueue")
         self.eq = self.event_queue
         self.matches = self.eq.matches
+        self.results = self.eq.results
+        self.tabified = tabify(self.results)
         self.intentions = self.eq.intentions
         self.alert = self.eq.alert
         self.set_title()
@@ -160,6 +163,9 @@ class EmailAlert(AlertBase):
 
         self.client_url = self.kibana_dashboard or self.client_url or self.url
 
+        self.template_dir = self.mailcfg.get('template_dir', os.path.join(TATTLE_HOME, 'usr', 'share', 'templates', 'html'))
+        self.email_template = self.mailcfg.get('template_name', 'email.html')
+
     def connect(self):
         try:
             self.server = smtplib.SMTP(self.mailcfg.get('host','localhost'), self.mailcfg.get('port', 25))
@@ -203,16 +209,17 @@ class EmailAlert(AlertBase):
             self.subject = self.title
 
     def make_email_body(self):
-        template_dir = os.path.join(TATTLE_HOME, 'usr', 'share', 'templates', 'html')
-        env = Environment(loader=FileSystemLoader(template_dir))
-        template = env.get_template('email.html')
+        #template_dir = os.path.join(TATTLE_HOME, 'usr', 'share', 'templates', 'html')
+        #template_dir = self.email_template_dir 
+        env = Environment(loader=FileSystemLoader(self.template_dir))
+        template = env.get_template(self.email_template)
 
         # convert a single dict into a list, so it can be built with dict_to_html_table()
         if isinstance(self.matches, dict):
             self.matches = [ self.matches ]
 
         if isinstance(self.matches, list):
-            results_table = tattle.dict_to_html_table(self.matches)
+            results_table = tattle.dict_to_html_table(self.tabified)
         elif isinstance(self.matches, str):
             results_table = self.matches
         else:
