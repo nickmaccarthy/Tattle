@@ -35,6 +35,14 @@ TATTLE_HOME = os.environ['TATTLE_HOME']
 class AlertException(Exception):
     pass
 
+
+class DateTimeEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if hasattr(obj, 'isoformat'):
+            return obj.isoformat()
+        else:
+            return json.JSONEncoder.default(self, obj)
+
 class AlertBase(object):
     """ 
         Base class for types of alerts
@@ -46,14 +54,21 @@ class AlertBase(object):
             setattr(self, k, v)
         if not self.event_queue:
             raise AlertException("Alerts require an EventQueue")
+
         self.eq = self.event_queue
         self.matches = self.eq.matches
         self.results = self.eq.results
-        self.tabified = tabify(self.results)
+
+        try:
+            self.tabified = tabify(self.results)
+        except AlertException as e:
+            raise "Unable to tabify results, reason: %e, results: %s" % (e, self.results)
+            pass
+        
         self.intentions = self.eq.intentions
         self.alert = self.eq.alert
         self.set_title()
-
+        
         self.client_url = kwargs.get('client_url') 
         self.url = kwargs.get('url')
         # Create a link to a kibana dashboard with the times for our alert
@@ -76,7 +91,7 @@ class AlertBase(object):
 
     def fire_per_match(self, **kwargs):
         raise NotImplementedError()
-               
+    
     def set_title(self):
         if self.title:
             self.title = self.title
@@ -430,7 +445,6 @@ class SlackAlert(AlertBase):
 
 
 
-
     def fire(self):
         alert_msg = []
         for k,v in self.alert.items():
@@ -505,6 +519,109 @@ class SlackAlert(AlertBase):
             logger.error("Error posting to slack, reason: {}".format(e))
 
         self.firemsg = """msg="{}", channel="{}", name="{}" """.format("Slack Alert Sent", self.channel, self.title)
+
+
+class MsteamsAlert(AlertBase):
+    required_options = frozenset(['ms_teams_webhook_url', 'ms_teams_alert_summary'])
+
+    def __init__(self, **kwargs):
+            super(MsteamsAlert, self).__init__(**kwargs)
+            self.teamscfg = tattle.config.load_configs().get('msteams', {})
+            self.cfgdefaults = self.teamscfg.get('default', {})
+
+            self.ms_teams_webhook_url = kwargs.get('ms_teams_webhook_url') or self.cfgdefaults.get('webhook_url')
+            if not self.ms_teams_webhook_url:
+                raise AlertException("Please sepcify a webhook URL for MSTeams. Please see documentation for more details...")
+             
+            if isinstance(self.ms_teams_webhook_url, basestring):
+                self.ms_teams_webhook_url = [self.ms_teams_webhook_url]
+
+            self.ms_teams_proxy = kwargs.get('ms_teams_proxy') or self.cfgdefaults.get('proxy')
+            self.ms_teams_alert_summary = kwargs.get('ms_teams_alert_summary', '') or self.cfgdefaults.get('alert_summary', '')
+            self.ms_teams_alert_fixed_width = kwargs.get('ms_teams_alert_fixed_width', False) or self.cfgdefaults.get('fixed_width', False)
+            self.ms_teams_theme_color = kwargs.get('ms_teams_theme_color', '') or self.cfgdefaults.get('theme_color', '')
+            self.ms_teams_ssl_verify = kwargs.get('ms_teams_ssl_verify') or self.cfgdefaults.get('ssl_verify', True)
+
+            self.dashboard_link = self.kibana_dashboard or kwargs.get('title_link') or kwargs.get('client_url') or kwargs.get('url') or None 
+            self.title = '{prefix} {title}'.format(prefix=self.cfgdefaults.get('title_prefix', 'Tattle -') or tcfg.get('title_prefix', 'Tattle -'), title=self.title)
+
+    def fire(self):
+        matches = self.matches 
+
+        #body = self.create_alert_body(matches)
+        from tabify import tabify, print_as_json 
+
+        body = print_as_json(self.results)
+
+        # post to Teams
+        headers = {'content-type': 'application/json'}
+
+        # set https proxy, if it was provided
+        proxies = {'https': self.ms_teams_proxy} if self.ms_teams_proxy else None
+        ssl_verify = self.ms_teams_ssl_verify if self.ms_teams_ssl_verify else True 
+
+        if isinstance(self.results, dict):
+            results_table = tattle.dict_to_html_table(tabify(self.results))
+        elif isinstance(self.results, str):
+            results_table = self.matches
+        else:
+            results_table = "No results found"
+
+
+        ## Build the message body...
+        body = []
+        body.append('')
+        if self.alert.get('description'):
+            body.append('**Description**: {}'.format(self.alert.get('description', '')))
+        if self.alert.get('severity'):
+            body.append('**Severity**: {}'.format(self.alert.get('severity')))
+
+        body.append('**Trigger Reason**: {}'.format(self.trigger_reason))
+        body.append('**Query**: {}'.format(self.intentions.get('_query', '')))
+        body.append('**TimePeriod**')
+        body.append('  **Start**: {}<br />({})'.format(self.intentions['_start_time_pretty'], self.intentions['_start']))
+        body.append('  **End**: {}<br />({})'.format(self.intentions['_end_time_pretty'], self.intentions['_end']))
+        body.append('')
+        body.append('**Results**: <br />{}'.format(results_table))
+        body = '<br />'.join(body)
+
+
+        payload = {
+            '@type': 'MessageCard',
+            '@context': 'http://schema.org/extensions',
+            'summary': self.alert.get('description', ''),
+            'themeColor': '0078D7',
+            'title': '{}'.format(self.title),
+            'text': body,
+
+            
+        }
+        print 'LINK: %s' % self.dashboard_link
+        if self.dashboard_link is not None:
+                payload.update({
+                    'sections': [ 
+                        { 
+                            'activityTitle': '[Dashboard Link]({})'.format(self.dashboard_link),
+                            'activityImage': 'https://oliverveits.files.wordpress.com/2016/11/kibana-logo-color-v.png',
+                            'markdown': True
+                        }
+                    ]
+                })
+   
+
+        if self.ms_teams_theme_color != '':
+            payload['themeColor'] = self.ms_teams_theme_color
+
+        for url in self.ms_teams_webhook_url:
+            try:
+                response = requests.post(url, data=json.dumps(payload, cls=DateTimeEncoder), headers=headers, proxies=proxies, verify=self.ms_teams_ssl_verify)
+                response.raise_for_status()
+            except RequestException as e:
+                raise AlertException("Error posting to ms teams: %s" % e)
+                logger.error("Error posting to ms teams: %s" % e)
+        self.firemsg = """msg="{}", name="{}" """.format("MSTeams Alert Sent", self.title)
+
+
 
 def find_in_alerts(search_id):
     for al in alerts:
