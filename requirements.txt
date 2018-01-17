@@ -10,8 +10,8 @@ itsdangerous==0.24
 Jinja2==2.8
 json2html==1.2.1
 MarkupSafe==0.23
-numpy==1.11.0
-pandas==0.18.1
+numpy==1.14.0
+pandas==0.22.0
 paramiko==1.15.1
 pbr==1.8.1
 py-dateutil==2.2
