@@ -13,6 +13,8 @@
 
   
   
+  
+  
 
   
 
@@ -30,6 +32,9 @@
   
 
   
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
     <link rel="top" title="Tattle latest documentation" href="index.html"/> 
 
   
@@ -39,6 +44,7 @@
 
 <body class="wy-body-for-nav" role="document">
 
+   
   <div class="wy-grid-for-nav">
 
     
@@ -58,7 +64,7 @@
             
             
               <div class="version">
-                1.0.11
+                1.0.12
               </div>
             
           
@@ -79,7 +85,10 @@
           
             
             
-                <ul>
+              
+            
+            
+              <ul>
 <li class="toctree-l1"><a class="reference internal" href="intro.html">Tattle Intro - Alerting For Your Elasticsearch Data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Getting Started - Install &amp; Setup</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tales.html">Tales, Alerts and Actions</a></li>
@@ -97,8 +106,10 @@
 
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="index.html">Tattle</a>
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Tattle</a>
+        
       </nav>
 
 
@@ -107,23 +118,40 @@
         <div class="rst-content">
           
 
- 
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 <div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
-    <li><a href="index.html">Docs</a> &raquo;</li>
-      
-    <li>Alert Types</li>
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Alert Types</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
         
-          
-            <a href="_sources/talesalerts.txt" rel="nofollow"> View page source</a>
+            
+            <a href="_sources/talesalerts.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
@@ -136,7 +164,7 @@
 <p>Frequency alerts occur when a certain number of events ( as defined by <code class="docutils literal"><span class="pre">relation</span></code> and <code class="docutils literal"><span class="pre">qty</span></code>) occur within a certain period of time.</p>
 <p>Here are some examples:</p>
 <ul class="simple">
-<li>&#8220;20 or more failed login events with in the past 1 hour&#8221;</li>
+<li>“20 or more failed login events with in the past 1 hour”</li>
 </ul>
 <p>Example</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">name</span><span class="p">:</span> <span class="s2">&quot;Too many login failures&quot;</span>
@@ -152,7 +180,7 @@
 </pre></div>
 </div>
 <ul class="simple">
-<li>&#8220;300 or more Nginx logs with an error code of 502 in the last 1 minute&#8221;</li>
+<li>“300 or more Nginx logs with an error code of 502 in the last 1 minute”</li>
 </ul>
 <p>Example</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">name</span><span class="p">:</span> <span class="s2">&quot;NGINX 502 errors&quot;</span>
@@ -168,7 +196,7 @@
 </pre></div>
 </div>
 <ul class="simple">
-<li>&#8220;Less than 1000 events on all of our NGINX logs for the past 1 hour&#8221;</li>
+<li>“Less than 1000 events on all of our NGINX logs for the past 1 hour”</li>
 </ul>
 <p>Example</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">name</span><span class="p">:</span> <span class="s2">&quot;Low event count on NGINX, possible log outage&quot;</span>
@@ -191,6 +219,9 @@
 </div>
 
 
+           </div>
+           <div class="articleComments">
+            
            </div>
           </div>
           <footer>
@@ -225,7 +256,8 @@
             VERSION:'latest',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
         };
     </script>
       <script type="text/javascript" src="_static/jquery.js"></script>

@@ -1,5 +1,6 @@
 import sys
 import os
+import sys
 import datetime
 import time
 import calendar
@@ -19,7 +20,8 @@ from jinja2 import Environment, FileSystemLoader
 import urllib
 import arrow
 import simplejson
-from tabify import tabify 
+from tabify import tabify, print_as_json 
+
 
 tcfg = tattle.config.load_configs().get('tattle')
 
@@ -35,6 +37,14 @@ TATTLE_HOME = os.environ['TATTLE_HOME']
 class AlertException(Exception):
     pass
 
+
+class DateTimeEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if hasattr(obj, 'isoformat'):
+            return obj.isoformat()
+        else:
+            return json.JSONEncoder.default(self, obj)
+
 class AlertBase(object):
     """ 
         Base class for types of alerts
@@ -46,14 +56,21 @@ class AlertBase(object):
             setattr(self, k, v)
         if not self.event_queue:
             raise AlertException("Alerts require an EventQueue")
+
         self.eq = self.event_queue
         self.matches = self.eq.matches
         self.results = self.eq.results
-        self.tabified = tabify(self.results)
+
+        try:
+            self.tabified = tabify(self.results)
+        except AlertException as e:
+            raise "Unable to tabify results, reason: %e, results: %s" % (e, self.results)
+            pass
+        
         self.intentions = self.eq.intentions
         self.alert = self.eq.alert
         self.set_title()
-
+        
         self.client_url = kwargs.get('client_url') 
         self.url = kwargs.get('url')
         # Create a link to a kibana dashboard with the times for our alert
@@ -76,7 +93,7 @@ class AlertBase(object):
 
     def fire_per_match(self, **kwargs):
         raise NotImplementedError()
-               
+    
     def set_title(self):
         if self.title:
             self.title = self.title
@@ -135,7 +152,6 @@ class PprintAlert(AlertBase):
 
 
 class EmailAlert(AlertBase):
-    
     def __init__(self, **kwargs):
         super(EmailAlert, self).__init__(**kwargs)
 
@@ -144,8 +160,7 @@ class EmailAlert(AlertBase):
         if self.mailcfg is None:
             raise ConfigException("Unable to load the email config.  Does it exist at $TATTLE_HOME/etc/tattle/email.yml?")
 
-        #self.subject = None
-        self.subject = self.title
+        self.subject = self.set_subject()
         self.cc = None
         self.bcc = None
 
@@ -154,12 +169,6 @@ class EmailAlert(AlertBase):
             setattr(self, k, v)
 
         self.sender = kwargs.get('sender', self.mailcfg['default_sender'])
-        # sets our email subject
-
-        #self.subject_prefix = self.mailcfg.get('subject_prefix', '')
-
-        #if not self.subject:
-        #    self.set_subject(**kwargs)
 
         self.client_url = self.kibana_dashboard or self.client_url or self.url
 
@@ -189,8 +198,6 @@ class EmailAlert(AlertBase):
 
     def fire(self):
         self.connect()
-        #self.subject = "{prefix}{subject}".format(prefix=self.subject_prefix, subject=self.subject)
-        self.subject = self.title
         self.build_msg()
         self.send_email()
         self.firemsg = """msg="{0}", email_to="{1}", tale_name="{2}", subject="{3}" """.format("Email Sent", self.to, self.alert.get('name'), self.subject)
@@ -202,15 +209,17 @@ class EmailAlert(AlertBase):
             except Exception as e:
                 logger.exception("Unable to send email, reason: {}".format(e))
 
-    def set_subject(self, **kwargs):
+    def set_subject(self):
         if 'subject' in self.alert['action']['email']:
-            self.subject = self.alert['alert']['email']['subject']
+            subject = self.alert['alert']['email']['subject']
+        elif self.mailcfg.get('subject_prefix') and self.mailcfg.get('subject_prefix') != '':
+            subject = '{}{}'.format(self.mailcfg['subject_prefix'], self.title)
         else: 
-            self.subject = self.title
+            subject = self.title
+        
+        return subject
 
     def make_email_body(self):
-        #template_dir = os.path.join(TATTLE_HOME, 'usr', 'share', 'templates', 'html')
-        #template_dir = self.email_template_dir 
         env = Environment(loader=FileSystemLoader(self.template_dir))
         template = env.get_template(self.email_template)
 
@@ -235,7 +244,6 @@ class EmailAlert(AlertBase):
 
 
 class IntentionsJSONEncoder(json.JSONEncoder):
-   
     import elasticsearch_dsl
     import arrow 
     def default(self, obj):
@@ -246,7 +254,6 @@ class IntentionsJSONEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 class ScriptAlert(AlertBase):
-
     def __init__(self, **kwargs):
         super(ScriptAlert, self).__init__(**kwargs)
         self.script_name = kwargs.get('filename') or kwargs.get('script_name') or kwargs.get('name')
@@ -265,7 +272,6 @@ class ScriptAlert(AlertBase):
         
         
 class PagerdutyAlert(AlertBase):
-    
     def __init__(self, **action):
         super(PagerdutyAlert, self).__init__(**action)
 
@@ -277,7 +283,6 @@ class PagerdutyAlert(AlertBase):
         self.pdcfg = tattle.config.load_configs().get('pagerduty')
         if self.pdcfg is None:
             raise ConfigException("Unable to load the pagerduty config. Does the pagerduty.yaml exist in $TATTLE_HOME/etc/tattle/pagerduty.yml?")
-
 
         # Find our config options based on our service name
         cfg = self.get_service_args(self.service_name)
@@ -299,7 +304,6 @@ class PagerdutyAlert(AlertBase):
     def get_service_args(self, key):
         for k,args in self.pdcfg.items():
             if key in k:
-                #return { k:args }
                 return args
 
     def make_body(self):
@@ -307,7 +311,6 @@ class PagerdutyAlert(AlertBase):
         fd.kibana_nested = True
         body = [ '\n-----------------\n']
         body.append('Alert Info:\n')
-        #body.append(fd.flatten_dict(self.alert))
         alertd = fd.flatten_dict(self.alert)
         tattle.pprint(alertd)
         for k,v in alertd.items():
@@ -376,7 +379,6 @@ class SlackAlert(AlertBase):
     def escape_body(self, body):
         return body
 
-
     def make_body(self):
         template_dir = os.path.join(TATTLE_HOME, 'usr', 'share', 'templates', 'html')
         env = Environment(loader=FileSystemLoader(template_dir))
@@ -427,9 +429,6 @@ class SlackAlert(AlertBase):
                 emoji = ':question:'
 
         return emoji
-
-
-
 
     def fire(self):
         alert_msg = []
@@ -505,6 +504,104 @@ class SlackAlert(AlertBase):
             logger.error("Error posting to slack, reason: {}".format(e))
 
         self.firemsg = """msg="{}", channel="{}", name="{}" """.format("Slack Alert Sent", self.channel, self.title)
+
+
+class MsteamsAlert(AlertBase):
+    def __init__(self, **kwargs):
+            super(MsteamsAlert, self).__init__(**kwargs)
+            self.teamscfg = tattle.config.load_configs().get('msteams', {})
+            self.cfgdefaults = self.teamscfg.get('default', {})
+
+            self.webhook_url = kwargs.get('webhook_url') or self.cfgdefaults.get('webhook_url')
+            if not self.webhook_url:
+                raise AlertException("Please sepcify a webhook URL for MSTeams. Please see documentation for more details...")
+             
+            if isinstance(self.webhook_url, basestring):
+                self.webhook_url = [self.webhook_url]
+
+            self.proxy = kwargs.get('proxy') or self.cfgdefaults.get('proxy')
+            self.ssl_verify = kwargs.get('ssl_verify') or self.cfgdefaults.get('ssl_verify', True)
+
+            self.dashboard_link = self.kibana_dashboard or kwargs.get('title_link') or kwargs.get('client_url') or kwargs.get('url') or None 
+            self.title = '{prefix} {title}'.format(prefix=self.cfgdefaults.get('title_prefix', 'Tattle -') or tcfg.get('title_prefix', 'Tattle -'), title=self.title)
+
+    def fire(self):
+       
+        try:
+            tabified = tabify(self.results)
+        except Exception as e:
+            raise AlertException("Unable to tabify results, reason: %s" % (e))
+            pass
+
+        # post to Teams
+        headers = {'content-type': 'application/json'}
+
+        # set https proxy
+        proxies = {'https': self.proxy} if self.proxy else None
+        # set ssl_verifiy 
+        ssl_verify = self.ssl_verify if self.ssl_verify else True 
+
+        # Turn our results into an html table if we have the proper format
+        if isinstance(self.results, dict):
+            results_table = tattle.dict_to_html_table(tabified)
+        elif isinstance(self.results, str):
+            results_table = self.matches
+        else:
+            results_table = "No results found"
+
+        # o365 throws a 413 if the result is too large, guessing here on the size threshold since I couldnt find it documented anywhere
+        if sys.getsizeof(results_table) >= 10000:
+            results_table = "<b>Note:</b> Table size was too big to send to Teams, truncating table to 3 items...<br/>"
+            results_table += tattle.dict_to_html_table( tabified[0:3] )
+
+        payload = {
+            '@type': 'MessageCard',
+            '@context': 'http://schema.org/extensions',
+            'summary': '%s\nItems: %s' % (self.alert.get('description', ''), len(tabified)),
+            'themeColor': '0078D7',
+            'title': '{}'.format(self.title),
+            'text': self.alert.get('description', ''),
+            'sections': [
+                {
+                    'activityTitle': 'Trigger Details',
+                    'facts': [
+                        {'name': 'TriggerReason', 'value': self.trigger_reason },
+                        {'name': 'Query', 'value': '`%s`' % self.intentions.get('_query', '')},
+                        {'name': 'Time Period', 'value': ''},
+                        {'name': 'Start', 'value': '%s (`%s`)' % (self.intentions['_start_time_pretty'], self.intentions['_start'])},
+                        {'name': 'End', 'value': '%s (`%s`)' % (self.intentions['_end_time_pretty'], self.intentions['_end'])}
+                    ]
+                },
+                {
+                    'activityTitle': 'Results',
+                    'markdown': False,
+                    'text': 'Result Count: %s' % (len(tabified)),
+                    'activityText': results_table
+                }
+            ]        
+        }
+
+        if self.dashboard_link is not None:
+                payload['sections'].append(
+                   
+                        { 
+                            'activityTitle': '[Dashboard Link]({})'.format(self.dashboard_link),
+                            'activityImage': 'https://oliverveits.files.wordpress.com/2016/11/kibana-logo-color-v.png',
+                            'markdown': True
+                        }
+                
+                )
+   
+        for url in self.webhook_url:
+            try:
+                response = requests.post(url, data=json.dumps(payload, cls=DateTimeEncoder), headers=headers, proxies=proxies, verify=self.ssl_verify)
+                response.raise_for_status()
+            except RequestException as e:
+                raise AlertException("Error posting to ms teams: %s webhook_url: %s, response: %s" % (e, url, response.text))
+                logger.error("Error posting to ms teams: %s, webhook_url: %s, response: %s" % (e, url, response.text))
+        self.firemsg = """msg="{}", tale_title="{}", ms_response="{}" """.format("MSTeams Alert Sent", self.title, response.text)
+
+
 
 def find_in_alerts(search_id):
     for al in alerts:

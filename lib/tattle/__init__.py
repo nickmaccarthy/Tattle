@@ -57,97 +57,64 @@ def epoch2iso(epoch_ts):
     if epoch_ts is not None:
         return datetime.datetime.fromtimestamp(float(epoch_ts)).strftime("%Y-%m-%dT%H:%M:%S.%f%Z")
 
-
+''' cleans errant chars from a string '''
 def clean_keys(string): 
     escape_these = ',\=\n\r\\'
     for char in escape_these:
         string = string.replace(char, '__')
     return string
 
-# ''' returns a list of dicts into a html table '''
-# old and busted, remove soon
-# def dict_to_html_table(ourl):
-#     #print "List: {0}".format(ourl)
-#     try:
-#         headers = ourl[0].keys()
+def dict_to_html_table(ourl, **kwargs):
+    ''' wrapper for dict2table '''
+    return dict2table(ourl, **kwargs)
 
-#         table = []
-#         theaders = []
-#         for h in headers:
-#             print h
-#             theaders.append("<th>%s</th>" % h)
+def dict2table(objects, table_attributes='border="1"', add_number_header=True, sort_keys=False):
+    ''' 
+        converts a list of dicts into a seris of html tables that are left headered 
+    '''
+    def get_headers(objects_list):
+        keys = []
+        for obj in objects_list:
+            if isinstance(obj, dict):
+                obj_keys = obj.keys()
+                if obj_keys:
+                    for key in obj_keys:
+                        keys.append(key)
+        return list(set(keys))
 
-#         table.append("<table border='1' cellpadding='1' cellspacing='1'>")
-#         table.append("<thead>")
-#         table.append("<tr>")
-#         for h in headers:
-#             table.append("<th>%s</th>" % h)
-#         table.append("</tr>")
-#         table.append("</thead>")
+    headers = get_headers(objects)
 
-#         table.append("<tbody>")
-#         tblst = []
-#         for l in ourl:
-#             print l
-#             table.append("<tr>")
-#             for h in headers:
-#                 table.append("<td><pre> %s </pre></td>" % (str(l[h])))
-#             table.append("</tr>")
-#         table.append("</tbody>")
-#         table.append("</table>")
+    table = []
+    for i, obj in enumerate(objects):
+        table.append('<table %s>' % table_attributes)
+        if add_number_header:
+            table.append('<tr><th colspan="2">Item #%s</th></tr>' % (i+1))
+        table.append('<tr>')
+        
+        if sort_keys:
+            keys = sorted(obj.keys())
+        else:
+            keys = obj.keys() 
+        
+        for key in keys:
+            value = obj[key]
+            if isinstance(value,dict):
+                value = dict2table([value], add_number_header=False, sort_keys=True)
+            if isinstance(value, list):
+                vall = []
+                vall.append('<ul>')
+                for item in value:
+                    vall.append('<li>%s</li>' % item)
+                vall.append('</ul>')
+                value = ''.join(vall)
+            table.append('<tr>')
+            table.append('<th>%s</th><td>%s</td>' % (key,value))
+            table.append('</tr>')
+        table.append('</tr>')
+        table.append('</table>')
+        table.append('<br />')
 
-#         return ''.join(table)
-#     except Exception as e:
-#         return e
-
-
-def dict_to_html_table(ourl):
-    try:
-        json_data = json.dumps(ourl)
-    except Exception as e:
-        raise Exception("Unable to convert input object to JSON, reason %s" % (e))
-
-    from json2html import *
-    return json2html.convert(json=json_data)
-
-def dt2(ourl):
-    def get_headers(ourl):
-        headers = []
-        for item in ourl:
-            if isinstance(item, dict):
-                headers.append(item.keys())
-        print list(set(headers))
-        return list(set(headers))
-
-    try: 
-        headers = get_headers(ourl)
-        table = []
-        theaders = []
-        for h in headers:
-            theaders.append("<th>%s</th>" % h)
-
-        table.append("<table border='1' cellpadding='1' cellspacing='1'>")
-        table.append("<thead>")
-        table.append("<tr>")
-        for h in headers:
-            table.append("<th>%s</th>" % h)
-        table.append("</tr>")
-        table.append("</thead>")
-
-        table.append("<tbody>")
-        tblst = []
-        for l in tabified:
-            table.append("<tr>")
-            for h in headers:
-                table.append("<td><pre> %s </pre></td>" % (str(l[h])))
-            table.append("</tr>")
-        table.append("</tbody>")
-        table.append("</table>")
-
-        return ''.join(table)
-    except Exception as e:
-        return e
-
+    return ''.join(table)
 
 def datatable(ourl):
     try:
@@ -198,7 +165,6 @@ def _get(dct, default, *keys):
         return default if level is sentry else level.get(key, sentry)
     return reduce(getter, keys, dct)
 
-
 def dm_convert(timestr):
     from datemath import dm
     return dm(timestr).timestamp
@@ -242,7 +208,6 @@ def find_in_dict(obj, key):
             if item is not None:
                 return item
 
-
 def fd(d):
     def items():
         for key, value in d.items():
@@ -267,7 +232,7 @@ def flatten_dict(d, lkey='', sep='.'):
             ret[key] = val
     return ret
 
-
+''' run a script, typically ran from alert.Scriptalert() '''
 def run_script(script_name, matches, alert, intentions):
     logger = get_logger('run-script')
        
@@ -305,7 +270,6 @@ def load_module_from_file(filepath, d=None):
         class_inst = getattr(py_mod, expected_class)(d)
 
     return class_inst
-
 
 '''
     Finds a file in a directory
@@ -416,8 +380,8 @@ def get_indexes(index, start, end, interval='day', pattern='YYYY.MM.DD', base_na
     Normalized boolean variables for us
 '''
 def normalize_boolean(input):
-    true_things = [True, 'true', 'True', 't', '1', 1, 'yes', 'y', 'on']
-    false_things = [None, False, 'false', 'False', 'f', '0', 0, 'no', 'n', 'off']
+    true_things = [True, 'true', 'True', 't', '1', 1, 'yes', 'Yes', 'Y', 'y', 'on']
+    false_things = [None, False, 'false', 'False', 'f', '0', 0, 'no', 'No', 'N', 'n', 'off']
 
     def norm(input):
         if input == True: return True
@@ -446,7 +410,6 @@ def humanize_ts(timestamp):
     except Exception as e:
         return "Unable to humanize timestamp, reason: {}".format(e)
 
-
 def makecsvfromlist(lst, filename=None):
     import csv
     
@@ -466,7 +429,6 @@ def makecsvfromlist(lst, filename=None):
             fh.write('No results')
 
     return filename_full
-
 
 '''
     Gets the current location of $TATTLE_HOME
@@ -488,7 +450,6 @@ def cron_check(cronstr, now=datemath('now'), itertype='next'):
     # returns how many seconds are left until/from the {itertype} ( next or previous ) run
     #return entry.next(now)
     return getattr(entry, itertype)(now)
-
 
 ''' runs a test of a datetime object against a cron entry to see if it should run (True) or not (False) '''
 def test_cron(cronstr, now=datemath('now')):
