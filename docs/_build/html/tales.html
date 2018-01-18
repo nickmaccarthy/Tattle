@@ -13,6 +13,8 @@
 
   
   
+  
+  
 
   
 
@@ -30,6 +32,9 @@
   
 
   
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
     <link rel="top" title="Tattle latest documentation" href="index.html"/>
         <link rel="next" title="Tattle Query Language (TQL)" href="tql.html"/>
         <link rel="prev" title="Getting Started - Install &amp; Setup" href="install.html"/> 
@@ -41,6 +46,7 @@
 
 <body class="wy-body-for-nav" role="document">
 
+   
   <div class="wy-grid-for-nav">
 
     
@@ -60,7 +66,7 @@
             
             
               <div class="version">
-                1.0.11
+                1.0.12
               </div>
             
           
@@ -81,7 +87,10 @@
           
             
             
-                <ul class="current">
+              
+            
+            
+              <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="intro.html">Tattle Intro - Alerting For Your Elasticsearch Data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Getting Started - Install &amp; Setup</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Tales, Alerts and Actions</a><ul>
@@ -117,6 +126,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#email">Email</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#script">Script</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pager-duty">Pager Duty</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#microsoft-teams">Microsoft Teams</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#slack">Slack</a></li>
 </ul>
 </li>
@@ -141,8 +151,10 @@
 
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="index.html">Tattle</a>
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Tattle</a>
+        
       </nav>
 
 
@@ -151,23 +163,40 @@
         <div class="rst-content">
           
 
- 
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 <div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
-    <li><a href="index.html">Docs</a> &raquo;</li>
-      
-    <li>Tales, Alerts and Actions</li>
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Tales, Alerts and Actions</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
         
-          
-            <a href="_sources/tales.txt" rel="nofollow"> View page source</a>
+            
+            <a href="_sources/tales.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
@@ -282,7 +311,7 @@
 <span class="n">enabled</span><span class="p">:</span> <span class="mi">0</span>
 <span class="c1"># You can even use strings</span>
 <span class="n">enabled</span><span class="p">:</span> <span class="s2">&quot;yes&quot;</span>
-<span class="c1"># Or True and False Statements</span>
+<span class="c1"># Or even booleans</span>
 <span class="n">enabled</span><span class="p">:</span> <span class="n">true</span>
 </pre></div>
 </div>
@@ -319,30 +348,24 @@
 <div class="section" id="index">
 <h3>index<a class="headerlink" href="#index" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-<div><ul>
-<li><p class="first">Required <cite>Yes</cite></p>
-</li>
-<li><p class="first">Description: The index pattern where you the events you are searching reside.  Default is <code class="docutils literal"><span class="pre">logstash-*</span></code></p>
-</li>
+<div><ul class="simple">
+<li>Required <cite>Yes</cite></li>
+<li>Description: The index pattern where you the events you are searching reside.  Default is <code class="docutils literal"><span class="pre">logstash-*</span></code></li>
 <li><dl class="first docutils">
 <dt>More information:</dt>
 <dd><ul class="first last">
 <li><dl class="first docutils">
 <dt>Builds the index names that Tattle will search data against</dt>
-<dd><ul class="first last simple">
+<dd><ul class="first last">
 <li>It uses the  <code class="docutils literal"><span class="pre">start</span></code> and <code class="docutils literal"><span class="pre">end</span></code> time in <code class="docutils literal"><span class="pre">timeperiod</span></code> of the Tale to determine which indexes to build/query against.</li>
 </ul>
 </dd>
 </dl>
 </li>
-<li><p class="first">Its common to store <cite>timeseries</cite> based indexes in Elasticsearch.  The most common format is store your data by day and append a date timestamp at the end of index.  The most common format is <code class="docutils literal"><span class="pre">YYYY.MM.DD</span></code>.  If you specify a <code class="docutils literal"><span class="pre">*</span></code> at the end of the index pattern in Tattle, ie <code class="docutils literal"><span class="pre">logstash-*</span></code>, then Tattle will build the indexs for you by <code class="docutils literal"><span class="pre">day</span></code> when it does its search.</p>
-</li>
-<li><p class="first">If you store your indexes in a different time pattern or interval other than daily, then you can specify the time pattern and interval.  See examples 2-4</p>
-</li>
-<li><p class="first">If you done specify a pattern or interval or a <code class="docutils literal"><span class="pre">*</span></code>, then Tattle will search just that single index.</p>
-</li>
-<li><p class="first">For more information on the tokens allowd for the patterns, please see the documentation for <a class="reference external" href="http://crsmithdev.com/arrow/#tokens">Arrow</a>.</p>
-</li>
+<li>Its common to store <cite>timeseries</cite> based indexes in Elasticsearch.  The most common format is store your data by day and append a date timestamp at the end of index.  The most common format is <code class="docutils literal"><span class="pre">YYYY.MM.DD</span></code>.  If you specify a <code class="docutils literal"><span class="pre">*</span></code> at the end of the index pattern in Tattle, ie <code class="docutils literal"><span class="pre">logstash-*</span></code>, then Tattle will build the indexs for you by <code class="docutils literal"><span class="pre">day</span></code> when it does its search.</li>
+<li>If you store your indexes in a different time pattern or interval other than daily, then you can specify the time pattern and interval.  See examples 2-4</li>
+<li>If you done specify a pattern or interval or a <code class="docutils literal"><span class="pre">*</span></code>, then Tattle will search just that single index.</li>
+<li>For more information on the tokens allowd for the patterns, please see the documentation for <a class="reference external" href="http://crsmithdev.com/arrow/#tokens">Arrow</a>.</li>
 </ul>
 </dd>
 </dl>
@@ -369,7 +392,7 @@
 </pre></div>
 </div>
 <p>Example 3 - specifying pattern as string:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">index</span><span class="p">:</span> <span class="s2">&quot;system-metrics-%{+YYYY.MM.DD}</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">index</span><span class="p">:</span> <span class="s2">&quot;system-metrics-%{+YYYY.MM.DD}&quot;</span>
 </pre></div>
 </div>
 <p>This would give us the same index names as Example 1 and 2
@@ -396,6 +419,10 @@ This would build index names with hour intervals such as:</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">If you do not specify a <code class="docutils literal"><span class="pre">schedule</span></code> for your Tale, then Tattle will run this Tale every time it runs.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The CRON scheulde you specify here will pertain to the timezone of the system Tattle is running on.  If Tattle’s system is UTC, but you need this scheduled in EST, please account for that time difference.</p>
 </div>
 <p>Example:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">schedule</span><span class="p">:</span> <span class="s2">&quot;* 8-18 * * mon-fri&quot;</span>
@@ -442,16 +469,13 @@ This would build index names with hour intervals such as:</p>
 <div class="section" id="timeperiod">
 <h3>timeperiod<a class="headerlink" href="#timeperiod" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-<div><ul>
-<li><p class="first"><code class="docutils literal"><span class="pre">start</span></code>, <code class="docutils literal"><span class="pre">end</span></code></p>
-</li>
-<li><p class="first">Required: <cite>Yes</cite></p>
-</li>
-<li><p class="first">Description: The timeperiod for events this Tale searches for.  This is a rolling window using python-datemath as our start and end times.</p>
-</li>
+<div><ul class="simple">
+<li><code class="docutils literal"><span class="pre">start</span></code>, <code class="docutils literal"><span class="pre">end</span></code></li>
+<li>Required: <cite>Yes</cite></li>
+<li>Description: The timeperiod for events this Tale searches for.  This is a rolling window using python-datemath as our start and end times.</li>
 <li><dl class="first docutils">
 <dt>More information:</dt>
-<dd><ul class="first last simple">
+<dd><ul class="first last">
 <li>More documentation on python-datemath can be found here: <a class="reference external" href="https://github.com/nickmaccarthy/python-datemath">https://github.com/nickmaccarthy/python-datemath</a></li>
 </ul>
 </dd>
@@ -488,17 +512,15 @@ This would build index names with hour intervals such as:</p>
 <div class="section" id="type">
 <h3>type<a class="headerlink" href="#type" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-<div><ul>
-<li><p class="first">Required: <cite>Yes</cite></p>
-</li>
-<li><p class="first">Description: The type of the alert</p>
-</li>
+<div><ul class="simple">
+<li>Required: <cite>Yes</cite></li>
+<li>Description: The type of the alert</li>
 <li><dl class="first docutils">
 <dt>Values</dt>
 <dd><ul class="first last">
 <li><dl class="first docutils">
 <dt><code class="docutils literal"><span class="pre">frequency</span></code> or <code class="docutils literal"><span class="pre">number_of_events</span></code></dt>
-<dd><ul class="first last simple">
+<dd><ul class="first last">
 <li>Description: If the <cite>number of events</cite> meets our <code class="docutils literal"><span class="pre">relation</span></code> and <code class="docutils literal"><span class="pre">qty</span></code></li>
 </ul>
 </dd>
@@ -506,8 +528,8 @@ This would build index names with hour intervals such as:</p>
 </li>
 <li><dl class="first docutils">
 <dt><code class="docutils literal"><span class="pre">agg_match</span></code></dt>
-<dd><ul class="first last simple">
-<li>Description: If our value meets a regular expression match of something</li>
+<dd><ul class="first last">
+<li>Description: If our value meets a regular expression match of “something”</li>
 </ul>
 </dd>
 </dl>
@@ -522,14 +544,12 @@ This would build index names with hour intervals such as:</p>
 <div class="section" id="relation">
 <h3>relation<a class="headerlink" href="#relation" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-<div><ul>
-<li><p class="first">Required: <cite>Yes</cite></p>
-</li>
-<li><p class="first">Description: If our event count meets our relation, then the alert should fire</p>
-</li>
+<div><ul class="simple">
+<li>Required: <cite>Yes</cite></li>
+<li>Description: If our event count meets our relation, then the alert should fire</li>
 <li><dl class="first docutils">
 <dt>Values</dt>
-<dd><ul class="first last simple">
+<dd><ul class="first last">
 <li><code class="docutils literal"><span class="pre">eq</span></code>, <code class="docutils literal"><span class="pre">=</span></code> - Equal To</li>
 <li><code class="docutils literal"><span class="pre">ne</span></code>, <code class="docutils literal"><span class="pre">!=</span></code> - Not Equal To</li>
 <li><code class="docutils literal"><span class="pre">lt</span></code>, <code class="docutils literal"><span class="pre">&lt;</span></code> - Less Than</li>
@@ -551,7 +571,7 @@ This would build index names with hour intervals such as:</p>
 <li>Description: What we compare our <code class="docutils literal"><span class="pre">relation</span></code> to</li>
 </ul>
 </div></blockquote>
-<p>Example&#8221;:</p>
+<p>Example”:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1">## If our number of events is greater than or equal to 10, then we should alert</span>
 <span class="n">relation</span><span class="p">:</span> <span class="s2">&quot;&gt;=&quot;</span>
 <span class="n">qty</span><span class="p">:</span> <span class="mi">10</span>
@@ -561,19 +581,16 @@ This would build index names with hour intervals such as:</p>
 <div class="section" id="realert">
 <h3>realert<a class="headerlink" href="#realert" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-<div><ul>
-<li><p class="first">Required: <cite>Yes</cite></p>
-</li>
-<li><p class="first">Description:  How long Tattle will wait before it will re-alert on this Tale.  If Tattle is still finding matches for this Tale, but we are within the re-alert threshold, then Tattle will not alert.</p>
-</li>
+<div><ul class="simple">
+<li>Required: <cite>Yes</cite></li>
+<li>Description:  How long Tattle will wait before it will re-alert on this Tale.  If Tattle is still finding matches for this Tale, but we are within the re-alert threshold, then Tattle will not alert.</li>
 <li><dl class="first docutils">
 <dt>Notes:</dt>
 <dd><ul class="first last">
-<li><p class="first">Every time Tattle fires an alert, it stores it in the Tattle index in Elasticserach ( default is <code class="docutils literal"><span class="pre">tattle-int</span></code> ).  When the Tale gets loaded, one of the first thing it does it check to see when the last time this Tale fired.  It then compares the last time to the realert threshold, diffs the two and if we are beyone our re-alert threshold, then Tattle will re-fire the Tale.</p>
-</li>
+<li>Every time Tattle fires an alert, it stores it in the Tattle index in Elasticserach ( default is <code class="docutils literal"><span class="pre">tattle-int</span></code> ).  When the Tale gets loaded, one of the first thing it does it check to see when the last time this Tale fired.  It then compares the last time to the realert threshold, diffs the two and if we are beyone our re-alert threshold, then Tattle will re-fire the Tale.</li>
 <li><dl class="first docutils">
 <dt>It uses simple datemath like so:</dt>
-<dd><ul class="first last simple">
+<dd><ul class="first last">
 <li><code class="docutils literal"><span class="pre">1h</span></code></li>
 <li><code class="docutils literal"><span class="pre">2m</span></code></li>
 <li><code class="docutils literal"><span class="pre">3d</span></code></li>
@@ -596,14 +613,12 @@ This would build index names with hour intervals such as:</p>
 <div class="section" id="return-matches">
 <h3>return_matches<a class="headerlink" href="#return-matches" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-<div><ul>
-<li><p class="first">Required: <cite>Yes</cite></p>
-</li>
-<li><p class="first">Description:  If Tattle should return the matches it found.  It will return those matches in whatever action you have configured</p>
-</li>
+<div><ul class="simple">
+<li>Required: <cite>Yes</cite></li>
+<li>Description:  If Tattle should return the matches it found.  It will return those matches in whatever action you have configured</li>
 <li><dl class="first docutils">
 <dt>Notes:</dt>
-<dd><ul class="first last simple">
+<dd><ul class="first last">
 <li>Sometimes you can get many matches ( hundreds or thousands for example ).  With the <code class="docutils literal"><span class="pre">random:</span> <span class="pre">True</span></code> or <code class="docutils literal"><span class="pre">length:</span> <span class="pre">10</span></code> stanzas Tattle can return a randam sample of <code class="docutils literal"><span class="pre">10</span></code> results</li>
 </ul>
 </dd>
@@ -631,7 +646,7 @@ This would build index names with hour intervals such as:</p>
 <p>Frequency alerts occur when a certain number of events ( as defined by <code class="docutils literal"><span class="pre">relation</span></code> and <code class="docutils literal"><span class="pre">qty</span></code>) occur within a certain period of time.</p>
 <p>Here are some examples:</p>
 <ul class="simple">
-<li>&#8220;20 or more failed login events with in the past 1 hour&#8221;</li>
+<li>“20 or more failed login events with in the past 1 hour”</li>
 </ul>
 <p>Example</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">name</span><span class="p">:</span> <span class="s2">&quot;Too many login failures&quot;</span>
@@ -647,7 +662,7 @@ This would build index names with hour intervals such as:</p>
 </pre></div>
 </div>
 <ul class="simple">
-<li>&#8220;300 or more Nginx logs with an error code of 502 in the last 1 minute&#8221;</li>
+<li>“300 or more Nginx logs with an error code of 502 in the last 1 minute”</li>
 </ul>
 <p>Example</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">name</span><span class="p">:</span> <span class="s2">&quot;NGINX 502 errors&quot;</span>
@@ -663,7 +678,7 @@ This would build index names with hour intervals such as:</p>
 </pre></div>
 </div>
 <ul class="simple">
-<li>&#8220;Less than 1000 events on all of our NGINX logs for the past 1 hour&#8221;</li>
+<li>“Less than 1000 events on all of our NGINX logs for the past 1 hour”</li>
 </ul>
 <p>Example</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">name</span><span class="p">:</span> <span class="s2">&quot;Low event count on NGINX, possible log outage&quot;</span>
@@ -777,7 +792,20 @@ This would build index names with hour intervals such as:</p>
         <span class="n">kibana4_dashboard</span><span class="p">:</span> <span class="s1">&#39;http://kibana.company.com/app/kibana#/dashboard/OurAwesomeDashboard&#39;</span>
 </pre></div>
 </div>
-<p>If you want to change the HTML for the email, add company logos etc, you can change the templates directly in <code class="docutils literal"><span class="pre">$TATTLE_HOME/use/share/templates/html/email.html</span></code></p>
+<p>Email are generated from a template via the Jinja Templating framework.  By default the email template is located in <code class="docutils literal"><span class="pre">$TATTLE_HOME/usr/share/templates/html/email.html</span></code> .</p>
+<p>You can use your own template(s) if you wish.  Just specify <code class="docutils literal"><span class="pre">template_dir</span></code> and <code class="docutils literal"><span class="pre">template_name</span></code> in <code class="docutils literal"><span class="pre">$TATTLE_HOME/etc/tattle/email.yml</span></code>.</p>
+<p>Example <code class="docutils literal"><span class="pre">$TATTLE_HOME/etc/tattle/email.yml</span></code></p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">server</span><span class="p">:</span> <span class="mf">127.0</span><span class="o">.</span><span class="mf">0.1</span>
+<span class="n">port</span><span class="p">:</span> <span class="mi">25</span>
+<span class="n">default_sender</span><span class="p">:</span> <span class="s1">&#39;tattle@dev.local&#39;</span>
+<span class="n">subject_prefix</span><span class="p">:</span> <span class="s1">&#39;Tattle PROD - &#39;</span>
+<span class="c1"># Specify where we are storing our Jinja tempaltes for our email</span>
+<span class="n">template_dir</span><span class="p">:</span> <span class="o">/</span><span class="n">some</span><span class="o">/</span><span class="nb">dir</span><span class="o">/</span><span class="k">with</span><span class="o">/</span><span class="n">my</span><span class="o">/</span><span class="n">templates</span>
+<span class="c1"># Specify which template name we need to use in our template_dir</span>
+<span class="n">template_name</span><span class="p">:</span> <span class="n">my_custom_email_template</span><span class="o">.</span><span class="n">html</span><span class="o">.</span><span class="n">j2</span>
+</pre></div>
+</div>
+<p>If you want to know more about Jinja, checkout the <a class="reference external" href="http://jinja.pocoo.org/docs/2.10/">Jinja Docs</a></p>
 </div>
 <div class="section" id="script">
 <h3>Script<a class="headerlink" href="#script" title="Permalink to this headline">¶</a></h3>
@@ -797,7 +825,7 @@ This would build index names with hour intervals such as:</p>
 <p class="first admonition-title">Note</p>
 <p class="last">The script will run as whatever user Tattle runs as.  For example if you run Tattle under a user called <cite>tattle</cite>, then the script will run as the user <cite>tattle</cite>.</p>
 </div>
-<p>Here is an example script that will echo out each of the ARGV&#8217;s</p>
+<p>Here is an example script that will echo out each of the ARGV’s</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span>#!/bin/bash
 echo &#39;RESULTS:&#39;
 echo $1
@@ -843,10 +871,46 @@ echo $3
 </pre></div>
 </div>
 </div>
+<div class="section" id="microsoft-teams">
+<h3>Microsoft Teams<a class="headerlink" href="#microsoft-teams" title="Permalink to this headline">¶</a></h3>
+<p>Tattle supports posting a MessageCard to the MS Teams channel of your choice via a webhook</p>
+<p>Before you proceed, please fill in the defaults ( which can be overridden on a per Tale/Action basis ) in <code class="docutils literal"><span class="pre">$TATTLE_HOME/etc/tattle/msteams.yml</span></code></p>
+<p>Default</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">default</span><span class="p">:</span>
+    <span class="c1"># The Webhook URL for the MS Teams channel you wish to post to</span>
+    <span class="n">webhook_url</span><span class="p">:</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">outlook</span><span class="o">.</span><span class="n">office</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">webhook</span><span class="o">/.....</span>
+    <span class="c1"># What to prefix the Tale Title with</span>
+    <span class="n">title_prefix</span><span class="p">:</span> <span class="s1">&#39;Tattle -&#39;</span>
+    <span class="c1"># If we should verify SSL or not, useful when behind some corporate proxies, default is True</span>
+    <span class="c1"># ssl_verify: true</span>
+    <span class="c1"># Proxy address if needed</span>
+    <span class="c1"># proxy: http://user:password@some.corp.proxy.com:80</span>
+</pre></div>
+</div>
+<p>Example</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">action</span><span class="p">:</span>
+    <span class="n">msteams</span><span class="p">:</span>
+        <span class="n">enabled</span><span class="p">:</span> <span class="mi">1</span>
+        <span class="n">once_per_match</span><span class="p">:</span> <span class="c1"># Optional</span>
+            <span class="c1"># The match key, is the part of the result we use our primary key for sperating the results in seperate PD alerts</span>
+            <span class="c1"># In this case its &quot;key&quot; since its the key of the aggregation.  In our case this will be the hostname</span>
+            <span class="c1"># If we had 4 hosts that matched then we would have 4 seperate Pagerduty alerts.  Tattle will append the &#39;match_key&#39; to the subject of the Tale Title as well</span>
+            <span class="n">match_key</span><span class="p">:</span> <span class="s2">&quot;key&quot;</span>
+        <span class="n">kibana4_dashboard</span><span class="p">:</span> <span class="s1">&#39;http://kibana.company.com/app/kibana#/dashboard/OurAwesomeDashboard&#39;</span>
+</pre></div>
+</div>
+<p>Or if you wanted to post this message to a differnt channel, simply overwrite the <cite>webhook_url</cite> that points to your desired channel in the action.
+Example</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">action</span><span class="p">:</span>
+    <span class="n">msteams</span><span class="p">:</span>
+        <span class="n">webhook_url</span><span class="p">:</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">outlook</span><span class="o">.</span><span class="n">office</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">webhook</span><span class="o">/&lt;</span><span class="n">my_other_channel</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</div>
 <div class="section" id="slack">
 <h3>Slack<a class="headerlink" href="#slack" title="Permalink to this headline">¶</a></h3>
-<p>Tattle can post its alerts into a Slack channel of your choice</p>
-<p>Before you go forward, please fill in the defaults ( which can be overridden on a per Tale/Action basis ) in <code class="docutils literal"><span class="pre">$TATTLE_HOME/etc/tattle/slack.yml</span></code></p>
+<p>Tattle has support for posting its alert into a Slack channel of your choice</p>
+<p>Before you proceed with Slack alerting, please fill in the defaults ( which can be overridden on a per Tale/Action basis ) in <code class="docutils literal"><span class="pre">$TATTLE_HOME/etc/tattle/slack.yml</span></code></p>
 <p>In the defaults section, fill in the info with whatever makes sense for your envionment.  As stated, these can be overridden on a per-tale/action basis if you wish as well ( example below ).
 Default</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">default</span><span class="p">:</span>
@@ -866,9 +930,16 @@ Example</p>
         <span class="n">once_per_match</span><span class="p">:</span> <span class="c1"># Optional</span>
             <span class="c1"># The match key, is the part of the result we use our primary key for sperating the results in seperate PD alerts</span>
             <span class="c1"># In this case its &quot;key&quot; since its the key of the aggregation.  In our case this will be the hostname</span>
-            <span class="c1"># If we had 4 hosts that matched then we would have 4 seperate Pagerduty alerts.  Tattle will append the &#39;match_key&#39; to the subject of the Pagerduty alert as well</span>
+            <span class="c1"># If we had 4 hosts that matched then we would have 4 seperate Pagerduty alerts.  Tattle will append the &#39;match_key&#39; to the subject of the Tale Title alert as well</span>
             <span class="n">match_key</span><span class="p">:</span> <span class="s2">&quot;key&quot;</span>
         <span class="n">kibana4_dashboard</span><span class="p">:</span> <span class="s1">&#39;http://kibana.company.com/app/kibana#/dashboard/OurAwesomeDashboard&#39;</span>
+</pre></div>
+</div>
+<p>Or if you wanted to post this alert in another channel from the default, and change the default emoji</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">action</span><span class="p">:</span>
+    <span class="n">slack</span><span class="p">:</span>
+        <span class="n">emoji</span><span class="p">:</span> <span class="s1">&#39;:fire:&#39;</span>
+        <span class="n">channel</span><span class="p">:</span> <span class="n">someotherchannel</span>
 </pre></div>
 </div>
 <p>By default slack will map the severity of an alert to an emoji as specified in <code class="docutils literal"><span class="pre">$TATTLE_HOME/etc/tattle/slack.yml</span></code>.  This can be customized by changing the regex keys in the <code class="docutils literal"><span class="pre">emoji_severity_map</span></code> to match your severity system in your environment.
@@ -983,15 +1054,18 @@ The default is</p>
 
 
            </div>
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="tql.html" class="btn btn-neutral float-right" title="Tattle Query Language (TQL)" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="tql.html" class="btn btn-neutral float-right" title="Tattle Query Language (TQL)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="install.html" class="btn btn-neutral" title="Getting Started - Install &amp; Setup" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="install.html" class="btn btn-neutral" title="Getting Started - Install &amp; Setup" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -1025,7 +1099,8 @@ The default is</p>
             VERSION:'latest',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
         };
     </script>
       <script type="text/javascript" src="_static/jquery.js"></script>

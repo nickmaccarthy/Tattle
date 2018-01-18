@@ -13,6 +13,8 @@
 
   
   
+  
+  
 
   
 
@@ -30,6 +32,9 @@
   
 
   
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
     <link rel="top" title="Tattle latest documentation" href="index.html"/>
         <link rel="next" title="Getting Started - Install &amp; Setup" href="install.html"/>
         <link rel="prev" title="Tattle - Alerting For Your Elasticsearch Data" href="index.html"/> 
@@ -41,6 +46,7 @@
 
 <body class="wy-body-for-nav" role="document">
 
+   
   <div class="wy-grid-for-nav">
 
     
@@ -60,7 +66,7 @@
             
             
               <div class="version">
-                1.0.11
+                1.0.12
               </div>
             
           
@@ -81,7 +87,10 @@
           
             
             
-                <ul class="current">
+              
+            
+            
+              <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Tattle Intro - Alerting For Your Elasticsearch Data</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#history">History</a></li>
@@ -105,8 +114,10 @@
 
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="index.html">Tattle</a>
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Tattle</a>
+        
       </nav>
 
 
@@ -115,23 +126,40 @@
         <div class="rst-content">
           
 
- 
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 <div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
-    <li><a href="index.html">Docs</a> &raquo;</li>
-      
-    <li>Tattle Intro - Alerting For Your Elasticsearch Data</li>
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Tattle Intro - Alerting For Your Elasticsearch Data</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
         
-          
-            <a href="_sources/intro.txt" rel="nofollow"> View page source</a>
+            
+            <a href="_sources/intro.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
@@ -140,14 +168,14 @@
   <div class="section" id="tattle-intro-alerting-for-your-elasticsearch-data">
 <h1>Tattle Intro - Alerting For Your Elasticsearch Data<a class="headerlink" href="#tattle-intro-alerting-for-your-elasticsearch-data" title="Permalink to this headline">¶</a></h1>
 <p>Welcome to Tattle, an alerting tool for your Elasticsearch data.</p>
-<p>Tattle aims to provide you with alerting capabilities for the data stored in your Elasticsearch cluster.  Utilizing powerful Elasticsearch features such as Aggregations and Lucene Query Syntax, coupled together with Tattle&#8217;s own query language (TQL) our goal is to make alerts that are easy to build and most of all, easy to read (because lets face it, you probably wont be the only one who has to read them)</p>
+<p>Tattle aims to provide you with alerting capabilities for the data stored in your Elasticsearch cluster.  Utilizing powerful Elasticsearch features such as Aggregations and Lucene Query Syntax, coupled together with Tattle’s own query language (TQL) our goal is to make alerts that are easy to build and most of all, easy to read (because lets face it, you probably wont be the only one who has to read them)</p>
 <div class="section" id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
 <p>Tattle was designed to make use of the powerful features of Elasticsearch (such as Aggregations) to alert us to a multitude of various metrics and log or event type data.  Things such as frequencys, event spikes, aggregation matches, etc all play a big role in our capabilities for alerting.  Coupled together with an extendable <code class="docutils literal"><span class="pre">alert</span> <span class="pre">action</span></code> mechanism, Tattle can even fix problems for you as they arise ( using the <code class="docutils literal"><span class="pre">script</span></code> action for example ), notify a Pager Duty Service, or even post to a Slack channel; or all of the above.</p>
 </div>
 <div class="section" id="history">
 <h2>History<a class="headerlink" href="#history" title="Permalink to this headline">¶</a></h2>
-<p>Back in 2013 when ELK was farily new term in most people vocabularies, I couldnt find any way to alert on the data inside my Elasticsearch cluster.  Since I was mostly using Elaticsearch to store log, metric and event type data, I couldnt really call ELK a full logging solution until it had the alerting component.  I then decided to build my own system, and &#8220;Project Bluenote&#8221; was born ( because I didnt have a better name for it at the time (and because I was listening to some old Bluenote records when I wrote the first few lines of code)).  Over the next year or so it was developed on an off in my free time and eventually became an invaluable tool for keeping my site up.  One day, after it alerted me that someone had released some particularly questionable code, they said &#8220;Bluenote is such a tattle tale&#8221;.  Figuring that was a much more appropriate name for the project, Tattle was born.</p>
+<p>Back in 2013 when ELK was farily new term in most people vocabularies, I couldnt find any way to alert on the data inside my Elasticsearch cluster.  Since I was mostly using Elaticsearch to store log, metric and event type data, I couldnt really call ELK a full logging solution until it had the alerting component.  I then decided to build my own system, and “Project Bluenote” was born ( because I didnt have a better name for it at the time (and because I was listening to some old Bluenote records when I wrote the first few lines of code)).  Over the next year or so it was developed on an off in my free time and eventually became an invaluable tool for keeping my site up.  One day, after it alerted me that someone had released some particularly questionable code, they said “Bluenote is such a tattle tale”.  Figuring that was a much more appropriate name for the project, Tattle was born.</p>
 </div>
 <div class="section" id="requirements">
 <h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
@@ -176,15 +204,18 @@
 
 
            </div>
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="install.html" class="btn btn-neutral float-right" title="Getting Started - Install &amp; Setup" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="install.html" class="btn btn-neutral float-right" title="Getting Started - Install &amp; Setup" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="index.html" class="btn btn-neutral" title="Tattle - Alerting For Your Elasticsearch Data" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="index.html" class="btn btn-neutral" title="Tattle - Alerting For Your Elasticsearch Data" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -218,7 +249,8 @@
             VERSION:'latest',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
         };
     </script>
       <script type="text/javascript" src="_static/jquery.js"></script>

@@ -13,6 +13,8 @@
 
   
   
+  
+  
 
   
 
@@ -30,6 +32,9 @@
   
 
   
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
     <link rel="top" title="Tattle latest documentation" href="index.html"/> 
 
   
@@ -39,6 +44,7 @@
 
 <body class="wy-body-for-nav" role="document">
 
+   
   <div class="wy-grid-for-nav">
 
     
@@ -58,7 +64,7 @@
             
             
               <div class="version">
-                1.0.11
+                1.0.12
               </div>
             
           
@@ -79,7 +85,10 @@
           
             
             
-                <ul>
+              
+            
+            
+              <ul>
 <li class="toctree-l1"><a class="reference internal" href="intro.html">Tattle Intro - Alerting For Your Elasticsearch Data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Getting Started - Install &amp; Setup</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tales.html">Tales, Alerts and Actions</a></li>
@@ -97,8 +106,10 @@
 
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="index.html">Tattle</a>
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Tattle</a>
+        
       </nav>
 
 
@@ -107,23 +118,40 @@
         <div class="rst-content">
           
 
- 
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 <div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
-    <li><a href="index.html">Docs</a> &raquo;</li>
-      
-    <li>Tales &amp; Alerts</li>
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Tales &amp; Alerts</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
         
-          
-            <a href="_sources/talesandalerts.txt" rel="nofollow"> View page source</a>
+            
+            <a href="_sources/talesandalerts.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
@@ -166,15 +194,18 @@
 </pre></div>
 </div>
 <p>In the above example, you will notice the <code class="docutils literal"><span class="pre">tql_query</span></code> config option.  This is a short hand query syntax that Tattle uses to create the Elasticsearch DSL Query with Aggregation support.  The first part (before the first <code class="docutils literal"><span class="pre">|</span></code>) is straight Lucene syntax.  You are probably familiar with this if you have ever used Kibana or worked with Lucene before.  The parts after the first <code class="docutils literal"><span class="pre">|</span></code> are aggregations in shorthand.
-You will notice there are two aggregations in this query.  The <code class="docutils literal"><span class="pre">|</span></code>&#8216;s denote these will be nested aggregations.  The <code class="docutils literal"><span class="pre">terms</span></code> query will run before the <code class="docutils literal"><span class="pre">avg</span></code> query.</p>
-<p>Next you will notice the timeperiod section.  This section denotes the start and end time for the &#8216;rolling&#8217; windows this alert will utilize.  In this case, the window for this search will be whatever time &#8216;now&#8217; is, minus 1 hour, and the end time for the query will be &#8216;now&#8217;.
-Then we have the alert type.  In this case it is <code class="docutils literal"><span class="pre">freqeuency</span></code> which means that if we have a &#8216;number_of_events&#8217; beyond our threshold, then we will use this to trigger our <code class="docutils literal"><span class="pre">action</span></code> below.  The thresholds in this case are a &#8216;number_of_events&#8217; that are <code class="docutils literal"><span class="pre">greater</span> <span class="pre">than</span> <span class="pre">or</span> <span class="pre">equal</span> <span class="pre">to</span></code> to <code class="docutils literal"><span class="pre">10</span></code> in the last <code class="docutils literal"><span class="pre">1</span> <span class="pre">hour</span></code> ( <code class="docutils literal"><span class="pre">now-1h</span></code> ).
+You will notice there are two aggregations in this query.  The <code class="docutils literal"><span class="pre">|</span></code>’s denote these will be nested aggregations.  The <code class="docutils literal"><span class="pre">terms</span></code> query will run before the <code class="docutils literal"><span class="pre">avg</span></code> query.</p>
+<p>Next you will notice the timeperiod section.  This section denotes the start and end time for the ‘rolling’ windows this alert will utilize.  In this case, the window for this search will be whatever time ‘now’ is, minus 1 hour, and the end time for the query will be ‘now’.
+Then we have the alert type.  In this case it is <code class="docutils literal"><span class="pre">freqeuency</span></code> which means that if we have a ‘number_of_events’ beyond our threshold, then we will use this to trigger our <code class="docutils literal"><span class="pre">action</span></code> below.  The thresholds in this case are a ‘number_of_events’ that are <code class="docutils literal"><span class="pre">greater</span> <span class="pre">than</span> <span class="pre">or</span> <span class="pre">equal</span> <span class="pre">to</span></code> to <code class="docutils literal"><span class="pre">10</span></code> in the last <code class="docutils literal"><span class="pre">1</span> <span class="pre">hour</span></code> ( <code class="docutils literal"><span class="pre">now-1h</span></code> ).
 Next up is the <code class="docutils literal"><span class="pre">action</span></code>.  If our alert has triggered has met its threshold, the next thing to do is do something about it.  In this case we have two actions, one is to send the alert to PagerDuty, the second is to email us.
 For more information about the setup of an alert, please see the alerts section.</p>
 <p>Please be sure to check out the Tales &amp; Alerts section for more information on creating and configuring Tales.</p>
 </div>
 
 
+           </div>
+           <div class="articleComments">
+            
            </div>
           </div>
           <footer>
@@ -209,7 +240,8 @@ For more information about the setup of an alert, please see the alerts section.
             VERSION:'latest',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
         };
     </script>
       <script type="text/javascript" src="_static/jquery.js"></script>
