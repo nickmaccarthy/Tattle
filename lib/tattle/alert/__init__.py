@@ -83,6 +83,12 @@ class AlertBase(object):
         else:
             self.kibana_dashboard = None
 
+        self.grafana_dashboard = kwargs.get('grafana_dashboard') or kwargs.get('grafana_url')
+        if self.grafana_dashboard is not None:
+            dash = self.grafana_dashboard 
+            dash_time_settings = "from={from}&to={to}".format(from=self.intentions['_start_time_epoch'], end=self.intentions['_end_time_epoch'])
+            dash_time_settings = urllib.quote(dash_time_settings)
+            self.grafana_dashboard = "{dash}?{time_settings}".format(dash=dash, times_settings=dash_time_settings)
         self.trigger_reason = self.set_trigger_reason()
 
         self.firemsg = 'FireMSG Not Set for {}'.format(self.alert.get('name'))
@@ -514,7 +520,7 @@ class MsteamsAlert(AlertBase):
 
             self.webhook_url = kwargs.get('webhook_url') or self.cfgdefaults.get('webhook_url')
             if not self.webhook_url:
-                raise AlertException("Please sepcify a webhook URL for MSTeams. Please see documentation for more details...")
+                raise AlertException("Please sepcify a webhook URL for MSTeams. Please see documentation for more details on how to configure this...")
              
             if isinstance(self.webhook_url, basestring):
                 self.webhook_url = [self.webhook_url]
@@ -550,7 +556,7 @@ class MsteamsAlert(AlertBase):
             results_table = "No results found"
 
         # o365 throws a 413 if the result is too large, guessing here on the size threshold since I couldnt find it documented anywhere
-        if sys.getsizeof(results_table) >= 10000:
+        if sys.getsizeof(results_table) >= 8000:
             results_table = "<b>Note:</b> Table size was too big to send to Teams, truncating table to 3 items...<br/>"
             results_table += tattle.dict_to_html_table( tabified[0:3] )
 
@@ -563,20 +569,21 @@ class MsteamsAlert(AlertBase):
             'text': self.alert.get('description', ''),
             'sections': [
                 {
+                    'activityTitle': 'Results',
+                    'markdown': False,
+                    'text': 'Result Count: %s' % (len(tabified)),
+                    'activityText': results_table
+                },
+                {
                     'activityTitle': 'Trigger Details',
                     'facts': [
+                        {'name': 'Severity', 'value': self.severity },
                         {'name': 'TriggerReason', 'value': self.trigger_reason },
                         {'name': 'Query', 'value': '`%s`' % self.intentions.get('_query', '')},
                         {'name': 'Time Period', 'value': ''},
                         {'name': 'Start', 'value': '%s (`%s`)' % (self.intentions['_start_time_pretty'], self.intentions['_start'])},
                         {'name': 'End', 'value': '%s (`%s`)' % (self.intentions['_end_time_pretty'], self.intentions['_end'])}
                     ]
-                },
-                {
-                    'activityTitle': 'Results',
-                    'markdown': False,
-                    'text': 'Result Count: %s' % (len(tabified)),
-                    'activityText': results_table
                 }
             ]        
         }
