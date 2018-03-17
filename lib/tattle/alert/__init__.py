@@ -88,7 +88,7 @@ class AlertBase(object):
             dash = self.grafana_dashboard 
             dash_time_settings = "from={from_time}&to={to_time}".format(from_time=self.intentions['_start_time_epoch'], to_time=self.intentions['_end_time_epoch'])
             dash_time_settings = urllib.quote(dash_time_settings)
-            self.grafana_dashboard = "{dash}?{time_settings}".format(dash=dash, times_settings=dash_time_settings)
+            self.grafana_dashboard = "{dash}?{time_settings}".format(dash=dash, time_settings=dash_time_settings)
 
         self.trigger_reason = self.set_trigger_reason()
 
