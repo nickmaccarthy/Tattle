@@ -531,7 +531,7 @@ class MsteamsAlert(AlertBase):
             self.proxy = kwargs.get('proxy') or self.cfgdefaults.get('proxy')
             self.ssl_verify = kwargs.get('ssl_verify') or self.cfgdefaults.get('ssl_verify', True)
 
-            self.dashboard_link = self.kibana_dashboard or kwargs.get('title_link') or kwargs.get('client_url') or kwargs.get('url') or None 
+            self.dashboard_link = self.kibana_dashboard or kwargs.get('title_link') or kwargs.get('client_url') or kwargs.get('url') or self.grafana_link or None 
             self.title = '{prefix} {title}'.format(prefix=self.cfgdefaults.get('title_prefix', 'Tattle -') or tcfg.get('title_prefix', 'Tattle -'), title=self.title)
 
     def fire(self):
