@@ -94,7 +94,9 @@ class TQL(DSLBase):
         self._start_time_pretty = self._start_time.format(self._PRETTY_TS)
         self._end_time_pretty = self._end_time.format(self._PRETTY_TS)
         self._start_time_epoch = int(self._start_time.format('X'))
+        self._start_time_epoch_millis = self._start_time_epoch * 1000
         self._end_time_epoch = int(self._end_time.format('X'))
+        self._end_time_epoch_millis = self._end_time_epoch * 1000
         self._start_time_unix = self._start_time_epoch 
         self._end_time_unix = self._end_time_epoch 
         self._qd = self.get_intentions(self._query_raw)

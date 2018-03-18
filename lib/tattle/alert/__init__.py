@@ -86,7 +86,7 @@ class AlertBase(object):
         self.grafana_dashboard = kwargs.get('grafana_dashboard') or kwargs.get('grafana_url')
         if self.grafana_dashboard is not None:
             dash = self.grafana_dashboard 
-            dash_time_settings = "from={from_time}&to={to_time}".format(from_time=self.intentions['_start_time_epoch'], to_time=self.intentions['_end_time_epoch'])
+            dash_time_settings = "from={from_time}&to={to_time}".format(from_time=self.intentions['_start_time_epoch_millis'], to_time=self.intentions['_end_time_epoch_millis'])
             #dash_time_settings = urllib.quote(dash_time_settings)
             self.grafana_dashboard = "{dash}?{time_settings}".format(dash=dash, time_settings=dash_time_settings)
         else:
