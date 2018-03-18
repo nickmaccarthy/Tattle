@@ -94,6 +94,8 @@ class AlertBase(object):
 
         self.firemsg = 'FireMSG Not Set for {}'.format(self.alert.get('name'))
 
+        self.severity = self.alert.get('severity', '')
+
 
     def fire(self, **kwargs):
         raise NotImplementedError()
