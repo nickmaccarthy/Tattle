@@ -87,8 +87,10 @@ class AlertBase(object):
         if self.grafana_dashboard is not None:
             dash = self.grafana_dashboard 
             dash_time_settings = "from={from_time}&to={to_time}".format(from_time=self.intentions['_start_time_epoch'], to_time=self.intentions['_end_time_epoch'])
-            dash_time_settings = urllib.quote(dash_time_settings)
+            #dash_time_settings = urllib.quote(dash_time_settings)
             self.grafana_dashboard = "{dash}?{time_settings}".format(dash=dash, time_settings=dash_time_settings)
+        else:
+            self.grafana_dashboard = None
 
         self.trigger_reason = self.set_trigger_reason()
 
@@ -572,12 +574,6 @@ class MsteamsAlert(AlertBase):
             'text': self.alert.get('description', ''),
             'sections': [
                 {
-                    'activityTitle': 'Results',
-                    'markdown': False,
-                    'text': 'Result Count: %s' % (len(tabified)),
-                    'activityText': results_table
-                },
-                {
                     'activityTitle': 'Trigger Details',
                     'facts': [
                         {'name': 'Severity', 'value': self.severity },
@@ -585,9 +581,17 @@ class MsteamsAlert(AlertBase):
                         {'name': 'Query', 'value': '`%s`' % self.intentions.get('_query', '')},
                         {'name': 'Time Period', 'value': ''},
                         {'name': 'Start', 'value': '%s (`%s`)' % (self.intentions['_start_time_pretty'], self.intentions['_start'])},
-                        {'name': 'End', 'value': '%s (`%s`)' % (self.intentions['_end_time_pretty'], self.intentions['_end'])}
+                        {'name': 'End', 'value': '%s (`%s`)' % (self.intentions['_end_time_pretty'], self.intentions['_end'])},
+                        {'name': 'Results found', 'value': len(tabified)}
                     ]
-                }
+                },
+                {
+                    'activityTitle': 'Results',
+                    'markdown': False,
+                    'text': 'Result Count: %s' % (len(tabified)),
+                    'activityText': results_table
+                },
+
             ]        
         }
 
