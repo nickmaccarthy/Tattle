@@ -179,7 +179,7 @@ class EmailAlert(AlertBase):
 
         self.sender = kwargs.get('sender', self.mailcfg['default_sender'])
 
-        self.client_url = self.kibana_dashboard or self.client_url or self.url
+        self.client_url = self.kibana_dashboard or self.client_url or self.url or self.grafana_dashboard
 
         self.template_dir = self.mailcfg.get('template_dir', os.path.join(TATTLE_HOME, 'usr', 'share', 'templates', 'html'))
         self.email_template = self.mailcfg.get('template_name', 'email.html')
