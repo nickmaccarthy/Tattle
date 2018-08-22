@@ -458,7 +458,12 @@ def test_cron(cronstr, now=datemath('now')):
     except Exception as e:
         raise CronException("Unable to parse cron expression, reason: %s" % e)
 
-    return entry.test(now)
+    localtime = now 
+    return (entry.matchers.minute(localtime.minute, localtime) and
+        entry.matchers.hour(localtime.hour, localtime) and
+        entry.matchers.day(localtime.day, localtime) and
+        entry.matchers.month(localtime.month, localtime) and
+        entry.matchers.weekday(localtime.isoweekday() % 7, localtime))
 
 ''' Tests to see if are with a current cron string or not '''
 def check_cron_schedule(cronstr, now=datemath('now')):

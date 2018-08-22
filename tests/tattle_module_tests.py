@@ -27,11 +27,12 @@ class TestTattleModule(unittest.TestCase):
         # True Things
         tests = [
             ( '2016-01-01T00:00:00', '0 0 * * *', True ),
-            ( '2016-01-01T00:00:55', '0 0 * * *', False ),
+            ( '2016-01-01T00:00:55', '0 0 * * *', True ),
             ( '2016-01-01T00:10:00', '0 0 * * *', False ),
             ( '2016-01-01T01:20:00', '* * * * fri', True),
             ( '2016-01-01T01:20:00', '* 2-4 * * mon-thu', False),
-            ( '2017-01-01T00:00:00', '* * * * sat-sun', True)
+            ( '2017-01-01T00:00:00', '* * * * sat-sun', True),
+            ( '2018-08-22T12:13:22', '00-59 12-14 * * mon-fri', True)
         ]
 
         for test in tests:
