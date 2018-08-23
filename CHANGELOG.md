@@ -1,5 +1,11 @@
 # Changelog
 
+### v.1.0.12 - 2018-08-22
+* Fixed cron schduler/logic 
+
+### v.1.0.11 - 2018-01-17
+* Added MS Teams Support for Alerting
+
 ### v.1.0.10 - 2017-01-24
 * Allows slack to have defaults ( webhook, channel, etc ) to eliniate tale clutter.  See docs for more info.
 
