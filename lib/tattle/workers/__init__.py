@@ -85,7 +85,8 @@ def tnd(es, alert):
             #results = es.search(index=esq['search_indexes'], body=esq['esquery'], request_timeout=10) 
             esargs = dict(
                     index=esq['search_indexes'],
-                    body=esq['esquery']
+                    body=esq['esquery'],
+                    ignore_unavailable=True
                 )
             results = es_search(es, **esargs) 
         except Exception as e:
@@ -143,15 +144,16 @@ def tnd(es, alert):
             if 'return_matches' in alert['alert']:
                 # todo:  move this logic somewhere more robust
                 amatch = alert['alert']['return_matches']
-                matchlen = amatch.get('length', 10)
-                return_random = amatch.get('random', False)
-                if return_random:
-                    if matchlen >= len(results):
-                        matches = results
+                if amatch:
+                    matchlen = amatch.get('length', 10)
+                    return_random = amatch.get('random', False)
+                    if return_random:
+                        if matchlen >= len(results):
+                            matches = results
+                        else:
+                            matches = random.sample(results, matchlen)
                     else:
-                        matches = random.sample(results, matchlen)
-                else:
-                    matches = results[0:matchlen]
+                        matches = results[0:matchlen]
             else:
                 #matches = "<br />I have found a total of <b>{}</b> matches. <br /> Note: Matches not returned because 'return_matches' was false.".format(total)
                 matches = { 'matches': total }
