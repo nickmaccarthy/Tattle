@@ -9,8 +9,6 @@ import tattle
 import random
 
 class FlattenDict(object):
-
-
     def __init__(self, opts_delimiter='.', kibana_nested=False, skip_hits_meta=True):
         self.csv_headers = [] 
         self.opts_delimiter = '.'
