@@ -292,6 +292,9 @@ class TQL(DSLBase):
 
         rangeq = elasticsearch_dsl.Q('range', **{ '{}'.format(self._ts_field) : { 'from': self._start_time.format(self._ISO_TS), 'to': self._end_time.format(self._ISO_TS)}})
         luceneq = elasticsearch_dsl.Q('query_string', query=qd['query_opts']['args'])
+
+        if isinstance(self.exclude, list):
+            self.exclude = ' OR '.join(self.exclude)
         excludeq = elasticsearch_dsl.Q('query_string', query=self.exclude)
 
         s = elasticsearch_dsl.Search()
@@ -394,7 +397,8 @@ class Search(object):
 
         exclude = qargs.get('exclude', '')
         filters = qargs.get('filters', '')
-
+        if isinstance(exclude, list):
+            exclude = str(' OR '.join(exclude))
         tqlargs = dict(
                     index=self._index,
                     start=self._start,

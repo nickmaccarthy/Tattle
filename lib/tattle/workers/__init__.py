@@ -78,11 +78,7 @@ def tnd(es, alert):
     if alert.get('tql_query'):
         try:
             esq = s.tql_query(alert['tql_query'], exclude=alert.get('exclude', ''), start=alert['timeperiod'].get('start', '-1m'), end=alert['timeperiod'].get('end', 'now'), index=alert.get('index', 'logstash-*'))
-            #print "ESQuery1:"
-            #tattle.pprint(esq['esquery'])
-            #tattle.pprint(esq)
-            #print "\n\n"
-            #results = es.search(index=esq['search_indexes'], body=esq['esquery'], request_timeout=10) 
+            
             esargs = dict(
                     index=esq['search_indexes'],
                     body=esq['esquery'],

@@ -226,10 +226,18 @@ exclude
 ~~~~~~~~
     * Required: `No`
     * Description: Allows you to specify query parameters to exclude form this Tale
+    * Can also be a list of items as well, which Tattle will "OR" together
     * More information:  For this example, lets say we dont want to see alerts for the host ``database4.company.com`` because its supposed to have a full disk, we can use this to parameter to exclude that host from the tale.  This parameter accepts Lucne query syntax
 Example:
 ::
-    host:database4.company.com OR host:database5.company.com
+   exclude: "host:database4.company.com OR host:database5.company.com"
+
+or 
+:: 
+    exclude:
+        - "host:database4.company.com"
+        - "host:database5.company.com"
+        - "*some other string*
 
 alert
 ~~~~~
