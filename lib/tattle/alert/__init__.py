@@ -522,13 +522,32 @@ class MsteamsAlert(AlertBase):
             super(MsteamsAlert, self).__init__(**kwargs)
             self.teamscfg = tattle.config.load_configs().get('msteams', {})
             self.cfgdefaults = self.teamscfg.get('default', {})
+            self.cfgchannelaliases = self.teamscfg.get('channel_aliasas')
 
-            self.webhook_url = kwargs.get('webhook_url') or self.cfgdefaults.get('webhook_url')
-            if not self.webhook_url:
+            self.webhook_url = []
+            default_webhook_url = self.cfgdefaults.get('webhook_url')
+            if not default_webhook_url:
                 raise AlertException("Please sepcify a webhook URL for MSTeams. Please see documentation for more details on how to configure this...")
-             
-            if isinstance(self.webhook_url, basestring):
-                self.webhook_url = [self.webhook_url]
+
+            # Grab the list teams channel(s) aliases defined by the user if there are any
+            channel_names = kwargs.get('channel') or kwargs.get('channel_names') or kwargs.get('channels') or kwargs.get('channel_name') or kwargs.get('channel_alias') or kwargs.get('teams_channel') or kwargs.get('teams_alias')
+
+            # If we dont have a list of channel_names, take value from our channel and make it a list to continue
+            if channel_names and isinstance(channel_names, str):
+                channel_names = [channel_names]
+
+            # Overwrite the webhook url if we have a Teams channel "alias" specified      
+            if channel_names and self.cfgchannelaliases:
+                for channel_name in channel_names:
+                    try:
+                        channel_alias = self.cfgchannelaliases.get(channel_name)
+                        self.webhook_url.append(channel_alias.get('webhook_url'))
+                    except:
+                        raise AlertException('Unable to find channel alias: %s in msteams config, please double check you specifed something that exists' % (channel_name))
+            elif kwargs.get('webhook_url'):
+                self.webhook_url.append(kwargs.get('webhook_url'))
+            else:
+                self.webhook_url.append(self.cfgdefaults.get('webhook_url'))
 
             self.proxy = kwargs.get('proxy') or self.cfgdefaults.get('proxy')
             self.ssl_verify = kwargs.get('ssl_verify') or self.cfgdefaults.get('ssl_verify', True)

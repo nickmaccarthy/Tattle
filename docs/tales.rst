@@ -559,11 +559,27 @@ Default
         # Proxy address if needed
         # proxy: http://user:password@some.corp.proxy.com:80
 
+    channel_alisases:
+        My Teams Alert Channel Name:
+            # Webhook url for your channel
+            webhook_url: https://outlook.office.com/webhook/.....
+        Some Other Channel Name:
+            webhook_url: https://outlook.office.com/webhook/.....<some other channel name>
+        AnotherAlertChannel:
+            webhook_url: https://outlook.office.com/webhook/.....<some other channel name>
+
 Example
 ::
     action:
         msteams:
             enabled: 1
+            # Optional teams_channel - The alias of the teams channel you wish to send the alert to
+            # This can be a list of channels if you wish to sent to multiple channels at the same time
+            # Note the channel aliases are defined in $TATTLE_HOME/etc/tattle/msteams.yml
+            teams_channel:
+                - My Teams Alert Channel
+                - Some Other Channel Name
+                - AnotherAlertChannel
             once_per_match: # Optional
                 # The match key, is the part of the result we use our primary key for sperating the results in seperate PD alerts
                 # In this case its "key" since its the key of the aggregation.  In our case this will be the hostname
