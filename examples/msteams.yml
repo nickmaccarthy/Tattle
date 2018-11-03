@@ -1,0 +1,13 @@
+default:
+    # The default webhook url to send an alert to.  If you do not use any channel_aliases, then all MS Teams alerts will go here by deafult
+    webhook_url: https://outlook.office.com/webhook/...
+    title_prefix: 'Tattle -'
+    emoji: ':squirrel:'
+    ssl_verify: false
+
+# If you wish to send to channels by their name, you can define the webhook to an alias here.  Then in your tale, you can specify the Key of your channel, "Tattle Alert" for example
+channel_aliasas:
+  Tattle Alerts:
+    webhook_url: https://outlook.office.com/webhook/...
+  Some Other Channel:
+    webhook_url: https://outlook.office.com/webhook/...
