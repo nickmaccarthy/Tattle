@@ -66,7 +66,7 @@
             
             
               <div class="version">
-                1.0.12
+                1.0.13
               </div>
             
           
@@ -885,12 +885,28 @@ echo $3
     <span class="c1"># ssl_verify: true</span>
     <span class="c1"># Proxy address if needed</span>
     <span class="c1"># proxy: http://user:password@some.corp.proxy.com:80</span>
+
+<span class="n">channel_alisases</span><span class="p">:</span>
+    <span class="n">My</span> <span class="n">Teams</span> <span class="n">Alert</span> <span class="n">Channel</span> <span class="n">Name</span><span class="p">:</span>
+        <span class="c1"># Webhook url for your channel</span>
+        <span class="n">webhook_url</span><span class="p">:</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">outlook</span><span class="o">.</span><span class="n">office</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">webhook</span><span class="o">/.....</span>
+    <span class="n">Some</span> <span class="n">Other</span> <span class="n">Channel</span> <span class="n">Name</span><span class="p">:</span>
+        <span class="n">webhook_url</span><span class="p">:</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">outlook</span><span class="o">.</span><span class="n">office</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">webhook</span><span class="o">/.....&lt;</span><span class="n">some</span> <span class="n">other</span> <span class="n">channel</span> <span class="n">name</span><span class="o">&gt;</span>
+    <span class="n">AnotherAlertChannel</span><span class="p">:</span>
+        <span class="n">webhook_url</span><span class="p">:</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">outlook</span><span class="o">.</span><span class="n">office</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">webhook</span><span class="o">/.....&lt;</span><span class="n">some</span> <span class="n">other</span> <span class="n">channel</span> <span class="n">name</span><span class="o">&gt;</span>
 </pre></div>
 </div>
 <p>Example</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">action</span><span class="p">:</span>
     <span class="n">msteams</span><span class="p">:</span>
         <span class="n">enabled</span><span class="p">:</span> <span class="mi">1</span>
+        <span class="c1"># Optional teams_channel - The alias of the teams channel you wish to send the alert to</span>
+        <span class="c1"># This can be a list of channels if you wish to sent to multiple channels at the same time</span>
+        <span class="c1"># Note the channel aliases are defined in $TATTLE_HOME/etc/tattle/msteams.yml</span>
+        <span class="n">teams_channel</span><span class="p">:</span>
+            <span class="o">-</span> <span class="n">My</span> <span class="n">Teams</span> <span class="n">Alert</span> <span class="n">Channel</span>
+            <span class="o">-</span> <span class="n">Some</span> <span class="n">Other</span> <span class="n">Channel</span> <span class="n">Name</span>
+            <span class="o">-</span> <span class="n">AnotherAlertChannel</span>
         <span class="n">once_per_match</span><span class="p">:</span> <span class="c1"># Optional</span>
             <span class="c1"># The match key, is the part of the result we use our primary key for sperating the results in seperate PD alerts</span>
             <span class="c1"># In this case its &quot;key&quot; since its the key of the aggregation.  In our case this will be the hostname</span>

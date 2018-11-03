@@ -347,6 +347,7 @@ def get_indexes(index, start, end, interval='day', pattern='YYYY.MM.DD', base_na
 
     if '*' in index:
         base_name = index.strip('*')
+        
 
     elif '{' in index: # then we have a pattern, like: 'some-index-%{+YYYY.MM.DD}'
         m = re.search('(.*?)?(?:%)?\{(?:\+)?(.*?)\}(?:[:\+](\w+))?', index)
