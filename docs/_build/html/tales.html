@@ -107,7 +107,10 @@
 <li class="toctree-l3"><a class="reference internal" href="#schedule">schedule</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#exclude-schedule">exclude_schedule</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#timeperiod">timeperiod</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#exclude">exclude</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#exclude">exclude</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#or">or</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#alert">alert</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#type">type</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#relation">relation</a></li>
@@ -498,12 +501,27 @@ This would build index names with hour intervals such as:</p>
 <div><ul class="simple">
 <li>Required: <cite>No</cite></li>
 <li>Description: Allows you to specify query parameters to exclude form this Tale</li>
+<li>Can also be a list of items as well, which Tattle will “OR” together</li>
 <li>More information:  For this example, lets say we dont want to see alerts for the host <code class="docutils literal"><span class="pre">database4.company.com</span></code> because its supposed to have a full disk, we can use this to parameter to exclude that host from the tale.  This parameter accepts Lucne query syntax</li>
 </ul>
 </div></blockquote>
 <p>Example:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">host</span><span class="p">:</span><span class="n">database4</span><span class="o">.</span><span class="n">company</span><span class="o">.</span><span class="n">com</span> <span class="n">OR</span> <span class="n">host</span><span class="p">:</span><span class="n">database5</span><span class="o">.</span><span class="n">company</span><span class="o">.</span><span class="n">com</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">exclude</span><span class="p">:</span> <span class="s2">&quot;host:database4.company.com OR host:database5.company.com&quot;</span>
 </pre></div>
+</div>
+<div class="section" id="or">
+<h4>or<a class="headerlink" href="#or" title="Permalink to this headline">¶</a></h4>
+<blockquote>
+<div><dl class="docutils">
+<dt>exclude:</dt>
+<dd><ul class="first last simple">
+<li>“host:database4.company.com”</li>
+<li>“host:database5.company.com”</li>
+<li>“<em>some other string</em></li>
+</ul>
+</dd>
+</dl>
+</div></blockquote>
 </div>
 </div>
 <div class="section" id="alert">

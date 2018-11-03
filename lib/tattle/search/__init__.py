@@ -47,8 +47,6 @@ class DSLBase(object):
 
 
 class ESQuery(DSLBase):
-
-
     def __init__(self, query, **kwargs):
 
         super(ESQuery, self).__init__(**kwargs)
@@ -72,8 +70,6 @@ class ESQuery(DSLBase):
 
 
 class TQL(DSLBase):
-
-
     def __init__(self, query, **kwargs):
 
         super(TQL, self).__init__(**kwargs)
@@ -206,14 +202,6 @@ class TQL(DSLBase):
         for argname, value in args.items():
             if re.match('[\[\{\]\}]', value):
                 args[argname] = eval(args[argname])
-        # The above logic replaces this
-        #if 'order' in args:
-        #    args['order'] = eval(args['order'])
-        #if 'script' in args:
-        #    args['script'] = eval(args['script'])
-        #if 'percents' in args:
-        #    args['percents'] = eval(args['percents'])
-
 
         thed = { 'title': agg_name or agg_type, 'args': args, 'type': agg_type }
         return thed
@@ -240,10 +228,6 @@ class TQL(DSLBase):
 
 
     def build_aggs(self, aggobj, aggs):
-        #print("build_aggs() - aggs that came in")
-        #tattle.pprint_as_json(aggs)
-        #print("build_aggs() - aggobj: {}".format(aggobj))
-
         if isinstance(aggs, dict):
             try:
                 agg = aggs['agg']
@@ -292,6 +276,9 @@ class TQL(DSLBase):
 
         rangeq = elasticsearch_dsl.Q('range', **{ '{}'.format(self._ts_field) : { 'from': self._start_time.format(self._ISO_TS), 'to': self._end_time.format(self._ISO_TS)}})
         luceneq = elasticsearch_dsl.Q('query_string', query=qd['query_opts']['args'])
+
+        if isinstance(self.exclude, list):
+            self.exclude = ' OR '.join(self.exclude)
         excludeq = elasticsearch_dsl.Q('query_string', query=self.exclude)
 
         s = elasticsearch_dsl.Search()
@@ -302,49 +289,13 @@ class TQL(DSLBase):
         # aggs
         if 'aggs' in qd and len(qd.get('aggs')) >= 1:
             aggs = qd['aggs']
-
-            #try:
-            #    fa = aggs[0]['agg']
-            #    base, fname, params_def = self.get_agg(fa['type'])
-            #    basename = self.find_method(base)
-            #    aggobj = getattr(s.aggs, basename)(*[fa['title'] , fa['type']], **fa['args'])
-            #except Exception as e:
-            #    raise TQLException("Unable to agg base: reason: {}, agg: {}".format(e, aggs[0]))
-
-            #print('build_es_query() - aggs that came in:')
-            #tattle.pprint_as_json(aggs)
             try:
-                #aggobj = self.build_aggs(s.aggs, aggs)
                 aggobj = self.build_aggs(s.aggs, aggs[0])
-
-                #print("build_es_query() - aggs[0]:")
-                #tattle.pprint_as_json(aggs[0])
             except Exception as e:
                 raise TQLException("Unable to agg base: reason: {}, agg: {}".format(e, aggs))
 
             if len(aggs) > 1:
                 aggobj = self.build_aggs(aggobj, aggs[1:])
-                
-            #if len(aggs) > 1:
-            #    for agg in aggs[1:]:
-            #        try:
-            #            agg = agg['agg']
-            #            agg_type = agg['type']
-            #            base, fname, params_def = self.get_agg(agg_type)
-            #            basename = self.find_method(base)
-            #            aggobj = getattr(aggobj, basename)(*[agg['title'], fname], **agg['args'])
-
-            #            # todo: support pipelines
-            #            #if basename == 'pipeline':
-            #            #    print "pipeline"
-            #            #    #s.aggs(agg_title, fname, **args)
-            #            #    aggz = getattr(s.aggs, basename)(*[agg_title,fname], **args)
-            #            #else:
-            #            #    aggz = getattr(aggz, basename)(*[agg_title,fname], **args)
-
-            #        except Exception as e:
-            #            raise TQLException("Unable to agg base in a loop: reason: {}".format(e))
-
             s = s[self.agg_size_from:self.agg_size]
         else:
             s = s[self.hit_size_from:self.hit_size]
@@ -394,7 +345,8 @@ class Search(object):
 
         exclude = qargs.get('exclude', '')
         filters = qargs.get('filters', '')
-
+        if isinstance(exclude, list):
+            exclude = str(' OR '.join(exclude))
         tqlargs = dict(
                     index=self._index,
                     start=self._start,
