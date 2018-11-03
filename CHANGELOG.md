@@ -1,5 +1,9 @@
 # Changelog
 
+### v.1.0.13 - 2018-11-03
+* Added channel aliasing for MS Teams.  A user can specify team channel aliases (in msteams.yml) for differnt webhook urls.  The user can then reference these alias in a list in their msteams alert action to send the alert to multiple MS Teams Channels
+* Added the abilty for the `exclude` option for queries to be a list.  This should help clean up Tales a bit for those that have lots of exclusions
+
 ### v.1.0.12 - 2018-08-22
 * Fixed cron schduler/logic 
 
