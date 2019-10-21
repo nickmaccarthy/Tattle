@@ -3,7 +3,7 @@ arrow==0.7.0
 Babel==2.5.3
 crontab==0.22.0
 docutils==0.14
-ecdsa==0.11
+ecdsa==0.13.3
 elasticsearch==2.3.0
 -e git+https://github.com/nickmaccarthy/elasticsearch-dsl-py.git@584a774bb13cc327130503671d517546a80deb04#egg=elasticsearch_dsl
 Fabric==1.10.2
