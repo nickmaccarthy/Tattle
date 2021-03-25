@@ -25,7 +25,7 @@ python-autocast==1
 python-datemath==1.4.7
 python-dateutil==2.5.3
 pytz==2014.10
-PyYAML==3.11
+PyYAML==5.4
 requests==2.9.1
 simplejson==3.8.2
 six==1.10.0
