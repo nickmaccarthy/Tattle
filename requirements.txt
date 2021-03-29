@@ -20,7 +20,7 @@ paramiko==1.15.1
 pbr==1.8.1
 py-dateutil==2.2
 pycrypto==2.6.1
-Pygments==2.2.0
+Pygments==2.7.4
 python-autocast==1
 python-datemath==1.4.7
 python-dateutil==2.5.3
