@@ -36,7 +36,7 @@ sphinxcontrib-websupport==1.0.1
 stevedore==1.11.0
 tabify==1.0
 typing==3.6.2
-urllib3==1.15.1
+urllib3==1.26.5
 virtualenv==14.0.6
 virtualenv-clone==0.2.6
 virtualenvwrapper==4.7.1
