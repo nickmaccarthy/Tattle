@@ -1,6 +1,6 @@
 alabaster==0.7.10
 arrow==0.7.0
-Babel==2.5.3
+Babel==2.9.1
 crontab==0.22.0
 docutils==0.14
 ecdsa==0.11
